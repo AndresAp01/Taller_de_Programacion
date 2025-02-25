@@ -21,3 +21,34 @@ def EjemploCondicionales(x):
 
 
 
+
+"""Si el numero es par mult por 3, si es impar suma 2
+"""
+
+def parimpar(x):
+    if (x%2)==0:
+        print(x*3)
+    else:
+        print(x+2)
+
+#Escribir una funcion que recibe 3 parametros (x, y, z)
+        #Si x es mayoe que z = (x^2 + y^5 + z^4)^6
+        #Si x es menor que y (x + y + z)*(z**3)
+        #Si no, (z**3 * x**2) + y
+
+x=10
+y=2
+z=1
+def funcxyz(x,y,z):
+    if(x>z):
+        print(((x**2)+(y**5)+(z**4))**6)
+    elif(x<y):
+        print((x+y+z)*(z**3))
+    else:
+        print(((z**3)*(x**2))+y)
+
+print(((1**3)*(1**2))+1)
+
+
+
+
