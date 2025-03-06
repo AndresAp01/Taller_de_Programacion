@@ -57,7 +57,7 @@ def promedio(num):
                 num=num//10
             return(suma//larg)
         
-#Escribir una funcion que recibe dos parametros}
+#{Escribir una funcion que recibe dos parametros}
 
 
 def prac1(num1, num2):
@@ -117,8 +117,8 @@ def prac2(num1, num2):
                 bandera=1
                 num1=num1//10
                 num2=num2//10
-            if bandera==1:
-                print("La suma es:", suma, "y ", mult)
-            else:
-                print("La suma es: ", suma,"la mult", 0)
+        if bandera==1:
+            print("La suma es:", suma, "y ", mult)
+        else:
+            print("La suma es: ", suma,"la mult", 0)
         

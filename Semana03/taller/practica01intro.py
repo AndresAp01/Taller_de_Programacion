@@ -64,10 +64,10 @@ def promedio(num):
 
         
 #Escribir una funcion que recibe dos parametros del mismo largo y positivos, reut. largo
-        #Sumar los digitos pares de ambos y multiplicar los digitos impares de ambos
+    #Sumar los digitos pares de ambos y multiplicar los digitos impares de ambos
 #tenemos suma=0, mult=1
 
-
+#FUNCIONA#
 def prac1(num1, num2):
     if type(num1)==int and type(num2)==int and largo(num1)==largo(num2):
         num1=abs(num1)
@@ -129,10 +129,3 @@ def prac1luis(num1, num2):
             print("la operacion es", suma and multi)
         else:
             print("la operacion es", suma and 0)
-            
-                    
-                    
-             
-        
-        
-        
