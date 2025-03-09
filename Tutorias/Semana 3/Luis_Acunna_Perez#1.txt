@@ -1,0 +1,31 @@
+Pseudocodigo para verificacion #1
+Luis Andrés Acuña Pérez
+
+Un numero primo solo es divisible entre 1 y si mismo
+Recibir como entrada, verificar si es primo y mostrar
+
+INICIO
+leer variable "n" (entero positivo > 1)
+
+	Si n==2:
+		Escribir "El numero es primo"
+		Terminar el codigo.
+	Si n%==0 o n < 2:
+		Escribir "El numero no es primo"
+		Terminar el codigo.
+	Si n>2>
+		i desde 3 hasta sqrt(n) de 2 en 2:
+			Si n%i==0:
+				Escribir "El numero es primo"
+				Terminar el codigo.
+
+	Imprimir(resultado)
+FIN 
+#------------------------
+Ejemplo con n = 17 
+
+n no es 2
+n es < 2
+i=3 -> 17%3=2, por lo que no es divisible
+i=5 -> 5>sqrt(17), por lo que no se evalua 
+por lo tanto, 17 es primo.
