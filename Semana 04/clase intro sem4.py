@@ -139,12 +139,17 @@ print(lista)
 
 def numalista1(n):
     if n>0 and isinstance(n, int):
-        num=abs(num)
-        lista=[]
-        while n>0:
-            lista=[n%10]+lista
-            n//=10
-        print(lista)
+        n=abs(n)
+        if n>=0 and n<=9:
+            return [n]
+        else:
+            lista=[]
+            while n!=0:
+                lista=[n%10]+lista
+                n//=10
+            return lista
+            print(lista)
+
 
 
 #---------------Promedio lista------------------
