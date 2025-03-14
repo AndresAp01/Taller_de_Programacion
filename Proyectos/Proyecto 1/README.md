@@ -20,4 +20,17 @@ El sistema de una cadena de restaurantes trabaja con archivos de varios tipos. E
 
 # Documentación
 ## Para el usuario:
+
+## Table of Contents
+- [Instalación](#installation)
+- [Cómo usar](#usage)
+- [Contribuir](#contributing)
+- [Lisencia](#license)
+
+##  Instalación
+
+## Cómo usar
+
+### Para correr este proyecto:
+
 ## Para el programador:
