@@ -1,5 +1,6 @@
 #Clase Martes Semana 4 // intro
-#Escribir una funcion que recibe una lista, suma los elementos impares de la lista ** 2 destruyendo y sin destr.
+#Escribir una funcion que recibe una lista,
+#suma los elementos impares de la lista ** 2 destruyendo y sin destr.
 
 #Destruyendo
 def funcion1(lista):
@@ -87,7 +88,7 @@ def largo(num):
 #------------ Suma sin ceros ---------------
     #------------ Quiz ---------------
         
-#Escribir una funcion que recibedos num de cualq largo igual tamaño
+#Escribir una funcion que recibe dos num de cualq largo igual tamaño
 def sumasinceros(num1, num2):
     #num1 = abs(num1)
     #num2 = abs(num2)
