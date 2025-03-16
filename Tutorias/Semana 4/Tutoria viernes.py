@@ -89,6 +89,6 @@ def ejercicio4():
     while i < len(lista_palabras):
         if lista_palabras[i] not in lista_palabras_cont:
             lista_palabras_cont += (lista_palabras[i])
-            print(lista_palabras[i] + " :" + str(lista_palabras.count
+            print(lista_palabras[i] + " :" + str(lista_palabras.count))
     pass
 
