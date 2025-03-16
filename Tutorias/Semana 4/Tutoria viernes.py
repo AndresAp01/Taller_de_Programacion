@@ -28,6 +28,7 @@ def Ejercicio1():
         i+=1
     print(matriz_palabras)
     obj_arch.close()
+Ejercicio1()
 
 #Ejercicio1()
 #lea u archivo nombre, edad

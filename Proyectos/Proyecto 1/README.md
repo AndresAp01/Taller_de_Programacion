@@ -21,7 +21,7 @@ El sistema de una cadena de restaurantes trabaja con archivos de varios tipos. E
 # Documentación
 ## Para el usuario:
 
-## Table of Contents
+## Tabla de contenidos
 - [Instalación](#installation)
 - [Cómo usar](#usage)
 - [Contribuir](#contributing)
@@ -30,7 +30,23 @@ El sistema de una cadena de restaurantes trabaja con archivos de varios tipos. E
 ##  Instalación
 
 ## Cómo usar
+El programa podra verificar ...
+Al iniciar el programa tiene tres opciones:
+1. Insercion
+2. Buscar
+    
+    Aqui entrara en un submenu, que le mostrara 7 opciones
+    1. Buscar por Ciudad
+   2. Buscar por 
+   3. Buscar por
+   4. Buscar por
+   5. Buscar por
+   6. Buscar por
+   7. Volver al menu principal
 
+3. Salir
+
+    Para salir completamente del programa. 
 ### Para correr este proyecto:
 
 ## Para el programador:
