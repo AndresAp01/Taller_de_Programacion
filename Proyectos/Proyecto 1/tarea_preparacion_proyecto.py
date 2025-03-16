@@ -11,13 +11,47 @@ por cada índice para cada opcion en la enumeración de las opciones y que empie
 se imprime
 """
 
+paises = []
+ciudades = []
+restaurantes = []
+menus = []
+productos = []
+clientes = []
+
+
+def cargar_paises():
+    with open("Archivos/Paises.txt", "r") as archivo:
+        for linea in archivo:
+            cod_pais, nombre = linea.strip().split(";")
+            if not any(p[0] == cod_pais for p in paises):  # Validar que no haya duplicados
+                paises.append((cod_pais, nombre))
 
 def mostrar_menu(opciones):
     print(f"\n=== Bienvenido al menu de Mantenimiento de Bases de Datos ===")
     for i, opcion in enumerate(opciones, start=1):
         print(f"{i}. {opcion}")
 
-def buscar_principal(nombre_archivo,buscar):
+#--------------------------------------------------------------------------------------------------
+#INSERCIONES_--------------------------------------------------------------------------------------
+def insertar_pais(cod_pais, nombre):
+    if any(p[0] == cod_pais for p in paises):
+        print("❌ Código de país ya existe.")
+    else:
+        paises.append((cod_pais, nombre))
+        print("✅ País agregado correctamente.")
+
+#--------------------------------------------------------------------------------------------------
+#BUSQUEDAS_----------------------------------------------------------------------------------------
+
+def buscar_pais(nombre_archivo,buscar):
+    """
+    input ("Ingrese el nombre del pais")
+        abre archivo
+        separe elementos y los ponga en una lista
+        valide si elemento buscado esta en la lista
+        print(valdio)
+    else
+    """
     try:
         # Abrimos el archivo específico
         with open(nombre_archivo, "r") as archivo:
@@ -46,54 +80,9 @@ def buscar_principal(nombre_archivo,buscar):
         print(f"Error: No se encontró el archivo {nombre_archivo}")
         return False
 
-
-def buscar_pais():
-    """
-    input ("Ingrese el nombre del pais")
-        abre archivo
-        separe elementos y los ponga en una lista
-        valide si elemento buscado esta en la lista
-        print(valdio)
-    else
-    """
-    # Especificamos la ruta exacta del archivo
-    nombre_archivo = "Archivos/Paises.txt"
-
-    # Pedimos al usuario que ingrese la ciudad a buscar
-    pais_buscar = input("Ingrese el nombre del pais a buscar: ")
-
-    try:
-        # Abrimos el archivo específico
-        with open(nombre_archivo, "r") as archivo:
-            # Leemos el archivo línea por línea
-            for linea in archivo:
-                # Eliminamos espacios en blanco y saltos de línea
-                linea = linea.strip()
-
-                # Ignoramos líneas vacías
-                if not linea:
-                    continue
-
-                # Separamos por punto y coma
-                elementos = linea.split(";")
-
-                # Verificamos que tengamos al menos 3 elementos y que el tercer elemento
-                # sea igual a la ciudad buscada (sin importar mayúsculas/minúsculas)
-                if len(elementos) >= 2 and elementos[1].lower() == pais_buscar.lower():
-                    print(f"¡El pais '{pais_buscar}' fue encontrado! Código: {elementos[0]}")
-
-                    return True
-            print(f"El pais '{pais_buscar}' no existe en el archivo.")
-            return False
-
-    except FileNotFoundError:
-        print(f"Error: No se encontró el archivo {nombre_archivo}")
-        return False
-
 def buscar_ciudad():
     nombre_archivo = "Archivos/Ciudades.txt"
-    ciudad_buscar = input("Ingrese el nombre de la ciudad a buscar: ")
-
+    buscar = input("Ingrese el nombre de la ciudad a buscar: ")
     try:
         with open(nombre_archivo, "r") as archivo:
             for linea in archivo:
@@ -101,13 +90,13 @@ def buscar_ciudad():
                 if not linea:
                     continue
                 elementos = linea.split(";")
-                if len(elementos) >= 3 and elementos[2].lower() == ciudad_buscar.lower():
-                    print(f"¡La ciudad '{ciudad_buscar}' fue encontrada! Código: {elementos[1]}")
+                if len(elementos) >= 3 and elementos[2].lower() == buscar.lower():
+                    print(f"¡La ciudad '{buscar}' fue encontrada! Código: {elementos[1]}")
 
                     return True
 
-            print(f"La ciudad '{ciudad_buscar}' no existe en el archivo.")
-            return False
+                print(f"La ciudad '{buscar}' no existe en el archivo.")
+                return False
 
     except FileNotFoundError:
         print(f"Error: No se encontró el archivo {nombre_archivo}")
@@ -200,9 +189,12 @@ def buscar_cli():
         print("Asegúrate de que el archivo exista en la ruta correcta.")
         return False
 
+#_________________________________#
+#MENU_____________________________#
+
 
 def MainMenu():
-    opciones_principales = ["Inserción", "Buscar", "Salir"]
+    opciones_principales = ["Leer Archivos", "Inserción", "Buscar", "Salir"]
     subopciones = ["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Regresar al mantenimiento"] #Para poder ingresar a otro ciclo y muestre un segundo menu
 
     while True:
@@ -213,10 +205,16 @@ def MainMenu():
 
         if type(x)==int:
             if x == 1:
-                pass
-            #-----------------------------------
+                cargar_paises()
 
+
+            #-----------------------------------
             elif x == 2:
+                cod_pais = input("Ingrese código de país: ")
+                nombre = input("Ingrese nombre del país: ")
+                insertar_pais(cod_pais, nombre)
+
+            elif x == 3:
                 print("Has seleccionado Buscar.")
                 while True:
                     # Mostrar submenú
@@ -226,7 +224,7 @@ def MainMenu():
                         print("\n Has seleccionado buscar Pais.")
                         nombre_archivo = "Archivos/Paises.txt"
                         buscar = input("Ingrese el nombre del pais a buscar: ")
-                        buscar_principal(nombre_archivo,buscar)
+                        buscar_pais(nombre_archivo,buscar)
                     elif y == 2:
                         print("Has seleccionado buscar Ciudad.")
                         buscar_ciudad()
