@@ -5,11 +5,6 @@
 
 #----------------------------------------------------------------------------------
 #Menu:
-""" Se requiere una función aparte de la del menu para que se pueda hacer un ciclo infinito
-Se usa for, enumerate, start
-por cada índice para cada opcion en la enumeración de las opciones y que empiece en 1
-se imprime
-"""
 
 paises = []
 ciudades = []
@@ -18,27 +13,49 @@ menus = []
 productos = []
 clientes = []
 
+#############################
 
-def cargar_paises():
-    with open("Archivos/Paises.txt", "r") as archivo:
-        for linea in archivo:
-            cod_pais, nombre = linea.strip().split(";")
-            if not any(p[0] == cod_pais for p in paises):  # Validar que no haya duplicados
-                paises.append((cod_pais, nombre))
+def datos_a_listas(ruta_archivo, separador=";", separador_lineas="\n"):
+    try:
+        with open(ruta_archivo, "r") as archivo:
+            texto = archivo.read()
+            lista_lineas = texto.split("\n")
+            matriz_datos = []
+            for linea in lista_lineas:
+                matriz_datos.append(linea.split(separador))
+
+            return matriz_datos
+    except FileNotFoundError:
+        print(f"El archivo {ruta_archivo} no existe")
+        return []
+
+paises = datos_a_listas("Archivos/Paises.txt", ";")
+#print(paises)
+ciudades = datos_a_listas("Archivos/Ciudades.txt", ";")
+#print(ciudades)
+restaurantes = datos_a_listas("Archivos/Restaurantes.txt", ";")
+#print(restaurantes)
+menu = datos_a_listas("Archivos/Menu.txt", ";")
+#print(menu)
+productos = datos_a_listas("Archivos/Productos.txt", ";")
+#print(productos)
+cliente = datos_a_listas("Archivos/Clientes.txt", ";")
+#print(cliente)
+
+# Para cargar países
+
+##############################
+#if isinstance(paises, list):
+
 
 def mostrar_menu(opciones):
     print(f"\n=== Bienvenido al menu de Mantenimiento de Bases de Datos ===")
     for i, opcion in enumerate(opciones, start=1):
         print(f"{i}. {opcion}")
 
-#--------------------------------------------------------------------------------------------------
-#INSERCIONES_--------------------------------------------------------------------------------------
-def insertar_pais(cod_pais, nombre):
-    if any(p[0] == cod_pais for p in paises):
-        print("❌ Código de país ya existe.")
-    else:
-        paises.append((cod_pais, nombre))
-        print("✅ País agregado correctamente.")
+############################
+
+###########################
 
 #--------------------------------------------------------------------------------------------------
 #BUSQUEDAS_----------------------------------------------------------------------------------------
@@ -194,7 +211,7 @@ def buscar_cli():
 
 
 def MainMenu():
-    opciones_principales = ["Leer Archivos", "Inserción", "Buscar", "Salir"]
+    opciones_principales = ["Inserción", "Buscar", "Salir"]
     subopciones = ["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Regresar al mantenimiento"] #Para poder ingresar a otro ciclo y muestre un segundo menu
 
     while True:
@@ -202,75 +219,78 @@ def MainMenu():
         print("\n Ingrese que quiere hacer: ")
         x = int(input())
         # verificando que este dentro de las opciones
+        if x == 1:
+            print("Has seleccionado la opcion Insertar.")
+            while True:
+                mostrar_menu(subopciones)
+                y = int(input("Selecciona una sub-opción (1-7) para insertar: "))
+                if y == 1:
+                    print("\n Has seleccionado insertar Pais.")
+                    codigo = input("Ingrese el codigo del pais: ")
+                    nombre = input("Ingrese el nombre del pais: ")
+                    #insertar_pais(paises, codigo, nombre)
+                elif y == 2:
+                    print("Has seleccionado insertar Ciudad.")
+                    codigo = input("Ingrese el codigo del pais: ")
+                    nombre = input("Ingrese el nombre del pais: ")
+                    #insertar_ciudad(codigo, nombre)
+                elif y == 3:
+                    print("Has seleccionado insertar Restaurante.")
+                    codigo = input("Ingrese el codigo del pais: ")
+                    nombre = input("Ingrese el nombre del pais: ")
+                elif y == 4:
+                    print("Has seleccionado insertar Menu.")
+                    codigo = input("Ingrese el codigo del pais: ")
+                    nombre = input("Ingrese el nombre del pais: ")
+                elif y == 5:
+                    print("Has seleccionado insertar Productos.")
+                    codigo = input("Ingrese el codigo del pais: ")
+                    nombre = input("Ingrese el nombre del pais: ")
+                elif y == 6:
+                    print("Has seleccionado insertar Clientes.")
+                    codigo = input("Ingrese el codigo del pais: ")
+                    nombre = input("Ingrese el nombre del pais: ")
+                elif y == 7:
+                    print("Volviendo al menú principal...")
+                    break  # Salir del submenú y volver al menú principal
+                else:
+                    print("Opción no válida. Por favor, selecciona una sub-opción del 1 al 7.")
 
-        if type(x)==int:
-            if x == 1:
-                cargar_paises()
-
-
-            #-----------------------------------
-            elif x == 2:
-                cod_pais = input("Ingrese código de país: ")
-                nombre = input("Ingrese nombre del país: ")
-                insertar_pais(cod_pais, nombre)
-
-            elif x == 3:
-                print("Has seleccionado Buscar.")
-                while True:
+        elif x == 2:
+            print("Has seleccionado Buscar.")
+            while True:
                     # Mostrar submenú
-                    mostrar_menu(subopciones)
-                    y = int(input("Selecciona una sub-opción (1-7) para buscar: "))
-                    if y == 1:
-                        print("\n Has seleccionado buscar Pais.")
-                        nombre_archivo = "Archivos/Paises.txt"
-                        buscar = input("Ingrese el nombre del pais a buscar: ")
-                        buscar_pais(nombre_archivo,buscar)
-                    elif y == 2:
-                        print("Has seleccionado buscar Ciudad.")
-                        buscar_ciudad()
-                    elif y == 3:
-                        print("Has seleccionado buscar Restaurante.")
-                        buscar_rest()
-                    elif y == 4:
-                        print("Has seleccionado buscar Menu.")
-                        buscar_menu()
-                    elif y == 5:
-                        print("Has seleccionado buscar Productos.")
-                        buscar_produ()
-                    elif y == 6:
-                        print("Has seleccionado buscar Clientes.")
-                        buscar_cli()
-                    elif y == 7:
-                        print("Volviendo al menú principal...")
-                        break  # Salir del submenú y volver al menú principal
-                    else:
-                        print("Opción no válida. Por favor, selecciona una sub-opción del 1 al 7.")
-            elif x == 3:
-                break #Sale del programa por completo
-            else:
-                print("\n\n Atención!! \n Ingresa una opción del 1 al 3.")
-                continue #Para que el usuario no tenga que reiniciar el programa
+                mostrar_menu(subopciones)
+                y = int(input("Selecciona una sub-opción (1-7) para buscar: "))
+                if y == 1:
+                    print("\n Has seleccionado buscar Pais.")
+                    nombre_archivo = "Archivos/Paises.txt"
+                    buscar = input("Ingrese el nombre del pais a buscar: ")
+                    buscar_pais(nombre_archivo,buscar)
+                elif y == 2:
+                    print("Has seleccionado buscar Ciudad.")
+                    buscar_ciudad()
+                elif y == 3:
+                    print("Has seleccionado buscar Restaurante.")
+                    buscar_rest()
+                elif y == 4:
+                    print("Has seleccionado buscar Menu.")
+                    buscar_menu()
+                elif y == 5:
+                    print("Has seleccionado buscar Productos.")
+                    buscar_produ()
+                elif y == 6:
+                    print("Has seleccionado buscar Clientes.")
+                    buscar_cli()
+                elif y == 7:
+                    print("Volviendo al menú principal...")
+                    break  # Salir del submenú y volver al menú principal
+                else:
+                    print("Opción no válida. Por favor, selecciona una sub-opción del 1 al 7.")
+        elif x == 3:
+            break #Sale del programa por completo
+        else:
+            print("\n\n Atención!! \n Ingresa una opción del 1 al 3.")
+            continue #Para que el usuario no tenga que reiniciar el programa
 MainMenu()
     #----------------------------------------------------------------------------------------------------------------------
-
-#Funciones de verificacion
-
-def abrirArchivo(nombre):
-    archivo = open(nombre, "r")
-    return archivo
-    pass
-
-#para separar cada parte de los txt
-#Separa cada linea en una lista diferente, dentro de la lista, separa cada elemento separado con ";"
-def Separar():
-    obj_arch = open("Archivos/Ciudades.txt", "r")
-    matriz_palabras = []
-    texto = obj_arch.read()
-    lista_lineas = texto.split("\n")
-    i=0
-    while i < len(lista_lineas):
-        matriz_palabras += [lista_lineas[i].split(";")]
-        i+=1
-    print(matriz_palabras)
-    obj_arch.close()
-    pass
