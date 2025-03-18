@@ -4,17 +4,8 @@
 #Tener inserciones y listas
 
 #----------------------------------------------------------------------------------
-#Menu:
-
-paises = []
-ciudades = []
-restaurantes = []
-menus = []
-productos = []
-clientes = []
 
 #############################
-
 def datos_a_listas(ruta_archivo, separador=";", separador_lineas="\n"):
     try:
         with open(ruta_archivo, "r") as archivo:
@@ -29,74 +20,33 @@ def datos_a_listas(ruta_archivo, separador=";", separador_lineas="\n"):
         print(f"El archivo {ruta_archivo} no existe")
         return []
 
+paises = []
 paises = datos_a_listas("Archivos/Paises.txt", ";")
-#print(paises)
+ciudades = []
 ciudades = datos_a_listas("Archivos/Ciudades.txt", ";")
-#print(ciudades)
+restaurantes = []
 restaurantes = datos_a_listas("Archivos/Restaurantes.txt", ";")
-#print(restaurantes)
-menu = datos_a_listas("Archivos/Menu.txt", ";")
-#print(menu)
+menus = []
+menus = datos_a_listas("Archivos/Menu.txt", ";")
+productos = []
 productos = datos_a_listas("Archivos/Productos.txt", ";")
-#print(productos)
+cliente = []
 cliente = datos_a_listas("Archivos/Clientes.txt", ";")
-#print(cliente)
-
-# Para cargar países
-
-##############################
-#if isinstance(paises, list):
-
-
 def mostrar_menu(opciones):
     print(f"\n=== Bienvenido al menu de Mantenimiento de Bases de Datos ===")
     for i, opcion in enumerate(opciones, start=1):
         print(f"{i}. {opcion}")
-
-############################
-
-###########################
-
 #--------------------------------------------------------------------------------------------------
 #BUSQUEDAS_----------------------------------------------------------------------------------------
-
-def buscar_pais(nombre_archivo,buscar):
-    """
-    input ("Ingrese el nombre del pais")
-        abre archivo
-        separe elementos y los ponga en una lista
-        valide si elemento buscado esta en la lista
-        print(valdio)
-    else
-    """
-    try:
-        # Abrimos el archivo específico
-        with open(nombre_archivo, "r") as archivo:
-            # Leemos el archivo línea por línea
-            for linea in archivo:
-                # Eliminamos espacios en blanco y saltos de línea
-                linea = linea.strip()
-
-                # Ignoramos líneas vacías
-                if not linea:
-                    continue
-
-                # Separamos por punto y coma
-                elementos = linea.split(";")
-
-                # Verificamos que tengamos al menos 3 elementos y que el tercer elemento
-                # sea igual a la ciudad buscada (sin importar mayúsculas/minúsculas)
-                if len(elementos) >= 2 and elementos[1].lower() == buscar.lower():
-                    print(f"¡El pais '{buscar}' fue encontrado! Código: {elementos[0]}")
-
-                    return True
-            print(f"El pais '{buscar}' no existe en el archivo.")
-            return False
-
-    except FileNotFoundError:
-        print(f"Error: No se encontró el archivo {nombre_archivo}")
-        return False
-
+def buscar_pais(paises, nombre):
+    """Busca un país por nombre"""
+    resultados = [pais for pais in paises if nombre.lower() in pais[1].lower()]
+    if resultados:
+        print("\nResultados de la búsqueda:")
+        for pais in resultados:
+            print(f"Código: {pais[0]}, Nombre: {pais[1]}")
+    else:
+        print(f"No se encontraron países con el nombre '{nombre}'.")
 def buscar_ciudad():
     nombre_archivo = "Archivos/Ciudades.txt"
     buscar = input("Ingrese el nombre de la ciudad a buscar: ")
@@ -118,7 +68,6 @@ def buscar_ciudad():
     except FileNotFoundError:
         print(f"Error: No se encontró el archivo {nombre_archivo}")
         return False
-
 def buscar_rest():
     nombre_archivo = "Archivos/Restaurantes.txt"
     buscar = input("Ingrese el nombre del restaurante a buscar: ")
@@ -139,7 +88,6 @@ def buscar_rest():
         print(f"Error: No se encontró el archivo {nombre_archivo}")
         print("Asegúrate de que el archivo exista en la ruta correcta.")
         return False
-
 def buscar_menu():
     nombre_archivo = "Archivos/Menu.txt"
     buscar = input("Ingrese el nombre del Menu a buscar: ")
@@ -160,7 +108,6 @@ def buscar_menu():
     except FileNotFoundError:
         print(f"Error: No se encontró el archivo {nombre_archivo}")
         return False
-
 def buscar_produ():
     nombre_archivo = "Archivos/Productos.txt"
     buscar = input("Ingrese el nombre del producto a buscar: ")
@@ -180,7 +127,6 @@ def buscar_produ():
     except FileNotFoundError:
         print(f"Error: No se encontró el archivo {nombre_archivo}")
         return False
-
 def buscar_cli():
     # Especificamos la ruta exacta del archivo
     nombre_archivo = "Archivos/Clientes.txt"
@@ -205,15 +151,73 @@ def buscar_cli():
         print(f"Error: No se encontró el archivo {nombre_archivo}")
         print("Asegúrate de que el archivo exista en la ruta correcta.")
         return False
-
 #_________________________________#
+#INSERCIONES
+def insertar_en_lista(lista, nuevo_registro, indice_unico=None):
+    # Validar que el primer parámetro sea una lista
+    if not isinstance(lista, list):
+        print("Error: El primer parámetro debe ser una lista")
+        return False
+    # Validar que el nuevo registro sea una lista
+    if not isinstance(nuevo_registro, list):
+        print("Error: El nuevo registro debe ser una lista")
+        return False
+    # Validar campo único
+    if indice_unico is not None:
+        if any(item[indice_unico] == nuevo_registro[indice_unico] for item in lista):
+            print(
+                f"Error: Ya existe un registro con el valor '{nuevo_registro[indice_unico]}' en la posición {indice_unico}")
+            return False
+    # Insertar el registro
+    lista.append(nuevo_registro)
+    print(f"Registro insertado correctamente: {nuevo_registro}")
+    return True
+# Funciones específicas para cada tipo de lista
+def insertar_pais(paises, codigo, nombre):
+    """Inserta un país en la lista de países"""
+
+    return insertar_en_lista(paises,[codigo, nombre],indice_unico=0)
+#------------------------------------------------------------------------------------------
+def insertar_ciudad(paises, ciudades, cod_pais, cod_ciudad, nombre):
+    """Inserta una ciudad en la lista de ciudades"""
+    if not any(pais[0] == cod_pais for pais in paises):
+        print(f"Error: No existe un país con código '{cod_pais}'")
+        return False
+    return insertar_en_lista(ciudades,[cod_pais, cod_ciudad, nombre], indice_unico=1)
+#------------------------------------------------------------------------------------------
+def insertar_restaurante(paises, ciudades, restaurantes, cod_pais, cod_ciudad, cod_rest, nombre):
+    """Inserta un restaurante en la lista de barrios"""
+    if not any(pais[0] == cod_pais for pais in paises):
+        print(f"Error: No existe un país con código '{cod_pais}'")
+        return False
+    # Verificar que exista la ciudad
+    if not any(ciudad[0] == cod_pais and ciudad[1] == cod_ciudad for ciudad in ciudades):
+        print(f"Error: No existe una ciudad con código '{cod_ciudad}' en el país '{cod_pais}'")
+        return False
+    return insertar_en_lista(restaurantes, [cod_pais, cod_ciudad, cod_rest, nombre], indice_unico=2)
+#------------------------------------------------------------------------------------------
+def insertar_menu(paises, ciudades, restaurantes, menus, cod_pais, cod_ciudad, cod_rest, cod_menu, nombre):
+    """Inserta un menu en la lista de restaurantes"""
+    def validar_menu(menu):
+        # Verificar que exista la ciudad
+        if not any(rest[0] == cod_pais and rest[1] == cod_ciudad and rest[2] == cod_rest for rest in restaurantes):
+            print(f"Error: No existe un restaurante con código '{cod_rest}' en la ciudad '{cod_ciudad}' y el pais '{cod_pais}'")
+            return False
+        return True
+    return insertar_en_lista(menus, [cod_rest, cod_menu, nombre], indice_unico=3)
+#------------------------------------------------------------------------------------------
+def insertar_productos(paises, ciudades, restaurantes, menus, productos, cod_pais, cod_ciudad, cod_rest, cod_menu, cod_producto, nombre, kcal, precio):
+    """Inserta un producto en la lista de productos"""
+    # Validar que el menú exista
+    if not any(menu[0] == cod_pais and menu[1] == cod_ciudad and menu[2] == cod_rest and menu[3] == cod_menu for menu in menus):
+        print(f"Error: No existe un menú con código '{cod_menu}' en el restaurante '{cod_rest}', ciudad '{cod_ciudad}' y país '{cod_pais}'")
+        return False
+    # Insertar el producto
+    return insertar_en_lista(productos, [cod_pais, cod_ciudad, cod_rest, cod_menu, cod_producto, nombre, kcal, precio], indice_unico=4)
 #MENU_____________________________#
-
-
 def MainMenu():
     opciones_principales = ["Inserción", "Buscar", "Salir"]
     subopciones = ["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Regresar al mantenimiento"] #Para poder ingresar a otro ciclo y muestre un segundo menu
-
     while True:
         mostrar_menu(opciones_principales)
         print("\n Ingrese que quiere hacer: ")
@@ -224,38 +228,47 @@ def MainMenu():
             while True:
                 mostrar_menu(subopciones)
                 y = int(input("Selecciona una sub-opción (1-7) para insertar: "))
-                if y == 1:
+                if y == 1: #Insercion de Pais
                     print("\n Has seleccionado insertar Pais.")
-                    codigo = input("Ingrese el codigo del pais: ")
+                    codigo = int(input("Ingrese el codigo del pais: "))
                     nombre = input("Ingrese el nombre del pais: ")
-                    #insertar_pais(paises, codigo, nombre)
+                    insertar_pais(paises, codigo, nombre)
+                    print(paises)
                 elif y == 2:
-                    print("Has seleccionado insertar Ciudad.")
-                    codigo = input("Ingrese el codigo del pais: ")
-                    nombre = input("Ingrese el nombre del pais: ")
-                    #insertar_ciudad(codigo, nombre)
+                    print("\n Has seleccionado insertar Ciudad.")
+                    cod_pais = int(input("Ingrese el codigo del pais: "))
+                    cod_ciudad = int(input("Ingrese el codigo de la ciudad: "))
+                    nombre = input("Ingrese el nombre del ciudad: ")
+                    insertar_ciudad(paises, ciudades, cod_pais, cod_ciudad, nombre)
+                    print(ciudades)
                 elif y == 3:
                     print("Has seleccionado insertar Restaurante.")
-                    codigo = input("Ingrese el codigo del pais: ")
-                    nombre = input("Ingrese el nombre del pais: ")
+                    cod_pais = int(input("Ingrese el codigo del pais: "))
+                    cod_ciudad = int(input("Ingrese el codigo de la ciudad: "))
+                    cod_rest = int(input("Ingrese el codigo del restaurante: "))
+                    nombre = input("Ingrese el nombre del restaurante: ")
+                    insertar_restaurante(paises, ciudades, restaurantes, cod_pais, cod_ciudad, cod_rest, nombre)
+                    print(restaurantes)
                 elif y == 4:
                     print("Has seleccionado insertar Menu.")
-                    codigo = input("Ingrese el codigo del pais: ")
-                    nombre = input("Ingrese el nombre del pais: ")
+                    cod_rest = int(input("Ingrese el codigo del restaurante: "))
+                    cod_menu = int(input("Ingrese el codigo del menu: "))
+                    nombre = input("Ingrese el nombre del menu: ")
+                    insertar_menu(paises, ciudades, restaurantes, menus, cod_rest, cod_menu, nombre)
                 elif y == 5:
                     print("Has seleccionado insertar Productos.")
-                    codigo = input("Ingrese el codigo del pais: ")
-                    nombre = input("Ingrese el nombre del pais: ")
+                    cod_menu = int(input("Ingrese el codigo del menu: "))
+                    cod_producto = int(input("Ingrese el codigo del producto: "))
+                    nombre = input("Ingrese el nombre del producto: ")
+                    insertar_en_lista(paises, ciudades, restaurantes, menus, productos, [cod_menu, cod_producto, nombre])
                 elif y == 6:
                     print("Has seleccionado insertar Clientes.")
-                    codigo = input("Ingrese el codigo del pais: ")
-                    nombre = input("Ingrese el nombre del pais: ")
+
                 elif y == 7:
                     print("Volviendo al menú principal...")
                     break  # Salir del submenú y volver al menú principal
                 else:
                     print("Opción no válida. Por favor, selecciona una sub-opción del 1 al 7.")
-
         elif x == 2:
             print("Has seleccionado Buscar.")
             while True:
@@ -293,4 +306,4 @@ def MainMenu():
             print("\n\n Atención!! \n Ingresa una opción del 1 al 3.")
             continue #Para que el usuario no tenga que reiniciar el programa
 MainMenu()
-    #----------------------------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------------
