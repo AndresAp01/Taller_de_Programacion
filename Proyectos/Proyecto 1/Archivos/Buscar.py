@@ -3,7 +3,7 @@ def verificar_pais_existe(nombre_archivo, pais_buscar):
     nombre_archivo = "Paises.txt"
     pais_buscar = input("Ingrese el nombre del pais a buscar: ")
     try:
-        with open("Paises.txt", "r") as archivo: #abrir el archivo
+        with open("../Paises.txt", "r") as archivo: #abrir el archivo
             datos = [] #Crea lista para guardar los datos
 
             # Leemos el archivo línea por línea

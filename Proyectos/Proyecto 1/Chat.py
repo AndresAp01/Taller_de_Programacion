@@ -85,7 +85,7 @@ def menu_principal():
             print("❌ Entrada no válida, ingrese un número.")
 
 # Listas globales de datos (deben cargarse desde archivos en el proyecto real)
-paises = open('Archivos/Paises.txt', 'r')
+paises = open('Paises.txt', 'r')
 ciudades = [("10", "123", "San José"), ("20", "456", "CDMX")]
 restaurantes = [("10", "123", "789", "Restaurante Tico")]
 menus = [("10", "123", "789", "001", "Menú Ejecutivo")]
