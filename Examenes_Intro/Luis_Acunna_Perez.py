@@ -46,6 +46,19 @@ def pasalista(num):
             return listaNueva
     else:
         print("Parametro incorrecto")
+def factorialDEC(num):  # Funciona
+    if num < 0 or not type(num) == int:
+        print("Parametro de entrada no valido")
+    elif num == 0:
+        return 1
+    else:
+        resultado = 1
+        i = num
+        while i > 0:
+            resultado = resultado * i
+            i = i - 1
+        return resultado
+
 
 #Funciones para Examen____________________________________________________________________________________
 def UNO(num1, num2): #Funcion UNO recibe dos parametros num1 y num2
@@ -126,6 +139,25 @@ def DOS(num): #Funciona
 
 #_________________________________________________________________________________________________________________
 #Funcion 3
+def TRES():
+    pass
 
-
-
+#_________________________________________________________________________________________________________________
+#Funcion 4
+def CUATRO(n): #SUpongo que funciona
+    if isinstance(n, int) and n > 0:
+        i = 1
+        suma = 0 #inicio variable de suma que almacenara los valores calculados de la variable operacion
+        while i <= n: #mintras el indice sea mayor que 1, hago la operacion
+            par1 = i ** 2  # nombro variable par1 para simplificar
+            par1 = factorialDEC(par1)  # par1 le calculo factorial llanando a la funcion auixiliar de factorial
+            par2 = n
+            par2 = factorialDEC(par2)  # lo mismo con par2
+            numerador = (((par1)**3)**2) * (((n**2)+1)**(n-1)) * (((n-1)+3)**2)
+            denominador = ((((3**n) * ((n*(i**2))**i)) + ((par2)**2)) ** 4)
+            operacion = (numerador/denominador)
+            suma += operacion
+            i = i + 1
+        print(suma**3)
+    else:
+        print("Parametro incorrecto, debe ser un numero entero y positivo y diferente de 0")
