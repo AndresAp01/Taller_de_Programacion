@@ -1,0 +1,4 @@
+Hola mundo este es un ejemplo
+Python es un lenguaje de programacion muy util
+Esta funcion divide cada linea en palabras
+Los archivos de texto son faciles de procesar

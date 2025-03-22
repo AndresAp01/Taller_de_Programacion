@@ -61,60 +61,84 @@ def factorialDEC(num):  # Funciona
 
 
 #Funciones para Examen____________________________________________________________________________________
-def UNO(num1, num2): #Funcion UNO recibe dos parametros num1 y num2
-    if isinstance(num1, int) and isinstance(num2, int):
-        #Esto verifica que el num1 y el num2 sean enteros
-        num1 = abs(num1)  # Para hacerlos positivos siempre
-        num2 = abs(num2)
-        #Doy valores a las variables
-        patron_izq = [1, 0, 1]  # Es el patron que va al principio de la lista
-        patron_der = [-1, 0, -1]  # Es el que va al final de la lista
-        patron_izq_2 = [2, 0, 2]  # Patron al principio al analizar el num2
-        patron_der_2 = [-2, 0, -2]  # Patron al final al analizar el num2
-        #Para que sean del mismo tamanno:
-        if largo(num1) >= 3 and largo(num2) >= 3 and largo(num1) == largo(num2):
+def UNO(num1, num2):
+    #45672 #98371
+    lista = []
+    len1 = largo(num1)
+    len2 = largo(num2)
+    patron_izq = [1, 0, 1]  # Es el patron que va al principio de la lista
+    patron_der = [-1, 0, -1]  # Es el que va al final de la lista
+    patron_izq2 = [2, 0, 2]  # Patron al principio al analizar el num2
+    patron_der2 = [-2, 0, -2]  # Patron al final al analizar el num2
+    centro1 = centronum(num1)
+    centro2 = centronum(num2) #innecesario pero lo pongo para no complicarme
+    i1_izq = 0
+    i2_izq = 0
+    i1_der = 0
+    i2_der = 0
+    # Mientras haya dígitos por procesar en alguno de los números
+    while (i1_izq < len1 // 2 and i1_der < len1 // 2):
+        # Procesar el centro de num1 (si existe)
+        if centro1 != 0:
+            lista += [patron_izq + [centro1 + (centro1 - 1)] + [centro1, -centro1] + [centro1 - (centro1 + 1)] + patron_der]
+        '''if i_centro < len1:
+            centro1 = centronum(num1)  # Obtener el dígito central de num1
+            lista += [patron_izq + [centro1 + (centro1 - 1)] + [centro1, -centro1] + [centro1 - (centro1 + 1)] + patron_der]
+            i_centro += 1'''
 
-            #Procesando el num1
-            antecesor = 0
-            sucesor = 0
-            centro_num1 = centronum(num1)  # Para encontrar el centro del num1
-            while num1 != 0:
-                ultimo_digito_num1 = num1 % 10  # Extraer el último dígito
-                num1 = num1 // 10  # Eliminar el último dígito
+        # Procesar el primer dígito de derecha a izquierda de num2 (si existe)
+        if i2_der < len2:
+            # Obtener el dígito de derecha a izquierda
+            derecha_izquierda2 = (num2 // (10 ** i2_der)) % 10
+            sucesor = derecha_izquierda2 + 1
+            antecesor = derecha_izquierda2 - 1
+            lista += [patron_izq + [derecha_izquierda2 + antecesor] + [derecha_izquierda2, -derecha_izquierda2] + [
+                derecha_izquierda2 - sucesor] + patron_der]
+            i2_der += 1  # Avanzar al siguiente dígito de num2
 
-                if num1 % 10 == centro_num1:  # Si el siguiente dígito es el central
-                    sucesor = ultimo_digito_num1  # El sucesor es el dígito actual
-                if ultimo_digito_num1 == centro_num1:  # Si el dígito actual es el central
-                    antecesor = num1 % 10  # El antecesor es el siguiente dígito
-            print(antecesor, sucesor)
+        # Procesar el primer dígito de izquierda a derecha de num2 (si existe)
+        if i2_izq < len2:
+            izquierda_derecha2 = int(str(num2)[i2_izq]) #((num2 // (10 ** (len2 - i2_izq))) % 10)
+            sucesor = izquierda_derecha2 + 1
+            antecesor = izquierda_derecha2 - 1
+            lista += [patron_izq + [izquierda_derecha2 + antecesor] + [izquierda_derecha2, -izquierda_derecha2] + [
+                izquierda_derecha2 - sucesor] + patron_der]
+            i2_izq += 1
 
-            lista_nueva_num1 = patron_izq + [centro_num1 + antecesor] + [centro_num1, -centro_num1] + [centro_num1 - sucesor] + patron_der
-            print(lista_nueva_num1)
+        # Procesar el centro de num2 (si existe)
+        if centro2 != 0:
+            lista += [patron_izq2 + [centro2 + (centro2 - 1)] + [centro2, -centro2] + [
+                centro2 - (centro2 + 1)] + patron_der2]
+        ''' if i_centro < len2:
+            centro2 = centronum(num2)  # Obtener el dígito central de num2
+            lista += [patron_izq2 + [centro2 + (centro2 - 1)] + [centro2, -centro2] + [centro2 - (centro2 + 1)] + patron_der2]
+            i_centro += 1 '''
 
-            #Procesando el Num2
-            antecesor_2 = None
-            sucesor_2 = None
-            centro_num2 = centronum(num2)  # para encontrar el centro del num2
-            while num2 != 0:
-                ultimo_digito_num2 = num2 % 10  # Extraer el último dígito
-                num2 = num2 // 10  # Eliminar el último dígito
 
-                if num2 % 10 == centro_num2:  # Si el siguiente dígito es el central
-                    sucesor_2 = ultimo_digito_num2  # El sucesor es el dígito actual
-                if ultimo_digito_num2 == centro_num2:  # Si el dígito actual es el central
-                    antecesor_2 = num2 % 10  # El antecesor es el siguiente dígito
-            print(antecesor_2, sucesor_2)
-            lista_nueva_num2 = patron_izq_2 + [centro_num2 + antecesor_2] + [centro_num2, -centro_num2] + [
-                centro_num2 - sucesor_2] + patron_der_2
-            print(lista_nueva_num2)
+        # Procesar el primer dígito de izquierda a derecha de num1 (si existe)
+        if i1_izq < len1:
+            izquierda_derecha1 = int(str(num1)[i1_izq]) #(num1 // (10**(len1 - i1_izq))) % 10  # Obtener el dígito de izquierda a derecha
+            sucesor = izquierda_derecha1 + 1
+            antecesor = izquierda_derecha1 - 1
 
-            #despues = pass_none
-        else:
-            print("Ambos numeros deben tener mas de 3 digitos")
-    else:
-        print("El numero debe ser entero y tener mas de 3 digitos")
+            lista += [patron_izq2 + [izquierda_derecha1 + antecesor] + [izquierda_derecha1, -izquierda_derecha1] + [izquierda_derecha1 - sucesor] + patron_der2]
+            i1_izq += 1  # Avanzar al siguiente dígito de num1
 
-#UNO(45672,98361)
+        # Procesar el primer dígito de derecha a izquierda de num1 (si existe)
+        if i1_der < len1:
+            derecha_izquierda1 = int(str(num1)[len1 - i1_der - 1])  #(num1 // (10**i1_der)) % 10  # Obtener el dígito de derecha a izquierda
+            sucesor = derecha_izquierda1 + 1
+            antecesor = derecha_izquierda1 - 1
+            lista += [patron_izq2 + [derecha_izquierda1 + antecesor] + [derecha_izquierda1, -derecha_izquierda1] + [derecha_izquierda1 - sucesor] + patron_der2]
+            i1_der += 1  # Avanzar al siguiente dígito de num1
+
+    return lista  # Devolver la lista de resultados
+resultados = UNO(45672, 98361)
+print(resultados)
+'''i = 0
+while i < len(resultados):
+    print(resultados[i])
+    i += 1'''
 
 #_________________________________________________________________________________________________________________
 #Funcion 2
@@ -136,11 +160,10 @@ def DOS(num): #Funciona
         return nueva_lista  # Devolver la lista modificada
     else:
         print("Parametro incorrecto, debe ser un numero entero")
-
 #_________________________________________________________________________________________________________________
 #Funcion 3
 def TRES():
-    pass
+    pass #MA:ANANNAAAAA
 
 #_________________________________________________________________________________________________________________
 #Funcion 4
