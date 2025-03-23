@@ -30,7 +30,6 @@ def datos_a_listas(ruta_archivo, separador=";", separador_lineas="\n"):
         return None
 #Para pasar los datos de los archivos a listas
 paises = datos_a_listas("Paises.txt", ";")
-print(paises)
 ciudades = datos_a_listas("Ciudades.txt", ";")
 restaurantes = datos_a_listas("Restaurantes.txt", ";")
 menus = datos_a_listas("Menu.txt", ";")
@@ -52,12 +51,12 @@ def mostrar_menu(opciones):
 
 #VALIDACION----------------------------------------------------------------------------------------
 #FUNCIONA
-def validar_pais_existe(paises, cod_pais):
+def validar_pais_existe(paises, codigo):
     #Si existe un pais con el codigo cod_pais en la lista paises
     #Primer elemento pais[0] de cada pais en la lista coincide con el codigo
-    cod_pais = normalizar_codigo(cod_pais)
-    if not any(pais[0].lstrip('-') == cod_pais for pais in paises):
-        print(f"Error: No existe un país con código '{cod_pais}'")
+    codigo = normalizar_codigo(codigo)
+    if not any(pais[0].lstrip('-') == codigo for pais in paises):
+        print(f"Error: No existe un país con código '{codigo}'")
         return False
     return True
 
@@ -122,17 +121,16 @@ def validar_cliente_existe(clientes, cedula):
 def buscar_pais(paises, codigo): #FUNCIONA
     codigo = normalizar_codigo(codigo)
     resultados = [pais for pais in paises if codigo.lower() in pais[0].lower()]
-    if resultados:
+    if any(pais[0].lstrip('-') == codigo for pais in paises):
         print("\n Resultados de la búsqueda:")
         for pais in resultados:
             print(f"Código: {pais[0]}, Nombre: {pais[1]}")
     else:
         print(f"No se encontraron países con el nombre '{codigo}'.")
-
 def buscar_ciudad(ciudades, codigo): #FUNCIONA
     codigo = normalizar_codigo(codigo)
     resultados = [ciudad for ciudad in ciudades if codigo.lower() in ciudad[1].lower()]
-    if resultados:
+    if any(ciudad[1].lstrip('-') == codigo for ciudad in ciudades):
         print("\n Resultados de la búsqueda:")
         for ciudad in resultados:
             print(f"Código: {ciudad[1]}, Nombre: {ciudad[2]}")
@@ -177,7 +175,7 @@ def buscar_cliente(clientes, cedula):
     cedula_a_buscar = str(cedula)
     resultados = [cliente for cliente in clientes if cliente[0] == cedula_a_buscar]
     if resultados:
-        print("\n Resultaods de la busqueda: ")
+        print("\n Resultados de la busqueda: ")
         for cliente in resultados:
             print(f"Cliente encontrado: Cedula: {cliente[0]}, Nombre: {cliente[1]}")
             return cliente
@@ -357,9 +355,60 @@ def insertar_cliente(clientes, cedula, nombre):
     print("Cliente agregado exitosamente.")
     return True
 
+#para reistrar compra
+
+def registrar_compra(paises, ciudades, restaurantes, menus, productos, compras):
+    # Solicitar los datos de la compra
+    codigo_pais = None
+    codigo_ciudad = None
+    codigo_rest = None
+    codigo_menu = None
+    codigo_producto = None
+    cantidad = None
+    opcion = None
+
+    # Validar que los códigos existan en las listas correspondientes
+    if not validar_pais_existe(paises, codigo_pais):
+        print("Error: El código de país no existe.")
+        return
+    if not validar_ciudad_existe(ciudades, codigo_ciudad):
+        print("Error: El código de ciudad no existe.")
+        return
+    if not validar_restaurante_existe(restaurantes, codigo_rest):
+        print("Error: El código de restaurante no existe.")
+        return
+    if not validar_menu_existe(menus, codigo_menu):
+        print("Error: El código de menú no existe.")
+        return
+    if not validar_producto_existe(productos, codigo_producto):
+        print("Error: El código de producto no existe.")
+        return
+
+    # Crear un diccionario con la información de la compra
+    compra = {
+        'codigo_pais': codigo_pais,
+        'codigo_ciudad': codigo_ciudad,
+        'codigo_restaurante': codigo_rest,
+        'codigo_menu': codigo_menu,
+        'codigo_producto': codigo_producto,
+        'cantidad': cantidad,
+        'opcion': opcion
+    }
+
+    # Agregar la compra a la lista de compras
+    compras.append(compra)
+    print("Compra registrada con éxito.")
+
+def validar_existencia(lista, codigo):
+    # Función para validar si un código existe en una lista
+    for item in lista:
+        if item['codigo'] == codigo:
+            return True
+    return False
+
 #MENU_____________________________#
 def MainMenu():
-    opciones_principales = ["Inserción", "Buscar", "Salir"]
+    opciones_principales = ["Inserción", "Buscar", "Registrar compra", "Salir"]
     subopciones = ["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Regresar al mantenimiento"] #Para poder ingresar a otro ciclo y muestre un segundo menu
     while True:
         mostrar_menu(opciones_principales)
@@ -459,6 +508,17 @@ def MainMenu():
                 else:
                     print("Opción no válida. Por favor, selecciona una sub-opción del 1 al 7.")
         elif x == 3:
+            print("Has seleccionado Registrar compra.")
+            codigo_pais = input("Ingrese el código del país: ")
+            codigo_ciudad = input("Ingrese el código de la ciudad: ")
+            codigo_rest = input("Ingrese el código del restaurante: ")
+            codigo_menu = input("Ingrese el código del menú: ")
+            codigo_producto = input("Ingrese el código del producto: ")
+            cantidad = int(input("Ingrese la cantidad: "))
+            opcion = input("¿Es para llevar o comer en el restaurante? (llevar/comer): ").lower()
+            if registrar_compra(paises, ciudades, restaurantes, menus, productos, compras):
+                print(f"Compra exitosa. {compra}")
+        elif x == 4:
             break #Sale del programa por completo
         else:
             print("\n\n Atención!! \n Ingresa una opción del 1 al 3.")
