@@ -367,14 +367,13 @@ def registrar_compra_menu(paises, ciudades, restaurantes, menus, productos, arch
         print(f"Error: Producto {cod_menu} no existe")
         return False
 
-    #validar cliente
     cedula = input("\nIngrese cédula del cliente: ").strip()
     cliente = next((c for c in clientes if c[0] == cedula), None)
     if not cliente:
         print("Error: Cliente no registrado")
         return False
     print(f"Cliente: {cliente[1]}")
-    # Obtener datos adicionales
+
     while True:
         try:
             cantidad=int(input("\nIngrese la cantidad: "))
@@ -399,17 +398,12 @@ def registrar_compra_menu(paises, ciudades, restaurantes, menus, productos, arch
         print("Error: Producto no encontrado con los códigos proporcionados")
         return False
 
-    # Calcular el total
     precio_unitario = float(producto_encontrado[7])
     total = precio_unitario * cantidad
-
-    # Confirmación (sin recursión)
     confirmar = input("\n¿Confirmar compra? (S/N): ").strip().upper()
     if confirmar != "S":
         print("\nCompra cancelada")
         return False
-
-    # Guardar en archivo (formato corregido)
     with open(archivo_facturas, "a") as archivo:
         archivo.write(
             f"{cliente[0]};{cliente[1]};"
@@ -417,10 +411,8 @@ def registrar_compra_menu(paises, ciudades, restaurantes, menus, productos, arch
             f"{cod_menu};{cod_producto};{producto_encontrado[5]};"
             f"{cantidad};{precio_unitario:.2f};{total:.2f};{orden}\n"
         )
-
     print("\nCompra registrada exitosamente!")
-    return True  # ¡Este return faltaba!
-
+    return True
 
 #___________________________________________________________________________________________________
 #REPORTES
