@@ -470,19 +470,19 @@ def reporte_compras_cliente(compras):
 
 #MENU_____________________________#
 def MainMenu():
-    opciones_principales=["Inserción", "Buscar", "Registrar Compra", "Modificar", "Reportes", "Salir"]
+    opciones_principales=["Inserción", "Buscar", "Modificar", "Reportes", "Salir"]
     subopciones=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Regresar al mantenimiento"] #Para poder ingresar a otro ciclo y muestre un segundo menu
-    subopciones_compra=["Registrar compra", "Regresar al mantenimiento"]
+    subopciones_insertar=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Registrar compra", "Regresar al mantenimiento"]
     opciones_reportes = ["Lista de Países", "Ciudades de un País", "Restaurantes de una Ciudad", "Lista de Clientes", "Compras de un Cliente", "Regresar al menú principal"]
     while True:
         mostrar_menu(opciones_principales)
         print("\n Ingrese que quiere hacer: ")
         x = int(input())
         # verificando que este dentro de las opciones
-        if x == 1:
+        if x==1:
             print("Has seleccionado la opcion Insertar.")
             while True:
-                mostrar_menu(subopciones)
+                mostrar_menu(subopciones_insertar)
                 y = int(input("Selecciona una sub-opción (1-7) para insertar: "))
                 if y == 1: #Insercion de Pais
                     print("\n Has seleccionado insertar Pais.")
@@ -531,7 +531,15 @@ def MainMenu():
                     nombre = input("Ingrese el nombre del cliente: ")
                     if insertar_cliente(clientes, cedula, nombre):
                         print("Lista actualizada de clientes:", clientes)
-                elif y == 7:
+
+                elif y==7:
+                    print("Has seleccionado Registrar compra")
+                    if registrar_compra_menu(paises, ciudades, restaurantes, menus, productos, "facturas.txt"):
+                        print("Operación exitosa")
+                    else:
+                        print("No se completó la compra")
+                    input("Presione Enter para continuar...")
+                elif y==8:
                     print("Volviendo al menú principal...")
                     break  # Salir del submenú y volver al menú principal
                 else:
@@ -571,13 +579,6 @@ def MainMenu():
                 else:
                     print("Opción no válida. Por favor, selecciona una sub-opción del 1 al 7.")
         elif x==3:
-            print("Has seleccionado Registrar compra")
-            if registrar_compra_menu(paises, ciudades, restaurantes, menus, productos, "facturas.txt"):
-                print("Operación exitosa")
-            else:
-                print("No se completó la compra")
-            input("Presione Enter para continuar...")
-        elif x==4:
             print("Has seleccionado Modificar.")
             while True:
                 mostrar_menu(subopciones)
@@ -615,11 +616,10 @@ def MainMenu():
                     nuevo_precio=float(input("Ingrese el nuevo precio (o deje vacío para no cambiar): ") or 0)
                     modificar_producto(productos, cod_pais, cod_ciudad, cod_rest, cod_menu, cod_producto, nuevo_nombre,
                                        nuevas_calorias, nuevo_precio)
-
                 elif y==7:
                     print("Volviendo al menú principal...")
                     break
-        elif x==5:
+        elif x==4:
             print("Has seleccionado Reportes.")
             while True:
                 mostrar_menu(opciones_reportes)
@@ -637,11 +637,11 @@ def MainMenu():
                     reporte_clientes(clientes)
                 elif y==5:
                     cliente_cedula = input("Ingrese la cédula del cliente: ")
-                    reporte_compras_cliente(compras, cliente_cedula)
+                    reporte_compras_cliente('compras', cliente_cedula)
                 elif y==6:
                     print("Volviendo al menú principal...")
                     break
-        elif x == 6:
+        elif x==5:
             break
         else:
             print("\n\n Atención!! \n Ingresa una opción del 1 al 6.")
