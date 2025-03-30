@@ -1,5 +1,50 @@
-123;345;34;MacPanama
-345;987;456;Disney Springs
-4567;234;876;Mac
-12;34;234;MacBocas
-123;345;2341;X
+123;101;1;La Tapa del Coco
+123;101;2;Mercado de Mariscos
+123;102;3;Restaurante El Caribe
+123;103;4;El Rincon Veraguense
+345;201;5;Empire State Bistro
+345;201;6;Central Park Cafe
+345;202;7;Hollywood Grill
+345;203;8;Deep Dish Pizza Co.
+4567;301;9;Pujol
+4567;301;10;El Cardenal
+4567;302;11;El Gaucho
+4567;303;12;La Casa de los Munnecos
+12;401;13;Bocas Sea Food
+12;402;14;Changuinola BBQ
+12;403;15;Pescado Frito Almirante
+789;501;16;Central
+789;501;17;Maido
+789;502;18;Zig Zag
+101;601;19;Don Julio
+101;602;20;El Papagayo
+101;603;21;La Estancia
+112;701;22;Borago
+112;702;23;Oda Pacific
+112;703;24;Almacen Nacional
+131;801;25;Andres DC
+131;802;26;El Cielo
+131;803;27;Platillos Voladores
+141;901;28;D.O.M.
+141;902;29;Aprazivel
+141;903;30;Fogo de Chao
+151;1001;31;Sobrino de Botin
+151;1002;32;Els Quatre Gats
+151;1003;33;La Pepica
+161;1101;34;Le Jules Verne
+161;1102;35;Le Petit Nice
+161;1103;36;Paul Bocuse
+171;1201;37;Facil
+171;1202;38;Tantris
+171;1203;39;The Table
+181;1301;40;La Pergola
+181;1302;41;Da Vittorio
+181;1303;42;L'Olivo
+191;1401;43;The Fat Duck
+191;1402;44;Mana
+191;1403;45;Adam's
+202;1501;46;Alo
+202;1502;47;Toque!
+202;1503;48;Blue Water Cafe
+212;1601;49;Quay
+212;1602;50;Attica
