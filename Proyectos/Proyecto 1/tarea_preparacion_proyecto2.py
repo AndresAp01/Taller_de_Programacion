@@ -390,8 +390,20 @@ def insertar_cliente():
     return insertar_en_lista(clientes, [str(cedula), nombre], indices_unicos=[0])
 #______________________________________________________________________________________________________________________#
 #REGISTRO
+#Funcion para leer el ultimo codigo de factura
+def obtener_ultimo_codigo_factura(archivo):
+    try:
+        with open(archivo, 'r') as archivo:
+            lineas=archivo.readlines()
+            if lineas:
+                ultima_linea=lineas[-1]
+                ultimo_codigo=int(ultima_linea.split(';')[0])
+                return ultimo_codigo
+    except print("Error al cargar el archivo, verifica que se haya registrado al menos una factura"):
+        pass
+    return 234500
 def registrar_compra_menu():
-    global paises, ciudades, restaurantes, menus, productos
+    global paises, ciudades, restaurantes, menus, productos, clientes
     print("\n=== REGISTRAR NUEVA COMPRA ===")
     print("Por favor ingrese los siguientes datos:")
     # Mostrar paises disponibles
@@ -434,16 +446,16 @@ def registrar_compra_menu():
     while True:
         productos_menu=[prod for prod in productos if prod[0]==cod_pais and prod[1]==cod_ciudad and prod[2]==cod_restaurante and prod[3]==cod_menu]
         if not productos_menu:
-            print("\nNo hay productos dispoibles en este menu.")
+            print("\nNo hay productos disponibles en este menu.")
             return False
 
-        print(f"\n Productos dispoibles en este menu {cod_menu}: ")
+        print(f"\n Productos disponibles en este menu {cod_menu}: ")
         for prod in productos_menu:
             print(f"├─ Código: {prod[4]}")
             print(f"│  Nombre: {prod[5]}")
             print(f"│  Precio: ${prod[7]}")
             print("└──────────────────")
-        cod_producto = input("\nIngrese el código del producto (o 'fin' para terminar): ").strip()
+        cod_producto=input("\nIngrese el código del producto (o 'fin' para terminar): ").strip()
         if cod_producto.lower()=='fin':
             if not productos_seleccionados:
                 print("Debe seleccionar al menos un producto")
@@ -451,7 +463,7 @@ def registrar_compra_menu():
             break
         producto_encontrado = None
         for p in productos_menu:
-            if str(p[4]) == str(cod_producto):
+            if str(p[4])==str(cod_producto):
                 producto_encontrado = p
                 break
         if not producto_encontrado:
@@ -460,8 +472,8 @@ def registrar_compra_menu():
             continue
         while True:
             try:
-                cantidad = int(input(f"\nIngrese la cantidad para {producto_encontrado[5]}: "))
-                if cantidad <= 0:
+                cantidad=int(input(f"\nIngrese la cantidad para {producto_encontrado[5]}: "))
+                if cantidad<=0:
                     print("La cantidad debe ser mayor a 0")
                     continue
                 break
@@ -470,25 +482,38 @@ def registrar_compra_menu():
         productos_seleccionados.append({'producto': producto_encontrado, 'cantidad': cantidad})
         print(f"Producto {producto_encontrado[5]} agregado con éxito")
 
-    cedula=input("\nIngrese cédula del cliente: ").strip()
+    cedula=input("\nIngrese la cédula del cliente: ").strip()
     cliente=next((c for c in clientes if c[0]==cedula), None)
     if not cliente:
         print("Error: Cliente no registrado")
         return False
     print(f"Cliente: {cliente[1]}")
 
-    orden=input("\nIngrese la si es para llevar o comer aqui: (llevar/aqui): ")
+    orden=input("\nIngrese si la orden es para llevar o comer aqui: (llevar/aqui): ").strip().lower()
     while orden not in ['llevar', 'aqui']:
         print("Opción no válida. Ingrese 'llevar' o 'aqui'")
         orden=input("\nIngrese si es para llevar o comer aquí (llevar/aqui): ").strip().lower()
+
+    metodo_pago=input("\nIngrese el metodo de pago: (efectivo/tarjeta): ").strip().lower()
+    while metodo_pago not in ['efectivo', 'tarjeta']:
+        print("Opcion no valida. Ingrese 'efectivo' o 'tarjeta'")
+        metodo_pago=input("\nIngrese el metodo de pago: (efectivo/tarjeta): ").strip().lower()
     # Mostrar resumen de la compra
     print("\nResumen de su compra:")
     total_compra=0
     for i, item in enumerate(productos_seleccionados, 1):
         producto=item['producto']
         cantidad=item['cantidad']
-        subtotal=float(producto[7]) * cantidad
+        subtotal=float(producto[7])*cantidad
         total_compra+=subtotal
+        if orden=="llevar" and metodo_pago=="efectivo":
+            total_compra=total_compra
+        elif orden=="llevar" and metodo_pago=="tarjeta":
+            total_compra*=0.92
+        elif orden=="aqui" and metodo_pago=="efectivo":
+            total_compra=total_compra
+        else:
+            total_compra*=0.95
         print(f"{i}. {producto[5]} - Cantidad: {cantidad} - Subtotal: {subtotal:.2f}")
     print(f"\nTotal a pagar: {total_compra:.2f}")
 
@@ -612,38 +637,59 @@ def registrar_compra_menu():
         modificar = input("\n¿Desea realizar más modificaciones? (S/N): ").strip().upper()
 
     confirmar=input("\n¿Confirmar compra? (S/N): ").strip().upper()
-    if confirmar != "S":
+    if confirmar!="S":
         print("\nCompra cancelada")
         return False
     # Un archivo para todas las compras
     registro_compras=f"registro_compras.txt"
+    codigo_factura=obtener_ultimo_codigo_factura(registro_compras)+1
+
     with open(registro_compras,"a") as archivo:
         for item in productos_seleccionados:
-            producto = item['producto']
-            cantidad = item['cantidad']
-            precio_unitario = float(producto[7])
-            total = precio_unitario * cantidad
+            producto=item['producto']
+            cantidad=item['cantidad']
+            subtotal=float(producto[7])
+            total=subtotal*cantidad
+            if orden=="llevar" and metodo_pago=="efectivo":
+                total=total
+            elif orden=="llevar" and metodo_pago=="tarjeta":
+                total*=0.92
+            elif orden=="aqui" and metodo_pago=="efectivo":
+                total=total
+            else:
+                total*=0.95
             archivo.write(
+                f"{codigo_factura};"
                 f"{cliente[0]};{cliente[1]};"
                 f"{cod_pais};{cod_ciudad};{cod_restaurante};"
                 f"{cod_menu};{producto[4]};{producto[5]};"
-                f"{cantidad};{precio_unitario:.2f};{total:.2f};{orden}\n"
+                f"{cantidad};{subtotal:.2f};{total:.2f};{orden}\n"
             )
         print("\nCompra registrada exitosamente!")
     # Un archivo para cada cliente
-    nombre_archivo=f"factura_{cedula}.txt"
+    nombre_archivo=f"factura_{cedula}_{codigo_factura}.txt"
     with open(nombre_archivo, "a") as archivo:
         for item in productos_seleccionados:
-            producto = item['producto']
-            cantidad = item['cantidad']
-            precio_unitario = float(producto[7])
-            total = precio_unitario * cantidad
+            producto=item['producto']
+            cantidad=item['cantidad']
+            subtotal=float(producto[7])
+            total=subtotal*cantidad
+            if orden=="llevar" and metodo_pago=="efectivo":
+                total=total
+            elif orden=="llevar" and metodo_pago=="tarjeta":
+                total*=0.92
+            elif orden=="aqui" and metodo_pago=="efectivo":
+                total=total
+            else:
+                total*=0.95
             archivo.write(
+                f"{codigo_factura};"
                 f"{cliente[0]};{cliente[1]};"
                 f"{cod_pais};{cod_ciudad};{cod_restaurante};"
                 f"{cod_menu};{producto[4]};{producto[5]};"
-                f"{cantidad};{precio_unitario:.2f};{total:.2f};{orden}\n"
+                f"{cantidad};{subtotal:.2f};{total:.2f};{orden}\n"
             )
+        print(f"\nCompra registrada exitosamente! Factura #{codigo_factura}, Total: ${total_compra:.2f}")
     return True
 #______________________________________________________________________________________________________________________#
 #REPORTES
@@ -733,27 +779,83 @@ def reporte_compras():
         return
     print("\n=== LISTA DE COMPRAS ===\n")
     print("Lista de compras completa en el archivo: registro_compras.txt")
-def reporte_compras_cliente(cedula):
-    cedula=normalizar_codigo(cedula)
-    cedulas_filtradas=[ced for ced in compras if ced[0]==cedula]
-    if not cedulas_filtradas:
-        print(f"No hay compras registrados para el cliente: {cedula}.")
+#Funciones de estadisticas
+def leer_compras():
+    try:
+        with open("registro_compras.txt", "r") as archivo:
+            lineas=archivo.readlines()
+            if not lineas:
+                print("No hay compras registradas en el sistema.")
+                return
+            return [linea.strip().split(';') for linea in lineas]  # Devuelve lista de campos
+    except FileNotFoundError:
+        print("El archivo registro_compras.txt no existe, intenta registrar una compra primero.")
         return
-    contenido="\n".join([f"{ced[0]}. {ced[1]}" for ced in cedulas_filtradas])
-    print(f"\n=== COMPRAS DEL CLIENTE {cedula} ===\n"+contenido)
-    guardar_reporte(f"Compras del cliente {cedula}", contenido)
+def reporte_compras_cliente():
+    global compras
+    cedula=input("Ingrese la cédula del cliente: ").strip()
+    cedula=normalizar_codigo(cedula)
+    compras=leer_compras()
+    if not compras:
+        return
+    contador=0
+    nombre_cliente=None
+    for campos in compras:  # Iteramos directamente sobre la lista de campos
+        cedula_extraida=campos[1]  # Posición 1 es la cédula
+        if cedula_extraida==cedula:
+            if nombre_cliente is None:
+                nombre_cliente=campos[2]  # Posición 2 es el nombre
+            contador+=1
+
+    if contador==0:
+        print(f"No hay compras registradas para el cliente con cédula {cedula}.")
+        return
+    contenido=f"Cliente: {nombre_cliente}\nCédula: {cedula}\nCantidad de ítems comprados: {contador}"
+    print(f"\n=== COMPRAS DEL CLIENTE {cedula} ===\n{contenido}")
+    guardar_reporte(f"Compras del Cliente {cedula}", contenido)
+def reporte_restaurante_mas_escogido():
+    global compras
+    compras=leer_compras()
+    if not compras:
+        return
+    contados=[]
+    for indice in compras:
+        cod_restaurante=indice[5]
+        encontrado=False
+        for i in range(len(contados)):
+            if contados[i][0]==cod_restaurante:
+                contados[i][1]+=1
+                encontrado=True
+                break
+        if not encontrado:
+            contados.append([cod_restaurante, 1])
+    restaurante_mas_escogido = None
+    mayor_cantidad=0
+    for par in contados:
+        cod_restaurante=par[0]
+        cantidad=par[1]
+        if cantidad>mayor_cantidad:
+            restaurante_mas_escogido=cod_restaurante
+            mayor_cantidad=cantidad
+    if restaurante_mas_escogido is None:
+        print("No se encontraron restaurantes en las compras.")
+        return
+    contenido = f"{restaurante_mas_escogido}. Compras: {mayor_cantidad}"
+    print(f"\n=== RESTAURANTE MÁS ESCOGIDO ===\n{contenido}")
+    guardar_reporte("Restaurante Más Escogido", contenido)
 #______________________________________________________________________________________________________________________#
 #MENU__________________________________________________________________________________________________________________#
 def mostrar_menu(opciones):
     print(f"\n=== Bienvenido al menu de Mantenimiento de Bases de Datos ===")
     for i, opcion in enumerate(opciones, start=1):
         print(f"{i}. {opcion}")
-
 def MainMenu():
     opciones_principales=["Inserción", "Buscar", "Modificar", "Reportes", "Salir"]
     subopciones=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Regresar al mantenimiento"] #Para poder ingresar a otro ciclo y muestre un segundo menu
     subopciones_insertar=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Registrar compra", "Regresar al mantenimiento"]
-    opciones_reportes = ["Lista de Países", "Ciudades de un País", "Restaurantes de una Ciudad", "Lista de Clientes", "Reporte de todas las compras", "Compras de un Cliente", "Regresar al menú principal"]
+    opciones_reportes=["Lista de Países", "Ciudades de un País", "Restaurantes de una Ciudad", "Lista de Clientes", "Reporte de todas las compras", "Compras de un Cliente", "Estadisticas", "Regresar al menú principal"]
+    opciones_rep_estadisticas=["Restaurante mas buscado", "Menu mas buscado", "Producto mas comprado", "Factura de mayor monto", "Factura de menor monto"]
+    opciones_consulta=["Precio de un producto", "Descuento por pagar con tarjeta"]
     while True:
         mostrar_menu(opciones_principales)
         print("\n Ingrese que quiere hacer: ")
@@ -762,7 +864,7 @@ def MainMenu():
             print("Has seleccionado la opcion Insertar.")
             while True:
                 mostrar_menu(subopciones_insertar)
-                y=int(input("Selecciona una sub-opción (1-7) para insertar: "))
+                y=int(input("Selecciona una sub-opción (1-8) para insertar: "))
                 if y==1:insertar_pais()
                 elif y==2:insertar_ciudad()
                 elif y==3:insertar_restaurante()
@@ -780,7 +882,7 @@ def MainMenu():
                     print("Volviendo al menú principal...")
                     break
                 else:
-                    print("Opción no válida. Por favor, selecciona una sub-opción del 1 al 7.")
+                    print("Opción no válida. Por favor, selecciona una sub-opción del 1 al 8.")
         elif x==2:
             print("Has seleccionado Buscar.")
             while True:
@@ -815,22 +917,26 @@ def MainMenu():
             print("Has seleccionado Reportes.")
             while True:
                 mostrar_menu(opciones_reportes)
-                y=int(input("Selecciona un reporte (1-6): "))
+                y=int(input("Selecciona un reporte (1-7): "))
                 if y==1:reporte_paises()
                 elif y==2:reporte_ciudades()
                 elif y==3:reporte_restaurantes()
                 elif y==4:reporte_clientes()
                 elif y==5:reporte_compras()
-                elif y==6:
-                    cedula = input("Ingrese la cédula del cliente: ")
-                    reporte_compras_cliente('compras', cedula)
+                elif y==6:reporte_compras_cliente()
                 elif y==7:
+                    while True:
+                        mostrar_menu(opciones_rep_estadisticas)
+                        x=int(input("Selecciona una opcion del 1-5: "))
+                        if x==1:reporte_restaurante_mas_escogido()
+                        pass
+                elif y==8:
                     print("Volviendo al menú principal...")
                     break
         elif x==5:
             break
         else:
-            print("\n\n Atención!! \n Ingresa una opción del 1 al 6.")
+            print("\n\n Atención!! \n Ingresa una opción del 1 al 5.")
             continue #Para que el usuario no tenga que reiniciar el programa
 MainMenu()
 #______________________________________________________________________________________________________________________#
