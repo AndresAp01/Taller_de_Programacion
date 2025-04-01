@@ -4,9 +4,9 @@ Fecha:
   Jueves 13 de marzo a Jueves 3 de Abril
 
 ## Funciones del sistema:
-### Para que sirve
+### Para qué sirve
 Este sistema se dirige a una cadena de restaurantes internacionales. Donde la informacion para  las compras se gfuarda en arcchivos de varios tipos.
-Estos archivos se cargan automaticamente al iniciar el programa.
+Estos archivos se cargan automáticamente al iniciar el programa.
 El usuario podra hacer varias cosas:
 - [Insertar](#opcion-1-insercion-)
 - [Buscar](#opcion-2-buscar)
@@ -27,8 +27,8 @@ El usuario podra hacer varias cosas:
 - [Lisencia](#license)
 
 ##  Instalación 
-
-Simplemente descargue el archivo comprimido: "Proyecto_1.zip" y guárdelo en una carpeta donde todos los archivos estén en
+> [!IMPORTANT]
+> Simplemente descargue el archivo comprimido: "Proyecto_1.zip" y guárdelo en una carpeta donde todos los archivos estén en
 una sola carpeta. No mueva ni modifique ningun archivo.
 
 Abra el archivo "Proyecto_1.py" con el entorno que guste, de preferencia Python IDLE, PyCharm, VSCode.
