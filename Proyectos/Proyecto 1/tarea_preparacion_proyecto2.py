@@ -62,6 +62,11 @@ menus=datos_a_listas("Menu.txt", ";")
 productos=datos_a_listas("Productos.txt", ";")
 clientes=datos_a_listas("Clientes.txt", ";")
 compras=datos_a_listas("registro_compras.txt", ";")
+#Listas para estadisticas
+contador_busquedas_rest=[]
+contador_busquedas_menu=[]
+contador_compras_producto=[]
+
 def normalizar_codigo(codigo):
     if not isinstance(codigo, (str, int)):
         print(f"El codigo {codigo} no es alfanumerico")
@@ -250,10 +255,23 @@ def buscar_ciudad(): #FUNCIONA
         print(f"No se encontraron países con el codigo '{codigo}'.")
 def buscar_rest():
     global restaurantes
+    global contador_busquedas_rest
     print("Has seleccionado buscar Restaurante.")
     codigo = input("Ingrese el codigo del restaurante: ")
     codigo=normalizar_codigo(codigo)
     resultados=[rest for rest in restaurantes if codigo == rest[2].lower()]
+    if resultados:
+        for rest in resultados:
+            nombre_restaurante=rest[3]
+            encontrado=False
+            for contador in contador_busquedas_rest:
+                if contador[0]==nombre_restaurante:
+                    contador[1]+=1
+                    encontrado=True
+                    break
+            if not encontrado:
+                contador_busquedas_rest.append([nombre_restaurante, 1])
+
     if resultados:
         print("\nResultados de la búsqueda:")
         for rest in resultados:
@@ -261,11 +279,22 @@ def buscar_rest():
     else:
         print(f"No se encontraron restaurantes con el nombre '{codigo}'.")
 def buscar_menu(): #FUNCIONA
-    global menus
+    global menus, contador_busquedas_menu
     print("Has seleccionado buscar Menu.")
     codigo = input("Ingrese el codigo del menu: ")
     codigo=normalizar_codigo(codigo)
     resultados=[menu for menu in menus if codigo.lower() in menu[4].lower()]
+    if resultados:
+        for menu in menus:
+            nombre_menu=menu[4]
+            encontrado=False
+            for contador in contador_busquedas_menu:
+                if contador[0]==nombre_menu:
+                    contador[1]+=1
+                    encontrado=True
+                    break
+            if not encontrado:
+                contador_busquedas_menu.append([nombre_menu, 1])
     if resultados:
         print("\nResultados de la búsqueda:")
         for menu in resultados:
@@ -273,12 +302,17 @@ def buscar_menu(): #FUNCIONA
                 f"País: {menu[0]}, Ciudad: {menu[1]}, Restaurante: {menu[2]}, Código: {menu[3]}, Nombre: {menu[4]}")
     else:
         print(f"No se encontraron menús con el nombre '{codigo}'.")
-def buscar_produ(): #FUNCIONA
+def buscar_produ(retornar_precio=False): #FUNCIONA
     global productos
     print("Has seleccionado buscar Productos.")
-    codigo = input("Ingrese el codigo del producto: ")
+    codigo=input("Ingrese el codigo del producto: ")
     codigo=normalizar_codigo(codigo)
-    resultados=[prod for prod in productos if codigo.lower() in prod[5].lower()]
+    resultados=[prod for prod in productos if codigo.lower() in prod[4]]
+    if retornar_precio:
+        if resultados:
+            return resultados[0][7]  # Retorna el precio
+        else:
+            return None
     if resultados:
         print("\nResultados de la búsqueda: ")
         for prod in resultados:
@@ -301,6 +335,38 @@ def buscar_cliente():
             return cliente
     else:
         print(f"Cliente no encontrado con cedula '{cedula_a_buscar}'.")
+def obtener_restaurante_mas_buscado():
+    global contador_busquedas_rest
+    if not contador_busquedas_rest:
+        return None, 0
+    mas_buscado=contador_busquedas_rest[0]
+    for contador in contador_busquedas_rest:
+        if contador[1]>mas_buscado[1]:
+            mas_buscado=contador
+    return mas_buscado[0], mas_buscado[1]
+def obtener_menu_mas_buscado():
+    global contador_busquedas_menu
+    if not contador_busquedas_menu:
+        return None, 0
+    mas_buscado=contador_busquedas_menu[0]
+    for contador in contador_busquedas_menu:
+        if contador[1]>mas_buscado[1]:
+            mas_buscado=contador
+    return mas_buscado[0], mas_buscado[1]
+def obtener_producto_mas_buscado():
+    global contador_busquedas_producto
+    if not contador_busquedas_producto:
+        return None, 0
+    mas_buscado=contador_busquedas_producto[0]
+    for contador in contador_busquedas_producto:
+        if contador[1]>mas_buscado[1]:
+            mas_buscado=contador
+    return mas_buscado[0], mas_buscado[1]
+def buscar_precio():
+    pass
+def buscar_descuento():
+    pass
+
 #______________________________________________________________________________________________________________________#
 #INSERCIONES___________________________________________________________________________________________________________#
 def insertar_en_lista(lista, nuevo_registro, indices_unicos=None):
@@ -813,7 +879,15 @@ def reporte_compras_cliente():
     contenido=f"Cliente: {nombre_cliente}\nCédula: {cedula}\nCantidad de ítems comprados: {contador}"
     print(f"\n=== COMPRAS DEL CLIENTE {cedula} ===\n{contenido}")
     guardar_reporte(f"Compras del Cliente {cedula}", contenido)
-def reporte_restaurante_mas_escogido():
+def reporte_restaurante_mas_buscado():
+    nombre_rest, cantidad=obtener_restaurante_mas_buscado()
+    if nombre_rest is None:
+        print("No hay datos, se necesita buscar un restaurante al menos.")
+        return
+    contenido=f"El restaurante mas buscado es: {nombre_rest}\nCantidad de busquedas: {cantidad}"
+    print(f"\n=== RESTAURANTE MAS BUSCADO ===\n{contenido}")
+    guardar_reporte("Menu mas buscado", contenido)
+'''def reporte_restaurante_mas_buscado():
     global compras
     compras=leer_compras()
     if not compras:
@@ -842,7 +916,112 @@ def reporte_restaurante_mas_escogido():
         return
     contenido = f"{restaurante_mas_escogido}. Compras: {mayor_cantidad}"
     print(f"\n=== RESTAURANTE MÁS ESCOGIDO ===\n{contenido}")
-    guardar_reporte("Restaurante Más Escogido", contenido)
+    guardar_reporte("Restaurante Más Escogido", contenido)'''
+def reporte_menu_mas_buscado():
+    nombre_menu, cantidad=obtener_menu_mas_buscado()
+    if nombre_menu is None:
+        print("No hay datos, se ncesita buscar un menu antes.")
+        return
+    contenido=f"El menu mas buscado es: {nombre_menu}\nCantidad de busquedas: {cantidad}"
+    print(f"\n=== MENU MAS BUSCADO ===\n{contenido}")
+    guardar_reporte("Menu mas buscado", contenido)
+def obtener_producto_mas_comprado():
+    global contador_compras_producto
+    try:
+        with open("registro_compras.txt", "r") as archivo:
+            lineas=archivo.readlines()
+    except FileNotFoundError:
+        print("No se encontró el archivo 'registro_compras.txt'.")
+        return None, None
+
+    for linea in lineas:
+        datos=linea.strip().split(";")
+        try:
+            cantidad=int(datos[9])
+        except ValueError:
+            continue
+        producto=datos[8]
+        encontrado=False
+        for registro in contador_compras_producto:
+            if registro[0]==producto:
+                registro[1]+=cantidad
+                encontrado=True
+                break
+        if not encontrado:
+            contador_compras_producto.append([producto, cantidad])
+    producto_mas_comprado=None
+    max_cantidad=0
+    for registro in contador_compras_producto:
+        if registro[1]>max_cantidad:
+            max_cantidad=registro[1]
+            producto_mas_comprado=registro[0]
+
+    return producto_mas_comprado, max_cantidad
+def reporte_producto_mas_comprado():
+    nombre_producto, cantidad=obtener_producto_mas_comprado()
+    if nombre_producto is None:
+        print("No hay datos para generar el reporte.")
+        return
+    contenido=f"El producto más comprado es: {nombre_producto}\nCantidad de compras: {cantidad}"
+    print(f"\n=== PRODUCTO MÁS COMPRADO ===\n{contenido}")
+    guardar_reporte("Producto más comprado", contenido)
+def reporte_facturas_extremas(mayor=True):
+    try:
+        with open("registro_compras.txt", "r") as archivo:
+            lineas = archivo.readlines()
+    except FileNotFoundError:
+        print("No se encuentra el archivo 'registro_compras.txt', trata de hacer compras primero.")
+        return
+    factura_mayor=None
+    factura_menor=None
+    monto_mayor=float('-inf')
+    monto_menor=float('inf')
+    for linea in lineas:
+        datos = linea.strip().split(";")
+        if len(datos)<12:
+            continue  # línea malformada
+        try:
+            monto=float(datos[11])
+        except ValueError:
+            continue  # si no se puede convertir a número, ignoramos
+        if monto>monto_mayor:
+            monto_mayor=monto
+            factura_mayor=datos
+        if monto<monto_menor:
+            monto_menor=monto
+            factura_menor=datos
+
+    if not (factura_mayor and factura_menor):
+        print("No se encontraron facturas válidas en el archivo.")
+        return
+
+    if mayor:
+        contenido=f"""\
+        === FACTURA DE MAYOR MONTO ===
+        Factura N°: {factura_mayor[0]}
+        Cliente: {factura_mayor[2]}
+        Producto: {factura_mayor[8]}
+        Cantidad: {factura_mayor[9]}
+        Total: {factura_mayor[11]}
+        """
+        titulo="Factura de Mayor Monto"
+    else:
+        contenido=f"""\
+            === FACTURA DE MENOR MONTO ===
+            Factura N°: {factura_menor[0]}
+            Cliente: {factura_menor[2]}
+            Producto: {factura_menor[8]}
+            Cantidad: {factura_menor[9]}
+            Total: {factura_menor[11]}
+            """
+        titulo="Factura de Menor Monto"
+    print(contenido)
+    guardar_reporte(titulo, contenido)
+def reporte_factura_menor_monto():
+    pass
+def reporte_descuentos():
+    pass
+
 #______________________________________________________________________________________________________________________#
 #MENU__________________________________________________________________________________________________________________#
 def mostrar_menu(opciones):
@@ -854,8 +1033,7 @@ def MainMenu():
     subopciones=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Regresar al mantenimiento"] #Para poder ingresar a otro ciclo y muestre un segundo menu
     subopciones_insertar=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Registrar compra", "Regresar al mantenimiento"]
     opciones_reportes=["Lista de Países", "Ciudades de un País", "Restaurantes de una Ciudad", "Lista de Clientes", "Reporte de todas las compras", "Compras de un Cliente", "Estadisticas", "Regresar al menú principal"]
-    opciones_rep_estadisticas=["Restaurante mas buscado", "Menu mas buscado", "Producto mas comprado", "Factura de mayor monto", "Factura de menor monto"]
-    opciones_consulta=["Precio de un producto", "Descuento por pagar con tarjeta"]
+    opciones_rep_estadisticas=["Restaurante mas buscado", "Menu mas buscado", "Producto mas comprado", "Factura de mayor monto", "Factura de menor monto", "Precio de un producto", "Descuento por pagar con tarjeta", "Regresar al menu principal"]
     while True:
         mostrar_menu(opciones_principales)
         print("\n Ingrese que quiere hacer: ")
@@ -927,9 +1105,15 @@ def MainMenu():
                 elif y==7:
                     while True:
                         mostrar_menu(opciones_rep_estadisticas)
-                        x=int(input("Selecciona una opcion del 1-5: "))
-                        if x==1:reporte_restaurante_mas_escogido()
-                        pass
+                        x=int(input("Selecciona una opcion del 1-7: "))
+                        if x==1:reporte_restaurante_mas_buscado()
+                        if x==2:reporte_menu_mas_buscado()
+                        if x==3: reporte_producto_mas_comprado()
+                        if x==4: reporte_facturas_extremas(mayor=True)
+                        if x==5: reporte_facturas_extremas(mayor=False)
+                        if x==6: pass
+                        if x==7: pass
+                        if x==8: break
                 elif y==8:
                     print("Volviendo al menú principal...")
                     break
