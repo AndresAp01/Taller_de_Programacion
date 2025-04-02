@@ -254,12 +254,11 @@ def buscar_ciudad(): #FUNCIONA
     else:
         print(f"No se encontraron países con el codigo '{codigo}'.")
 def buscar_rest():
-    global restaurantes
-    global contador_busquedas_rest
+    global restaurantes, contador_busquedas_rest
     print("Has seleccionado buscar Restaurante.")
     codigo = input("Ingrese el codigo del restaurante: ")
     codigo=normalizar_codigo(codigo)
-    resultados=[rest for rest in restaurantes if codigo == rest[2].lower()]
+    resultados=[rest for rest in restaurantes if codigo==rest[2].lower()]
     if resultados:
         for rest in resultados:
             nombre_restaurante=rest[3]
@@ -276,6 +275,7 @@ def buscar_rest():
         print("\nResultados de la búsqueda:")
         for rest in resultados:
             print(f"País: {rest[0]}, Ciudad: {rest[1]}, Código: {rest[2]}, Nombre: {rest[3]}")
+        return resultados[0][3]
     else:
         print(f"No se encontraron restaurantes con el nombre '{codigo}'.")
 def buscar_menu(): #FUNCIONA
