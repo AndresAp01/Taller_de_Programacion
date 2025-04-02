@@ -1020,7 +1020,49 @@ def reporte_facturas_extremas(mayor=True):
 def reporte_factura_menor_monto():
     pass
 def reporte_descuentos():
-    pass
+    orden=input("Ingrese el tipo de servicio ('llevar' o 'aqui'): ").strip().lower()
+    metodo_pago=input("Ingrese el tipo de pago ('tarjeta' o 'efectivo'): ").strip().lower()
+    descuento=None
+    if orden=="llevar":
+        if metodo_pago=="efectivo":
+            descuento=3
+        elif metodo_pago=="tarjeta":
+            descuento=8
+    elif orden=="aqui":
+        if metodo_pago=="tarjeta":
+            descuento=5
+        elif metodo_pago== "efectivo":
+            descuento=0
+    contenido = (f"Para el servicio '{orden}' y pago con '{metodo_pago}', "
+                 f"se aplica un descuento del {descuento}%.")
+    print("\n=== DESCUENTO APLICADO ===\n"+contenido)
+    guardar_reporte("Descuento aplicado", contenido)
+
+
+def reporte_precio_produ():
+    global productos
+    precio=buscar_produ(retornar_precio=True)
+    if precio is None:
+        print("No se encontro el producto solicitado.")
+        return
+    codigo=input("Confirme el codigo del producto para el reporte: ")
+    codigo=normalizar_codigo(codigo)
+    for prod in productos:
+        if codigo.lower() in prod[4].lower():
+            nombre_producto=prod[4]
+            restaurante=prod[2]
+            break
+    else:
+        nombre_producto="Producto desconocido"
+        restaurante="Restaurante desconocido"
+    titulo=f"REPORTE DE PRECIO - {nombre_producto}"
+    contenido=f"Producto: {nombre_producto}\n"
+    contenido+=f"Restaurante: {restaurante}\n"
+    contenido+=f"Código: {codigo}\n"
+    contenido+=f"Precio: ${precio}"
+
+    print(f"\n=== {titulo} ===\n{contenido}")
+    guardar_reporte(titulo, contenido)
 
 #______________________________________________________________________________________________________________________#
 #MENU__________________________________________________________________________________________________________________#
@@ -1111,8 +1153,8 @@ def MainMenu():
                         if x==3: reporte_producto_mas_comprado()
                         if x==4: reporte_facturas_extremas(mayor=True)
                         if x==5: reporte_facturas_extremas(mayor=False)
-                        if x==6: pass
-                        if x==7: pass
+                        if x==6: reporte_precio_produ()
+                        if x==7: reporte_descuentos()
                         if x==8: break
                 elif y==8:
                     print("Volviendo al menú principal...")
