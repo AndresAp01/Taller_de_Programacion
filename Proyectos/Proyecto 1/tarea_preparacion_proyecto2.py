@@ -469,11 +469,8 @@ def insertar_producto():
 def insertar_cliente():
     global clientes
     cedula=input("Ingrese la cédula del cliente: ")
-    if not validar_cliente_existe(cedula):
-        return False
     nombre=input("Ingrese el nombre del cliente: ")
     resultado=insertar_en_lista(clientes, [str(cedula), nombre], indices_unicos=[0])
-
     if resultado:
         print(f"Registro insertado correctamente: {clientes}")
     return resultado
