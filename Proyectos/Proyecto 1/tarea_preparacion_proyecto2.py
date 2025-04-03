@@ -75,9 +75,9 @@ def normalizar_codigo(codigo):
 def validar_pais_existe(cod_pais):
     cod_pais=normalizar_codigo(cod_pais)
     for i in range(len(paises)):
-        if paises[i][0].lstrip('-')==cod_pais:
+        if paises[i][0]==cod_pais:
             return True
-    print(f"Error: No existe un país con código '{paises[1]}'")
+    print(f"Error: No existe un país con código '{cod_pais}'")
     return False
 def validar_ciudad_existe(cod_pais, cod_ciudad):
     global paises, ciudades
@@ -94,9 +94,10 @@ def validar_restaurante_existe(cod_pais, cod_ciudad, cod_rest):
     cod_ciudad=normalizar_codigo(cod_ciudad)
     cod_rest=normalizar_codigo(cod_rest)
     for i in range(len(restaurantes)):
-        if ciudades[i][0]==cod_pais and ciudades[i][1]==cod_ciudad and restaurantes[i][2]==cod_rest:
+        if restaurantes[i][0]==cod_pais and restaurantes[i][1]==cod_ciudad and restaurantes[i][2]==cod_rest:
             return True
     print(f"Error: No existe un restaurante con codigo '{cod_rest}' en la ciudad '{cod_ciudad}'")
+    return False
 def validar_menu_existe(cod_pais, cod_ciudad, cod_rest, cod_menu):
     global paises, ciudades, restaurantes, menus
     cod_pais=normalizar_codigo(cod_pais)
@@ -107,6 +108,7 @@ def validar_menu_existe(cod_pais, cod_ciudad, cod_rest, cod_menu):
         if menus[i][0]==cod_pais and menus[i][1]==cod_ciudad and menus[i][2]==cod_rest and menus[i][3]==cod_menu:
             return True
     print(f"Error: No existe un menu con codigo '{cod_menu}' en el restaurante '{cod_rest}'")
+    return False
 def validar_producto_existe(cod_pais, cod_ciudad, cod_rest, cod_menu, cod_producto):
     global paises, ciudades, restaurantes, menus, productos
     cod_pais=normalizar_codigo(cod_pais)
@@ -485,14 +487,18 @@ def obtener_ultimo_codigo_factura(archivo):
                 ultima_linea=lineas[-1]
                 ultimo_codigo=int(ultima_linea.split(';')[0])
                 return ultimo_codigo
-    except print("Error al cargar el archivo, verifica que se haya registrado al menos una factura"):
-        pass
+            else: #Si el archivo existiera pero esta vacio
+                return 234500
+    except FileNotFoundError:
+        print("Error al cargar el archivo, verifica que se haya registrado al menos una factura")
+        with open(archivo, 'w') as nuevo_archivo:
+            pass
     return 234500
 def registrar_compra_menu():
     global paises, ciudades, restaurantes, menus, productos, clientes
     print("\n=== REGISTRAR NUEVA COMPRA ===")
     print("Por favor ingrese los siguientes datos:")
-    # Mostrar paises disponibles
+    #Mostrar paises disponibles
     print("\nPaíses disponibles:")
     for pais in paises:
         print(f"- {pais[0]}: {pais[1]}")
@@ -500,7 +506,7 @@ def registrar_compra_menu():
     if not validar_pais_existe(cod_pais):
         print(f"Error: País {cod_pais} no existe")
         return False
-    #  ciudades disponibles para ese pais
+    #ciudades disponibles para ese pais
     print("\nCiudades disponibles en este país:")
     ciudades_pais=[c for c in ciudades if c[0]==cod_pais]
     for ciudad in ciudades_pais:
@@ -509,7 +515,8 @@ def registrar_compra_menu():
     if not validar_ciudad_existe(cod_pais, cod_ciudad):
         print(f"Error: Ciudad {cod_ciudad} no existe")
         return False
-    #  restaurantes disponibles en esa ciudad
+
+    #restaurantes disponibles en esa ciudad
     print("\nRestaurantes disponibles en esta ciudad:")
     restaurantes_ciudad=[r for r in restaurantes if r[0]==cod_pais and r[1]==cod_ciudad]
     for rest in restaurantes_ciudad:
@@ -686,19 +693,18 @@ def registrar_compra_menu():
 
         elif opcion=="4":  # Agregar producto
             print("\nProductos disponibles en este menú:")
-            # Filtrar todos los productos que pertenecen al menú seleccionado
-            productos_en_menu = [prod for prod in productos if prod[0]==cod_pais and prod[1]==cod_ciudad and prod[2]==cod_restaurante and prod[3] == cod_menu]
+            productos_en_menu=[prod for prod in productos if prod[0]==cod_pais and prod[1]==cod_ciudad and prod[2]==cod_restaurante and prod[3] == cod_menu]
             if not productos_en_menu:
                 print("No hay productos disponibles en este menú")
                 continue
             for producto in productos_en_menu:
                 print(f"- {producto[4]}: {producto[5]} (Precio: {producto[7]})")
-            cod_producto = input("\nIngrese el código del producto a agregar: ").strip()
+            cod_producto=input("\nIngrese el código del producto a agregar: ").strip()
             producto_encontrado=next((p for p in productos_en_menu if p[4]==cod_producto), None)
             if not producto_encontrado:
                 print("Error: Producto no encontrado en este menú")
                 continue
-            cantidad = int(input(f"\nIngrese la cantidad para {producto_encontrado[5]}: "))
+            cantidad=int(input(f"\nIngrese la cantidad para {producto_encontrado[5]}: "))
             if cantidad<= 0:
                 print("La cantidad debe ser mayor a 0")
                 continue
