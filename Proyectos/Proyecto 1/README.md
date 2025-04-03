@@ -36,6 +36,7 @@ Abra el archivo "Proyecto_1.py" con el entorno que guste, de preferencia Python 
 ## Cómo usar
 Al abrir el programa este se ejecutara de manera automatica.
 
+![pyIDLE](https://github.com/user-attachments/assets/3027cf75-4433-46aa-bc22-6fc0297709e7)
 
 Se le presentara una serie de opciones, que veremos a continuacion.
 
@@ -52,7 +53,8 @@ Aquí entrará en un submenú, que le mostrará 7 opciones:
       4. Insertar un nuevo menú
       5. Insertar un nuevo producto
       6. Insertar un nuevo cliente
-      7. Volver al menu principal`
+      7. Registrar compra
+      8. Volver al menu principal`
 
 Para cada opcion, usted debe ingresar los datos requeridos. Por ejemplo, para insertar un pais, solamente es necesario digitar el codigo y su nombre, luego darle "Enter" para registrar la insercion.
 Sin embargo, para un restaurante, necesitara primero haber ingresado un pais y luego una ciudad.
@@ -117,6 +119,47 @@ Por ejemplo, si quisiera cambiarle el nombre a un producto desde donde quedamos 
 
 
 ### Opcion 5: Salir
+
+## Dentro de Insertar
+### Para registrar una compra
+Para registrar una compra de un cliente tiene que ir al menu de inserciones. Para esto, en el menu principal preisone 1. Luego presione la opcion 8 'Registrar Compra'
+
+A este punto se le mostrara la lista de paises disponibles (Para registrar un nuevo pais o cualquier otro codigo necesario: vease ()) . Luego se le mostrara la lista de ciudades disponibles dentro de ese pais, asi, hasta llegar a productos disponibles.
+
+Debe ingresar:
+1. El codigo de un pais valido, existente.
+2. El codigo de una ciudad valdia, existente.
+3. El codigo de un restaurante valido, existente.
+![Reg Compra 1](https://github.com/user-attachments/assets/5f5f825c-f7c0-42b5-848e-b2f75f256649)
+
+Al llegar a la opcion de ingresar el codigo del producto, se le mostrara la opcion de ingresar la cedula del cliente. Digitela y si existe, se le mostrara el nombre del cliente. Debe indicar si la orden es para llevar tecleando 'llevar' o para comer en el restaurante 'aqui'. Luego de esto se le deslpegara el resumen de la compra del cliente, la cual usted podra modificar, escribiendo 'S' o 'N' en la consola.
+
+![Reg Compra 2](https://github.com/user-attachments/assets/56b3b2e5-74bb-45b1-9bd8-0f217a27b3a9)
+
+Para modificarla, ingrese 'S' o 's' y se le desplegara el menu de modificaciones. Escoga el que quiera modificar y haga los cambios respectivos.
+
+![Reg Compra 3](https://github.com/user-attachments/assets/d68deedd-e944-4f51-9d44-f076a69c54cf)
+
+Para terminar teclee 'N' para seguir con la factura.
+
+Teclee 'S' para confirmar la compra.
+
+Se creara un archivo con el siguiente nombre: "Factura_#Cedula_#Secuencia.txt"
+
+Ademas, se enviara la informacion al archivo 'registro_compras.txt' donde se tendra la informacion de todas las facturas que vaya a tener.
+
+![Reg Compra 4](https://github.com/user-attachments/assets/b6b708d1-a102-4025-b828-54c158353478)
+
+### Reportes
+Si quisiera obtener algun tipo de reporte, en el menu principal,  escriba '4' para entrar en el menu de reportes. Escriba '6' por ejemplo, para obtener los reportes de la cantidad de facturas de un cliente. Seguido de esto ingrese la cedula para el cual quiere obtener informacion y, si el cliente ha hecho compras, se enviara a 'reportes.txt'
+
+![Reportes de un cliente](https://github.com/user-attachments/assets/930ae5dc-d6fb-4be7-931b-8ead7dd9f754)
+
+Para ver el archivo de reportes, dirigase a la ruta o carpeta donde tenga el programa y busque el archivo 'reportes.txt' abralo con su editor de texto preferido.
+Ejemplo de formato:
+
+![Reportes](https://github.com/user-attachments/assets/a1595862-b6b2-4f41-8c42-3c17b8404296)
+
 
     Para salir completamente del programa. 
 ## Para el programador:
