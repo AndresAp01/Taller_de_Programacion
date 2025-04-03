@@ -280,20 +280,20 @@ def buscar_rest():
 def buscar_menu(): #FUNCIONA
     global menus, contador_busquedas_menu
     print("Has seleccionado buscar Menu.")
-    codigo = input("Ingrese el codigo del menu: ")
+    codigo=input("Ingrese el codigo del menu: ")
     codigo=normalizar_codigo(codigo)
-    resultados=[menu for menu in menus if codigo.lower() in menu[4].lower()]
+    resultados=[menu for menu in menus if codigo.lower() in menu[3].lower()]
     if resultados:
         for menu in menus:
-            nombre_menu=menu[4]
+            codigo_menu=menu[3]
             encontrado=False
             for contador in contador_busquedas_menu:
-                if contador[0]==nombre_menu:
+                if contador[0]==codigo_menu:
                     contador[1]+=1
                     encontrado=True
                     break
             if not encontrado:
-                contador_busquedas_menu.append([nombre_menu, 1])
+                contador_busquedas_menu.append([codigo_menu, 1])
     if resultados:
         print("\nResultados de la búsqueda:")
         for menu in resultados:
@@ -409,7 +409,6 @@ def insertar_ciudad():
     if resultado:
         print(f"Registro insertado correctamente: {ciudades}")
     return resultado
-
 def insertar_restaurante():
     global paises, ciudades, restaurantes
     print(restaurantes)
@@ -426,7 +425,6 @@ def insertar_restaurante():
     if resultado:
         print(f"Registro insertado correctamente: {restaurantes}")
     return resultado
-
 def insertar_menu():
     global paises, ciudades, restaurantes, menus
     cod_pais=input("Ingrese el código del país: ")
@@ -445,7 +443,6 @@ def insertar_menu():
     if resultado:
         print(f"Registro insertado correctamente: {menus}")
     return resultado
-
 def insertar_producto():
     global paises, ciudades, restaurantes, menus, productos
     cod_pais=input("Ingrese el código del país: ")
