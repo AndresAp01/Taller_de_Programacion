@@ -73,7 +73,6 @@ def normalizar_codigo(codigo):
     return str(codigo).lstrip('-')
 
 def validar_pais_existe(cod_pais):
-    global paises
     cod_pais=normalizar_codigo(cod_pais)
     for i in range(len(paises)):
         if paises[i][0].lstrip('-')==cod_pais:
@@ -379,7 +378,7 @@ def insertar_en_lista(lista, nuevo_registro, indices_unicos=None):
         for i in range(len(lista)):
             coincide=True
             for ix in indices_unicos:
-                if lista[i][ix] != nuevo_registro[ix]:
+                if lista[i][ix]!=nuevo_registro[ix]:
                     coincide=False
                     break
             if coincide:
@@ -391,69 +390,96 @@ def insertar_en_lista(lista, nuevo_registro, indices_unicos=None):
     return True
 def insertar_pais():
     global paises
-    print(paises)
-    cod_pais = input("Ingrese el codigo del pais: ")
-    nombre = input("Ingrese el nombre del pais: ")
-    return insertar_en_lista(paises, [str(cod_pais), nombre], indices_unicos=[0])
+    print("Lista actual:", paises)
+    cod_pais=input("Ingrese el codigo del pais: ")
+    nombre=input("Ingrese el nombre del pais: ")
+    resultado=insertar_en_lista(paises, [str(cod_pais), nombre], indices_unicos=[0])
+    if resultado:
+        print(f"Registro insertado correctamente: {paises}")
+    return resultado
 def insertar_ciudad():
     global paises, ciudades
     print(ciudades)
-    cod_pais = input("Ingrese el código del país: ")
-    cod_ciudad = input("Ingrese el código de la ciudad: ")
-    nombre = input("Ingrese el nombre de la ciudad: ")
+    cod_pais=input("Ingrese el código del país: ")
     if not validar_pais_existe(cod_pais):
         return False
-    return insertar_en_lista(ciudades, [str(cod_pais), str(cod_ciudad), nombre], indices_unicos=[0, 1])
+    cod_ciudad=input("Ingrese el código de la ciudad: ")
+    nombre=input("Ingrese el nombre de la ciudad: ")
+    resultado=insertar_en_lista(ciudades, [str(cod_pais), str(cod_ciudad), nombre], indices_unicos=[0, 1])
+    if resultado:
+        print(f"Registro insertado correctamente: {ciudades}")
+    return resultado
+
 def insertar_restaurante():
     global paises, ciudades, restaurantes
     print(restaurantes)
-    cod_pais = input("Ingrese el código del país: ")
-    cod_ciudad = input("Ingrese el código de la ciudad: ")
-    cod_rest = input("Ingrese el código del restaurante: ")
-    nombre = input("Ingrese el nombre del restaurante: ")
+    cod_pais=input("Ingrese el código del país: ")
     if not validar_pais_existe(cod_pais):
         return False
+    cod_ciudad=input("Ingrese el código de la ciudad: ")
     if not validar_ciudad_existe(cod_pais, cod_ciudad):
         return False
-    return insertar_en_lista(restaurantes, [str(cod_pais), str(cod_ciudad), str(cod_rest), nombre], indices_unicos=[0, 1, 2])
+    cod_rest=input("Ingrese el código del restaurante: ")
+    nombre=input("Ingrese el nombre del restaurante: ")
+    resultado=insertar_en_lista(restaurantes, [str(cod_pais), str(cod_ciudad), str(cod_rest), nombre], indices_unicos=[0, 1, 2])
+
+    if resultado:
+        print(f"Registro insertado correctamente: {restaurantes}")
+    return resultado
+
 def insertar_menu():
     global paises, ciudades, restaurantes, menus
-    cod_pais = input("Ingrese el código del país: ")
-    cod_ciudad = input("Ingrese el código de la ciudad: ")
-    cod_rest = input("Ingrese el código del restaurante: ")
-    cod_menu = input("Ingrese el código del menú: ")
-    nombre = input("Ingrese el nombre del menú: ")
+    cod_pais=input("Ingrese el código del país: ")
     if not validar_pais_existe(cod_pais):
         return False
+    cod_ciudad=input("Ingrese el código de la ciudad: ")
     if not validar_ciudad_existe(cod_pais, cod_ciudad):
         return False
+    cod_rest=input("Ingrese el código del restaurante: ")
     if not validar_restaurante_existe(cod_pais, cod_ciudad, cod_rest):
         return False
-    return insertar_en_lista(menus, [str(cod_pais), str(cod_ciudad), str(cod_rest), str(cod_menu), nombre], indices_unicos=[0, 1, 2, 3])
+    cod_menu=input("Ingrese el código del menú: ")
+    nombre=input("Ingrese el nombre del menú: ")
+    resultado=insertar_en_lista(menus, [str(cod_pais), str(cod_ciudad), str(cod_rest), str(cod_menu), nombre],indices_unicos=[0, 1, 2, 3])
+
+    if resultado:
+        print(f"Registro insertado correctamente: {menus}")
+    return resultado
+
 def insertar_producto():
     global paises, ciudades, restaurantes, menus, productos
-    cod_pais = input("Ingrese el código del país: ")
-    cod_ciudad = input("Ingrese el código de la ciudad: ")
-    cod_rest = input("Ingrese el código del restaurante: ")
-    cod_menu = input("Ingrese el código del menú: ")
-    cod_producto = input("Ingrese el código del producto: ")
-    nombre = input("Ingrese el nombre del producto: ")
-    calorias = float(input("Ingrese las calorías del producto: "))
-    precio = float(input("Ingrese el precio: "))
+    cod_pais=input("Ingrese el código del país: ")
     if not validar_pais_existe(cod_pais):
         return False
+    cod_ciudad=input("Ingrese el código de la ciudad: ")
     if not validar_ciudad_existe(cod_pais, cod_ciudad):
         return False
+    cod_rest=input("Ingrese el código del restaurante: ")
     if not validar_restaurante_existe(cod_pais, cod_ciudad,cod_rest):
         return False
+    cod_menu=input("Ingrese el código del menú: ")
     if not validar_menu_existe(cod_pais, cod_ciudad, cod_rest, cod_menu):
         return False
-    return insertar_en_lista(productos, [str(cod_pais),str(cod_ciudad),str(cod_rest),str(cod_menu),str(cod_producto), nombre, calorias, precio],indices_unicos=[0, 1, 2, 3, 4])
+    cod_producto=input("Ingrese el código del producto: ")
+    nombre=input("Ingrese el nombre del producto: ")
+    calorias=float(input("Ingrese las calorías del producto: "))
+    precio=float(input("Ingrese el precio: "))
+    resultado=insertar_en_lista(productos, [str(cod_pais),str(cod_ciudad),str(cod_rest),str(cod_menu),str(cod_producto), nombre, calorias, precio],indices_unicos=[0, 1, 2, 3, 4])
+
+    if resultado:
+        print(f"Registro insertado correctamente: {productos}")
+    return resultado
 def insertar_cliente():
     global clientes
-    cedula = input("Ingrese la cédula del cliente: ")
-    nombre = input("Ingrese el nombre del cliente: ")
-    return insertar_en_lista(clientes, [str(cedula), nombre], indices_unicos=[0])
+    cedula=input("Ingrese la cédula del cliente: ")
+    if not validar_cliente_existe(cedula):
+        return False
+    nombre=input("Ingrese el nombre del cliente: ")
+    resultado=insertar_en_lista(clientes, [str(cedula), nombre], indices_unicos=[0])
+
+    if resultado:
+        print(f"Registro insertado correctamente: {clientes}")
+    return resultado
 #______________________________________________________________________________________________________________________#
 #REGISTRO
 #Funcion para leer el ultimo codigo de factura
