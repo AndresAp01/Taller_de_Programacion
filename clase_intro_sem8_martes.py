@@ -170,5 +170,55 @@ def largo_lista_DES(lista):
 resultado=largo_lista_DES([1,2,3])
 print(resultado)
     
+def largoPSD(lista):
+    if type(lista)==list:
+        if lista==[]:
+            return 0
+        else:
+            return largoPSD_aux(lista, 0)
+    else:
+        print("Paremetro incorrecto")
+
+def largoPSD_aux(lista, cont):
+    if cont==len(lista):
+        return 0
+    else:
+        return 1+largoPSD_aux(lista, cont+1)
+    
+def largoCD(lista):
+    if type(lista)==list:
+        if lista==[]:
+            return 0
+        else:
+            return largoCD_aux(lista, 0)
+    else:
+        print("Parametro inc")
+    
+
+def largoCD_aux(lista, resultado):
+    if lista==[]:
+        return resultado
+    else:
+        return largoCD_aux(lista[1:], resultado+1)
+
+def largoCSD(lista):
+    if type(lista)==list:
+        if lista == []:
+            return 0
+        else:
+            return largoCSD_aux(lsita, 0)
+        
+    else:
+        print("Par incorre")
+
+def largoCSD_aux(lista, resultado):
+    if resultado==len(lista):
+        return resultado
+    else:
+        return largoCSD_aux(lista, resultado+1)    
+    
+return=largoCSD([1,4,5,6,7])
+print(resultado)
+
 
         
