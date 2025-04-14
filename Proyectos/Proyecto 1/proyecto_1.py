@@ -1,6 +1,21 @@
 #Luis Andrés Acuña Pérez y Patrick Zúñiga Arroyo
 #Mantenimiento de Bases de Datos
 ####################################################################################################################
+#Cambiaar a diccionario
+def datos_a_dicc(ruta_archivo):
+
+    diccionario={}
+    with open(ruta_archivo, "r") as archivo:
+        for line in archivo:
+            linea=line.strip()
+            if linea:
+                (llave, valor)=line.split(";")
+                diccionario[llave.strip()]=valor.strip()
+    return(diccionario)
+
+paises=datos_a_dicc("Paises.txt")
+print(paises)
+
 def datos_a_listas(ruta_archivo):
     try:
         #paises_unicos para las claves de paises
