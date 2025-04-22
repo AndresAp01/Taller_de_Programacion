@@ -8,10 +8,18 @@ def datos_a_dicc(ruta_archivo):
     with open(ruta_archivo, "r") as archivo:
         for line in archivo:
             linea=line.strip()
-            if linea:
-                (llave, valor)=line.split(";")
-                diccionario[llave.strip()]=valor.strip()
-    return(diccionario)
+            if not linea:
+                continue
+            claves, nombre=linea.strip().split(";")
+            diccionario[claves]={"nombre": nombre, "ciudades": []}
+            nivel=diccionario
+            for clave in claves[:-1]:
+                if clave not in nivel:
+                    nivel[clave]={}
+                nivel=nivel[clave]
+
+            nivel[claves[-1]]=valor
+    return diccionario
 
 paises=datos_a_dicc("Paises.txt")
 print(paises)
@@ -404,12 +412,29 @@ def insertar_en_lista(lista, nuevo_registro, indices_unicos=None):
     lista.append(nuevo_registro)
     print(f"Registro insertado correctamente: {nuevo_registro}")
     return True
+
+def insertar_en_diccionario(diccionario, nuevo_registro, indices_unicos=None):
+    print(f"Insertando: {nuevo_registro}")
+    print(f"En el Diccionario actual: {diccionario}")
+    if not isinstance(diccionario, dict):
+        print("Error: El primer parámetro debe ser un diccionario")
+        return False
+    if indices_unicos is not None:
+        for clave in diccionario:
+            coincide=True
+            for ix in indices_unicos:
+                if diccionario(nuevo_registro)!=nuevo_registro:
+                    coincide=False
+                    break
+            if coincide:
+                valores=[nuevo_registro[ix] for ix in indices_unicos]
+                print(f"Error: Ya existe un registro con los valores {valores}")
+                return False
 def insertar_pais():
-    global paises
-    print("Lista actual:", paises)
+    print("Diccionario actual:", paises)
     cod_pais=input("Ingrese el codigo del pais: ")
     nombre=input("Ingrese el nombre del pais: ")
-    resultado=insertar_en_lista(paises, [str(cod_pais), nombre], indices_unicos=[0])
+    resultado=insertar_en_lista
     if resultado:
         print(f"Registro insertado correctamente: {paises}")
     return resultado
