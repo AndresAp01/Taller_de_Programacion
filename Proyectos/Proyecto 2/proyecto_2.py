@@ -2,87 +2,33 @@
 #Mantenimiento de Bases de Datos
 ####################################################################################################################
 #Cambiaar a diccionario
-def datos_a_dicc(ruta_archivo):
 
-    diccionario={}
-    with open(ruta_archivo, "r") as archivo:
-        for line in archivo:
-            linea=line.strip()
-            if not linea:
-                continue
-            claves, nombre=linea.strip().split(";")
-            diccionario[claves]={"nombre": nombre, "ciudades": []}
-            nivel=diccionario
-            for clave in claves[:-1]:
-                if clave not in nivel:
-                    nivel[clave]={}
-                nivel=nivel[clave]
-
-            nivel[claves[-1]]=valor
-    return diccionario
-
-paises=datos_a_dicc("Paises.txt")
-print(paises)
-
-def datos_a_listas(ruta_archivo):
+def construir_diccionario(ruta_archivo):
+    diccionario = {}
     try:
-        #paises_unicos para las claves de paises
-        with open(ruta_archivo, "r") as archivo:
-            texto=archivo.read()
-            lista_lineas=texto.split("\n")
-            matriz_datos=[]
-            paises_unicos=[]
-            ciudades_unicas=[]
-            restaurantes_unicos=[]
-            menus_unicos=[]
-            productos_unicos=[]
-            for linea in lista_lineas:
-                if not linea.strip():
-                    continue
-                campos=linea.split(";")
-                if len(campos)<2:
-                    continue
-                #Las claves unicas
-                if len(campos)==2:  #Para paises
-                    clave=[campos[0]]
-                    if clave in paises_unicos:
-                        continue
-                    paises_unicos.append(clave)
-                elif len(campos)==3:    #Para ciudades
-                    clave=[campos[0], campos[1]]
-                    if clave in ciudades_unicas:
-                        continue
-                    ciudades_unicas.append(clave)
-                elif len(campos)==4:    #Para restaurantes
-                    clave = [campos[0], campos[1], campos[2]]
-                    if clave in restaurantes_unicos:
-                        continue
-                    restaurantes_unicos.append(clave)
-                elif len(campos)==5:    #Para menus
-                    clave=[campos[0], campos[1], campos[2], campos[3]]
-                    if clave in menus_unicos:
-                        continue
-                    menus_unicos.append(clave)
-                elif len(campos)>=6:    #Para producto
-                    clave = [campos[0], campos[1], campos[2], campos[3], campos[4]]
-                    if clave in productos_unicos:
-                        continue
-                    productos_unicos.append(clave)
-                else:
-                    continue
+        with open(ruta_archivo) as archivo:
+            for linea in archivo:
+                codigo, nombre=linea.strip().split(";")
+                diccionario[codigo]={"nombre": nombre, "ciudades": {}}
 
-                matriz_datos.append(campos)
-            return matriz_datos
+        with open(ruta_archivo) as f:
+            for linea in f:
+                cp, cc, nc = linea.strip().split(";")
+                if cp in diccionario:
+                    diccionario[cp]["ciudades"][cc] = {"nombre": nc, "restaurantes": {}}
+
+        with open(ruta_archivo) as f:
+            for linea in f:
+                cp, cc, cr, nr = linea.strip().split(";")
+                if cp in diccionario and cc in diccionario[cp]["ciudades"]:
+                    diccionario[cp]["ciudades"][cc]["restaurantes"][cr] = nr
+
+        return diccionario
     except FileNotFoundError:
         print(f"El archivo {ruta_archivo} no existe")
         return None
-paises=datos_a_listas("Paises.txt")
-ciudades=datos_a_listas("Ciudades.txt")
-restaurantes=datos_a_listas("Restaurantes.txt")
-menus=datos_a_listas("Menu.txt")
-productos=datos_a_listas("Productos.txt")
-clientes=datos_a_listas("Clientes.txt")
-compras=datos_a_listas("registro_compras.txt")
+diccionario=construir_diccionario("Paises.txt", "Ciudades.txt", "Restaurantes.txt")
+print(diccionario)
 #Listas para estadisticas
 contador_busquedas_rest=[]
 contador_busquedas_menu=[]
