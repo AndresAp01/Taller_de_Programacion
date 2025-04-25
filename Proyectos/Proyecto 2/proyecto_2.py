@@ -1,6 +1,7 @@
 #Luis Andrés Acuña Pérez y Patrick Zúñiga Arroyo
 #Mantenimiento de Bases de Datos
 ####################################################################################################################
+#Construccion de diccionarios
 def leer_archivo(ruta):
     filas=[]
     with open(ruta,'r') as archivo:
@@ -57,13 +58,8 @@ def cargar_datos(paises_archivo, ciudades_archivo, restaurantes_archivo, menus_a
     return diccionario
 def clientes_a_dicc(ruta_clientes):
     clientes_dicc={}
-    with open(ruta_clientes, "r") as archivo:
-        for linea in archivo:
-            linea=linea.strip()
-            if not linea:
-                continue
-            cedula, nombre=linea.split(";", 1)
-            clientes_dicc[cedula]=nombre
+    for cedula, nombre in leer_archivo(ruta_clientes):
+        clientes_dicc[cedula]={"nombre":nombre}
     return clientes_dicc
 #SEGUNDA MANERA
 def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus, ruta_productos):
@@ -146,15 +142,17 @@ clientes="Clientes.txt"
 dic=cargar_datos(paises, ciudades, restaurantes, menus, productos)
 cli=clientes_a_dicc(clientes)
 
+"""
 #Listas para estadisticas
 contador_busquedas_rest=[]
 contador_busquedas_menu=[]
-contador_compras_producto=[]
+contador_compras_producto=[]"""
 
 def normalizar_codigo(codigo):
     if not isinstance(codigo, (str, int)):
         print(f"El codigo {codigo} no es alfanumerico")
     return str(codigo).lstrip('-')
+#Funciones de validacion, sirven para buscar
 def validar_pais_existe(diccionario, cod_pais):
     cod_pais=normalizar_codigo(cod_pais)
     if cod_pais in diccionario:
@@ -195,12 +193,12 @@ print(muestra)"""
 #funciona
 def modificar_pais():
     cod_pais=input("Ingrese el código del país a modificar: ")
-    cod_pais = normalizar_codigo(cod_pais)
+    cod_pais=normalizar_codigo(cod_pais)
     if cod_pais not in dic:
         print("El pais no existe")
         return
-    nuevo_nombre = input("Ingrese el nuevo nombre del país: ")
-    dic[cod_pais]["nombre"] = nuevo_nombre
+    nuevo_nombre=input("Ingrese el nuevo nombre del país: ")
+    dic[cod_pais]["nombre"]=nuevo_nombre
     print(f"El pais {cod_pais} ha sido renombrado como: {nuevo_nombre}")
     print(dic)
 #funciona
@@ -219,122 +217,19 @@ def modificar_ciudad():
     dic[cod_pais]["ciudades"][cod_ciudad]["nombre"]=nuevo_nombre
     print(f"La ciudad {cod_ciudad} se ha renombrado como: {nuevo_nombre}")
     print(dic)
+#funcioooona
 def modificar_cliente():
-    global clientes
     cedula=input("Ingrese la cedula del cliente: ")
-    nuevo_nombre=input("Ingrese el nuevo nombre del cliente: ")
     cedula=normalizar_codigo(cedula)
-    for cliente in clientes:
-        if cliente[0]==cedula:
-            cliente[1]=nuevo_nombre
-            print(f"Cliente con cédula {cedula} modificado a '{nuevo_nombre}'")
-            return True
-    print(f"Error: No se encontró un cliente con cédula {cedula}")
-    return False
+    if cedula not in cli:
+        print(f"El cliente con cedula: {cedula} no existe")
+        return
+    nuevo_nombre = input("Ingrese el nuevo nombre del cliente: ")
+    cli[cedula]["nombre"]=nuevo_nombre
+    print(f"El cliente con cedula {cedula} ha sido renombrado como: {nuevo_nombre}")
+    print(cli)
 #______________________________________________________________________________________________________________________#
 #BUSQUEDAS_____________________________________________________________________________________________________________#
-def buscar_pais(diccionario, cod_pais): #FUNCIONA
-    cod_pais=normalizar_codigo(cod_pais)
-    if cod_pais in diccionario:
-        nombre = diccionario[cod_pais]["nombre"]
-        print(f"El código {cod_pais} pertenece a: {nombre}")
-        return cod_pais in diccionario
-    else:
-        return f"El codigo {cod_pais} no existe"
-def buscar_ciudad(): #FUNCIONA
-    global ciudades
-    print("Has seleccionado buscar Ciudad.")
-    codigo = input("Ingrese el codigo de la ciudad a buscar: ")
-    codigo=normalizar_codigo(codigo)
-    resultados=[ciudad for ciudad in ciudades if codigo.lower() in ciudad[1].lower()]
-    if resultados:
-        print("\n Resultados de la búsqueda:")
-        for ciudad in resultados:
-            print(f"Código: {ciudad[1]}, Nombre: {ciudad[2]}")
-    else:
-        print(f"No se encontraron países con el codigo '{codigo}'.")
-def buscar_rest():
-    global restaurantes, contador_busquedas_rest
-    print("Has seleccionado buscar Restaurante.")
-    codigo = input("Ingrese el codigo del restaurante: ")
-    codigo=normalizar_codigo(codigo)
-    resultados=[rest for rest in restaurantes if codigo==rest[2].lower()]
-    if resultados:
-        for rest in resultados:
-            nombre_restaurante=rest[3]
-            encontrado=False
-            for contador in contador_busquedas_rest:
-                if contador[0]==nombre_restaurante:
-                    contador[1]+=1
-                    encontrado=True
-                    break
-            if not encontrado:
-                contador_busquedas_rest.append([nombre_restaurante, 1])
-
-    if resultados:
-        print("\nResultados de la búsqueda:")
-        for rest in resultados:
-            print(f"País: {rest[0]}, Ciudad: {rest[1]}, Código: {rest[2]}, Nombre: {rest[3]}")
-        return resultados[0][3]
-    else:
-        print(f"No se encontraron restaurantes con el nombre '{codigo}'.")
-def buscar_menu(): #FUNCIONA
-    global menus, contador_busquedas_menu
-    print("Has seleccionado buscar Menu.")
-    codigo=input("Ingrese el codigo del menu: ")
-    codigo=normalizar_codigo(codigo)
-    resultados=[menu for menu in menus if codigo.lower() in menu[3].lower()]
-    if resultados:
-        for menu in menus:
-            codigo_menu=menu[3]
-            encontrado=False
-            for contador in contador_busquedas_menu:
-                if contador[0]==codigo_menu:
-                    contador[1]+=1
-                    encontrado=True
-                    break
-            if not encontrado:
-                contador_busquedas_menu.append([codigo_menu, 1])
-    if resultados:
-        print("\nResultados de la búsqueda:")
-        for menu in resultados:
-            print(
-                f"País: {menu[0]}, Ciudad: {menu[1]}, Restaurante: {menu[2]}, Código: {menu[3]}, Nombre: {menu[4]}")
-    else:
-        print(f"No se encontraron menús con el nombre '{codigo}'.")
-def buscar_produ(retornar_precio=False): #FUNCIONA
-    global productos
-    print("Has seleccionado buscar Productos.")
-    codigo=input("Ingrese el codigo del producto: ")
-    codigo=normalizar_codigo(codigo)
-    resultados=[prod for prod in productos if codigo.lower() in prod[4]]
-    if retornar_precio:
-        if resultados:
-            return resultados[0][7]  # Retorna el precio
-        else:
-            return None
-    if resultados:
-        print("\nResultados de la búsqueda: ")
-        for prod in resultados:
-            print(
-                f"País: {prod[0]}, Ciudad: {prod[1]}, Restaurante: {prod[2]}, Menú: {prod[3]}, "
-                +
-                f"Código: {prod[4]}, Nombre: {prod[5]}, Calorias : kcal {prod[6]}, Precio:${prod[7]}")
-    else:
-        print(f"No se encontraron productos con el nombre '{codigo}'.")
-def buscar_cliente():
-    global clientes
-    print("Has seleccionado buscar Clientes.")
-    cedula = int(input("Ingrese la cédula del cliente a buscar: "))
-    cedula_a_buscar = str(cedula)
-    resultados=[cliente for cliente in clientes if cliente[0] == cedula_a_buscar]
-    if resultados:
-        print("\n Resultaods de la busqueda: ")
-        for cliente in resultados:
-            print(f"Cliente encontrado: Cedula: {cliente[0]}, Nombre: {cliente[1]}")
-            return cliente
-    else:
-        print(f"Cliente no encontrado con cedula '{cedula_a_buscar}'.")
 def obtener_restaurante_mas_buscado():
     global contador_busquedas_rest
     if not contador_busquedas_rest:
@@ -1045,7 +940,7 @@ def MainMenu():
                 y=int(input("Selecciona una sub-opción (1-7) para buscar: "))
                 if y==1:
                     cod_pais=input("Ingrese el codigo del pais a buscar: ")
-                    buscar_pais(dic, cod_pais)
+                    validar_pais_existe(dic, cod_pais)
                 elif y==2:buscar_ciudad()
                 elif y==3:buscar_rest()
                 elif y==4:buscar_menu()
