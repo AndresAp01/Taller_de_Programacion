@@ -141,7 +141,9 @@ productos="Productos.txt"
 clientes="Clientes.txt"
 dic=cargar_datos(paises, ciudades, restaurantes, menus, productos)
 cli=clientes_a_dicc(clientes)
-
+print(dic)
+for clave in dic:
+    print(clave, dic[clave])
 """
 #Listas para estadisticas
 contador_busquedas_rest=[]
@@ -156,23 +158,42 @@ def normalizar_codigo(codigo):
 def validar_pais_existe(diccionario, cod_pais):
     cod_pais=normalizar_codigo(cod_pais)
     if cod_pais in diccionario:
-        nombre = diccionario[cod_pais]["nombre"]
+        nombre=diccionario[cod_pais]["nombre"]
         print(f"El código {cod_pais} pertenece a: {nombre}")
         return cod_pais in diccionario
     else:
         return f"El codigo {cod_pais} no existe"
-def validar_ciudad_existe(diccionario, cod_pais, ciudad):
+#otra
+def validar_ciudad_existe(diccionario, cod_pais, cod_ciudad):
     cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(ciudad)
-    if cod_pais not in diccionario:
-        return f"El pais {cod_pais} no existe"
-    ciudades=diccionario[cod_pais]["ciudades"]
-    if cod_ciudad not in ciudades:
-        return f"El pais {cod_pais} existe, pero la ciudad {cod_ciudad} no."
-    else:
-        nombre_ciudad=ciudades[cod_ciudad]["nombre"]
-        print(f"La ciudad {cod_ciudad}, {nombre_ciudad} si existe en el pais {cod_pais}")
-        return cod_ciudad in diccionario
+    existe_pais=validar_pais_existe(diccionario, cod_pais)
+    if existe_pais is not True:
+        return existe_pais
+    cod_ciudad=normalizar_codigo(cod_ciudad)
+    if "ciudades" not in diccionario[cod_pais]:
+        return f"No hay ciudades definidas en el pais {cod_pais}"
+    if cod_ciudad not in diccionario[cod_pais]["ciudades"]:
+        return f"El país {cod_pais} existe, pero la ciudad {cod_ciudad} no."
+    nombre_ciudad=diccionario[cod_pais]["ciudades"][cod_ciudad]["nombre"]
+    print(f"La ciudad {cod_ciudad}, {nombre_ciudad}, SI existe en: {cod_pais}")
+    return True
+
+def validar_restaurante_existe(diccionario, cod_pais, cod_ciudad, cod_restaurante):
+    cod_pais=normalizar_codigo(cod_pais)
+    cod_ciudad=normalizar_codigo(cod_ciudad)
+    existe_ciudad=validar_ciudad_existe(diccionario, cod_pais, cod_ciudad)
+    if existe_ciudad is not True:
+        return existe_ciudad
+    cod_restaurante=normalizar_codigo(cod_restaurante)
+    ciudad_info=diccionario[cod_pais]["ciudades"][cod_ciudad]
+    if "restaurantes" not in ciudad_info:
+        return f'No hay restaurantes definidos en la ciudad {cod_ciudad}'
+    if cod_restaurante not in ciudad_info["restaurantes"]:
+        return f"El restaurante {cod_restaurante} no existe en la ciudad {cod_ciudad}"
+    nombre_rest=ciudad_info["restaurantes"][cod_restaurante]["nombre"]
+    print(f"El restaurante {cod_restaurante}, {nombre_rest} si existe en la ciudad {cod_ciudad}")
+    return True
+
 """muestra=validar_ciudad_existe(dic,'123', "101")
 print(muestra)"""
 """muestra=validar_pais_existe(dic, "123")
@@ -217,6 +238,22 @@ def modificar_ciudad():
     dic[cod_pais]["ciudades"][cod_ciudad]["nombre"]=nuevo_nombre
     print(f"La ciudad {cod_ciudad} se ha renombrado como: {nuevo_nombre}")
     print(dic)
+#por hacer:
+def modificar_restaurante(diccionario, cod_pais, cod_ciudad, cod_restaurante, nuevo_nombre):
+    # Primero validamos que exista
+    existe = validar_restaurante_existe(diccionario, cod_pais, cod_ciudad, cod_restaurante)
+    if existe is not True:
+        print(existe)  # informa por qué falló
+        return False
+    # Modificamos directamente
+    diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_restaurante]["nombre"] = nuevo_nombre
+    print(f"Restaurante {cod_restaurante} renombrado a: {nuevo_nombre}")
+    return True
+def modificar_menu():
+    pass
+def modificar_producto():
+    pass
+
 #funcioooona
 def modificar_cliente():
     cedula=input("Ingrese la cedula del cliente: ")
@@ -289,7 +326,6 @@ def insertar_pais():
     if resultado:
         print(f"Registro insertado correctamente: {paises}")
     return resultado
-
 def insertar_producto():
     global paises, ciudades, restaurantes, menus, productos
     cod_pais=input("Ingrese el código del país: ")
@@ -941,11 +977,28 @@ def MainMenu():
                 if y==1:
                     cod_pais=input("Ingrese el codigo del pais a buscar: ")
                     validar_pais_existe(dic, cod_pais)
-                elif y==2:buscar_ciudad()
-                elif y==3:buscar_rest()
-                elif y==4:buscar_menu()
-                elif y==5:buscar_produ()
-                elif y==6:buscar_cliente()
+                elif y==2:
+                    cod_pais=input("Ingrese el codigo del pais donde se encuentra la ciudad: ")
+                    cod_ciudad=input("Ingrese el codigo de la ciudad a buscar: ")
+                    validar_ciudad_existe(dic, cod_pais, cod_ciudad)
+                elif y==3:
+                    cod_pais=input("Ingrese el codigo del pais: ")
+                    cod_ciudad=input("Ingrese el codigo de la ciudad: ")
+                    cod_rest=input("Ingrese el codigo del restaurante a buscar: ")
+                    validar_restaurante_existe(dic, cod_pais, cod_ciudad, cod_rest)
+                elif y==4:
+                    cod_pais=input("Ingrese el codigo del pais: ")
+                    cod_ciudad=input("Ingrese el codigo de la ciudad: ")
+                    cod_rest=input("Ingrese el codigo del restaurante: ")
+                    cod_menu=input("Ingrese el codigo del menu a buscar: ")
+
+                elif y==5:
+                    cod_pais=input("Ingrese el codigo del pais: ")
+                    cod_ciudad=input("Ingrese el codigo de la ciudad: ")
+                    cod_rest=input("Ingrese el codigo del restaurante: ")
+                    cod_menu=input("Ingrese el codigo del menu a buscar: ")
+                elif y==6:
+                    cedula=input("Ingrese la cedula del cliente a buscar")
                 elif y==7:
                     print("Volviendo al menú principal...")
                     break  # Salir del submenú y volver al menú principal
