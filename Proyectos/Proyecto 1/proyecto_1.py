@@ -9,9 +9,7 @@ def leer_archivo(ruta):
             if linea:
                 filas.append(linea.split(';'))
     return filas
-
 def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus, ruta_productos):
-
     diccionario={}
     with open(ruta_paises, "r") as archivo:
         for linea in archivo:
@@ -80,7 +78,6 @@ def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus, ruta
                     "precio": float(precio)
                     }
     return diccionario
-
 def clientes_a_dicc(ruta_clientes):
     clientes_dicc={}
     with open(ruta_clientes, "r") as archivo:
@@ -91,7 +88,6 @@ def clientes_a_dicc(ruta_clientes):
             cedula, nombre=linea.split(";", 1)
             clientes_dicc[cedula]=nombre
     return clientes_dicc
-
 def cargar_datos(paises_archivo, ciudades_archivo, restaurantes_archivo, menus_archivo, productos_archivo):
     diccionario={}
     #para paises
@@ -186,8 +182,8 @@ def validar_pais_existe(diccionario, cod_pais):
     else:
         return f"El codigo {cod_pais} no existe"
 
-muestra=validar_pais_existe(dic, "123")
-print(muestra)
+"""muestra=validar_pais_existe(dic, "123")
+print(muestra)"""
 
 def validar_ciudad_existe(diccionario, cod_pais, ciudad):
     cod_pais=normalizar_codigo(cod_pais)
@@ -201,48 +197,9 @@ def validar_ciudad_existe(diccionario, cod_pais, ciudad):
         nombre_ciudad=ciudades[cod_ciudad]["nombre"]
         return f"La ciudad {cod_ciudad}, {nombre_ciudad} si existe en el pais {cod_pais}"
 
-muestra=validar_ciudad_existe(dic,'123', "101")
-print(muestra)
+"""muestra=validar_ciudad_existe(dic,'123', "101")
+print(muestra)"""
 
-def validar_restaurante_existe(cod_pais, cod_ciudad, cod_rest):
-    global paises, ciudades, restaurantes
-    cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(cod_ciudad)
-    cod_rest=normalizar_codigo(cod_rest)
-    for i in range(len(restaurantes)):
-        if restaurantes[i][0]==cod_pais and restaurantes[i][1]==cod_ciudad and restaurantes[i][2]==cod_rest:
-            return True
-    print(f"Error: No existe un restaurante con codigo '{cod_rest}' en la ciudad '{cod_ciudad}'")
-    return False
-def validar_menu_existe(cod_pais, cod_ciudad, cod_rest, cod_menu):
-    global paises, ciudades, restaurantes, menus
-    cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(cod_ciudad)
-    cod_rest=normalizar_codigo(cod_rest)
-    cod_menu=normalizar_codigo(cod_menu)
-    for i in range(len(menus)):
-        if menus[i][0]==cod_pais and menus[i][1]==cod_ciudad and menus[i][2]==cod_rest and menus[i][3]==cod_menu:
-            return True
-    print(f"Error: No existe un menu con codigo '{cod_menu}' en el restaurante '{cod_rest}'")
-    return False
-def validar_producto_existe(cod_pais, cod_ciudad, cod_rest, cod_menu, cod_producto):
-    global paises, ciudades, restaurantes, menus, productos
-    cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(cod_ciudad)
-    cod_rest=normalizar_codigo(cod_rest)
-    cod_menu=normalizar_codigo(cod_menu)
-    cod_producto=normalizar_codigo(cod_producto)
-    if not any(producto[0]==cod_pais and producto[1]==cod_ciudad and producto[2]==cod_rest and producto[3]==cod_menu and producto[4]==cod_producto for producto in productos):
-        print(f"Error: No existe un producto con código '{cod_producto}' en el menú '{cod_menu}' del restaurante '{cod_rest}' de la ciudad '{cod_ciudad}' del país '{cod_pais}'")
-        return False
-    return True
-def validar_cliente_existe(cedula):
-    global clientes
-    cedula=normalizar_codigo(cedula)
-    if not any(cliente[0]==cedula for cliente in clientes):
-        print(f"Error: No existe un cliente con cédula '{cedula}'")
-        return False
-    return True
 #--------------------------------------------------------------------------------------------------
 #MODIFICAR_____________________________________________________________________________________________________________#
 def modificar_pais():
