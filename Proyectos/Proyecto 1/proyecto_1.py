@@ -1,7 +1,7 @@
 #Luis Andrés Acuña Pérez y Patrick Zúñiga Arroyo
 #Mantenimiento de Bases de Datos
 ####################################################################################################################
-def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus):
+def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus, ruta_productos):
 
     diccionario={}
     with open(ruta_paises, "r") as archivo:
@@ -14,7 +14,7 @@ def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus):
             diccionario[cod_pais.strip()]= {
                 "nombre": nombre_pais,
                 "ciudades": {}
-            }
+                }
     with open(ruta_ciudades, "r") as archivo:
         for linea in archivo:
             linea=linea.strip()
@@ -45,10 +45,32 @@ def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus):
                 continue
             cod_pais, cod_ciudad, cod_rest, cod_menu, nombre_menu=linea.split(";", 4)
             if cod_pais in diccionario and cod_ciudad in diccionario[cod_pais]["ciudades"] and cod_rest in diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"]:
-                diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]["menus"][cod_menu]=nombre_menu
+                diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]["menus"][cod_menu]={
+                    "nombre": nombre_menu,
+                    "productos": {}
+                    }
 
+    with open(ruta_productos, "r") as archivo:
+        for linea in archivo:
+            linea=linea.strip()
+            if not linea:
+                continue
+
+            algo=linea.split(";", 7)
+            if len(algo)!=8:
+                continue
+
+            (cod_pais, cod_ciudad, cod_rest, cod_menu, cod_producto, nombre_producto, calorias, precio)=algo
+            if (cod_pais in diccionario
+                and cod_ciudad in diccionario[cod_pais]["ciudades"]
+                and cod_rest in diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"]
+                and cod_menu in diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]["menus"]):
+                diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]["menus"][cod_menu]["productos"][cod_producto]={
+                    "nombre": nombre_producto,
+                    "calorias": int(float(calorias)),
+                    "precio": float(precio)
+                    }
     return diccionario
-
 
 def imprimir_cascada(diccionario):
     for cod_pais, info_pais in diccionario.items():
@@ -57,16 +79,21 @@ def imprimir_cascada(diccionario):
             print(f"  {cod_ciudad} — {info_ciudad['nombre']}")
             for cod_rest, info_rest in info_ciudad["restaurantes"].items():
                 print(f"    {cod_rest} — {info_rest['nombre']}")
-                # Nivel de menús (puede estar vacío)
-                for cod_menu, nombre_menu in info_rest.get("menus", {}).items():
-                    print(f"      {cod_menu} — {nombre_menu}")
+                # Nivel de menús
+                for cod_menu, info_menu in info_rest.get("menus", {}).items():
+                    print(f"      {cod_menu} — {info_menu['nombre']}")
+                    # Nivel de productos dentro del menú
+                    for cod_prod, nombre_prod in info_menu.get("productos", {}).items():
+                        print(f"        {cod_prod} — {nombre_prod}")
+
 
 
 paises="Paises.txt"
 ciudades="Ciudades.txt"
 restaurantes="Restaurantes.txt"
 menus="Menu.txt"
-dic=datos_a_dicc(paises, ciudades, restaurantes, menus)
+productos="Productos.txt"
+dic=datos_a_dicc(paises, ciudades, restaurantes, menus, productos)
 print(dic)
 print (imprimir_cascada(dic))
 
