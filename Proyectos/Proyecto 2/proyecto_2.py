@@ -159,13 +159,10 @@ def validar_pais_existe(diccionario, cod_pais):
     cod_pais=normalizar_codigo(cod_pais)
     if cod_pais in diccionario:
         nombre = diccionario[cod_pais]["nombre"]
-        return f"El código {cod_pais} pertenece a: {nombre}"
+        print(f"El código {cod_pais} pertenece a: {nombre}")
+        return cod_pais in diccionario
     else:
         return f"El codigo {cod_pais} no existe"
-
-muestra=validar_pais_existe(dic, "123")
-print(muestra)
-
 def validar_ciudad_existe(diccionario, cod_pais, ciudad):
     cod_pais=normalizar_codigo(cod_pais)
     cod_ciudad=normalizar_codigo(ciudad)
@@ -176,100 +173,53 @@ def validar_ciudad_existe(diccionario, cod_pais, ciudad):
         return f"El pais {cod_pais} existe, pero la ciudad {cod_ciudad} no."
     else:
         nombre_ciudad=ciudades[cod_ciudad]["nombre"]
-        return f"La ciudad {cod_ciudad}, {nombre_ciudad} si existe en el pais {cod_pais}"
-
+        print(f"La ciudad {cod_ciudad}, {nombre_ciudad} si existe en el pais {cod_pais}")
+        return cod_ciudad in diccionario
 """muestra=validar_ciudad_existe(dic,'123', "101")
 print(muestra)"""
-
+"""muestra=validar_pais_existe(dic, "123")
+print(muestra)"""
 #--------------------------------------------------------------------------------------------------
 #MODIFICAR_____________________________________________________________________________________________________________#
+#funciona
+#con fiunciones de validacion
+"""def modificar_pais():
+    cod_pais=input("Ingrese el código del país a modificar: ")
+    cod_pais=normalizar_codigo(cod_pais)
+    if not validar_pais_existe(dic,cod_pais):
+        print("El pais no existe")
+        return
+    nuevo_nombre=input("Ingrese el nuevo nombre del país: ")
+    dic[cod_pais]["nombre"]=nuevo_nombre
+    print(f"El pais {cod_pais} ha sido renombrado como: {nuevo_nombre}")"""
+#funciona
 def modificar_pais():
-    global paises
-    codigo = input("Ingrese el código del país a modificar: ")
+    cod_pais=input("Ingrese el código del país a modificar: ")
+    cod_pais = normalizar_codigo(cod_pais)
+    if cod_pais not in dic:
+        print("El pais no existe")
+        return
     nuevo_nombre = input("Ingrese el nuevo nombre del país: ")
-    codigo=normalizar_codigo(codigo)
-    for pais in paises:
-        if pais[0]==codigo:
-            pais[1]=nuevo_nombre
-            print(f"País con código {codigo} modificado a '{nuevo_nombre}'")
-            return True
-    print(f"Error: No se encontró un país con código {codigo}")
-    return False
+    dic[cod_pais]["nombre"] = nuevo_nombre
+    print(f"El pais {cod_pais} ha sido renombrado como: {nuevo_nombre}")
+    print(dic)
+#funciona
 def modificar_ciudad():
-    global paises, ciudades
-    cod_pais = input("Ingrese el código del país: ")
-    cod_ciudad = input("Ingrese el código de la ciudad: ")
-    nuevo_nombre = input("Ingrese el nuevo nombre de la ciudad: ")
+    cod_pais=input("Ingrese el código del país donde se encuentra la ciudad: ")
+    cod_ciudad=input("Ingrese el codigo de la ciudad a modificar: ")
     cod_pais=normalizar_codigo(cod_pais)
     cod_ciudad=normalizar_codigo(cod_ciudad)
-    for ciudad in ciudades:
-        if ciudad[0]==cod_pais and ciudad[1]==cod_ciudad:
-            ciudad[2]=nuevo_nombre
-            print(f"Ciudad con código {cod_ciudad} en país {cod_pais} modificada a '{nuevo_nombre}'")
-            return True
-    print(f"Error: No se encontró la ciudad con código {cod_ciudad} en el país {cod_pais}")
-    return False
-def modificar_restaurante():
-    global paises, ciudades, restaurantes, menus, productos
-    cod_pais = input("Ingrese el código del país: ")
-    cod_ciudad = input("Ingrese el código de la ciudad: ")
-    cod_rest = input("Ingrese el código del restaurante: ")
-    nuevo_nombre = input("Ingrese el nuevo nombre del restaurante: ")
-    cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(cod_ciudad)
-    cod_rest=normalizar_codigo(cod_rest)
-    for rest in restaurantes:
-        if rest[0]==cod_pais and rest[1]==cod_ciudad and rest[2]==cod_rest:
-            rest[3]=nuevo_nombre
-            print(f"Restaurante con código {cod_rest} modificado a '{nuevo_nombre}'")
-            return True
-    print(f"Error: No se encontró el restaurante con código {cod_rest}")
-    return False
-def modificar_menu():
-    global paises, ciudades, restaurantes, menus
-    cod_pais=input("Ingrese el código del país: ")
-    cod_ciudad=input("Ingrese el código de la ciudad: ")
-    cod_rest=input("Ingrese el código del restaurante: ")
-    cod_menu=input("Ingrese el código del menú: ")
-    nuevo_nombre=input("Ingrese el nuevo nombre del menú: ")
-    cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(cod_ciudad)
-    cod_rest=normalizar_codigo(cod_rest)
-    cod_menu = normalizar_codigo(cod_menu)
-    for menu in menus:
-        if menu[0]==cod_pais and menu[1]==cod_ciudad and menu[2]==cod_rest and menu[3]==cod_menu:
-            menu[4]=nuevo_nombre
-            print(f"Menú con código {cod_menu} modificado a '{nuevo_nombre}'")
-            return True
-    print(f"Error: No se encontró el menú con código {cod_menu}")
-    return False
-def modificar_producto():
-    global paises, ciudades, restaurantes, menus, productos
-    cod_pais=input("Ingrese el código del país: ")
-    cod_ciudad=input("Ingrese el código de la ciudad: ")
-    cod_rest=input("Ingrese el código del restaurante: ")
-    cod_menu=input("Ingrese el código del menú: ")
-    cod_producto=input("Ingrese el código del producto: ")
-    nuevo_nombre=input("Ingrese el nuevo nombre del producto: ")
-    nuevas_calorias=input("Ingrese las nuevas calorías (o deje vacío para no cambiar): ") or 0
-    nuevo_precio=input("Ingrese el nuevo precio (o deje vacío para no cambiar): ") or 0
-    cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(cod_ciudad)
-    cod_rest=normalizar_codigo(cod_rest)
-    cod_menu=normalizar_codigo(cod_menu)
-    cod_producto=normalizar_codigo(cod_producto)
-    for producto in productos:
-        if producto[0]==cod_pais and producto[1]==cod_ciudad and producto[2]==cod_rest and producto[3]==cod_menu and producto[4]==cod_producto:
-            if nuevo_nombre:
-                producto[5]=nuevo_nombre
-            if nuevas_calorias is not None:
-                producto[6]=nuevas_calorias
-            if nuevo_precio is not None:
-                producto[7]=nuevo_precio
-            print(f"Producto con código {cod_producto} modificado correctamente.")
-            return True
-    print(f"Error: No se encontró el producto con código {cod_producto}")
-    return False
+    if cod_pais not in dic:
+        print("El pais no existe")
+        return
+#if not validar_ciudad_existe(dic, cod_pais, cod_ciudad):"""
+    if cod_ciudad not in dic[cod_pais]["ciudades"]:
+        print("La ciudad no existe")
+        return
+    nuevo_nombre=input("Ingrese el nuevo nombre del ciudad: ")
+    dic[cod_pais]["ciudades"][cod_ciudad]["nombre"]=nuevo_nombre
+    print(f"La ciudad {cod_ciudad} se ha renombrado como: {nuevo_nombre}")
+    print(dic)
 def modificar_cliente():
     global clientes
     cedula=input("Ingrese la cedula del cliente: ")
