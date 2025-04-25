@@ -212,7 +212,6 @@ def modificar_ciudad():
     if cod_pais not in dic:
         print("El pais no existe")
         return
-#if not validar_ciudad_existe(dic, cod_pais, cod_ciudad):"""
     if cod_ciudad not in dic[cod_pais]["ciudades"]:
         print("La ciudad no existe")
         return
@@ -234,18 +233,14 @@ def modificar_cliente():
     return False
 #______________________________________________________________________________________________________________________#
 #BUSQUEDAS_____________________________________________________________________________________________________________#
-def buscar_pais(): #FUNCIONA
-    global paises
-    print("\n Has seleccionado buscar Pais.")
-    codigo=input("Ingrese el codigo del pais a buscar: ")
-    codigo=normalizar_codigo(codigo)
-    resultados=[pais for pais in paises if codigo.lower() in pais[0].lower()]
-    if resultados:
-        print("\n Resultados de la búsqueda:")
-        for pais in resultados:
-            print(f"Código: {pais[0]}, Nombre: {pais[1]}")
+def buscar_pais(diccionario, cod_pais): #FUNCIONA
+    cod_pais=normalizar_codigo(cod_pais)
+    if cod_pais in diccionario:
+        nombre = diccionario[cod_pais]["nombre"]
+        print(f"El código {cod_pais} pertenece a: {nombre}")
+        return cod_pais in diccionario
     else:
-        print(f"No se encontraron países con el nombre '{codigo}'.")
+        return f"El codigo {cod_pais} no existe"
 def buscar_ciudad(): #FUNCIONA
     global ciudades
     print("Has seleccionado buscar Ciudad.")
@@ -374,27 +369,6 @@ def buscar_descuento():
 
 #______________________________________________________________________________________________________________________#
 #INSERCIONES___________________________________________________________________________________________________________#
-def insertar_en_lista(lista, nuevo_registro, indices_unicos=None):
-    print(f"Insertando: {nuevo_registro}")
-    print(f"Lista actual: {lista}")
-    if not isinstance(lista, list) or not isinstance(nuevo_registro, list):
-        print("Error: Los parámetros deben ser listas")
-        return False
-    if indices_unicos is not None:
-        for i in range(len(lista)):
-            coincide=True
-            for ix in indices_unicos:
-                if lista[i][ix]!=nuevo_registro[ix]:
-                    coincide=False
-                    break
-            if coincide:
-                valores=[nuevo_registro[ix] for ix in indices_unicos]
-                print(f"Error: Ya existe un registro con los valores {valores}")
-                return False
-    lista.append(nuevo_registro)
-    print(f"Registro insertado correctamente: {nuevo_registro}")
-    return True
-
 def insertar_en_diccionario(diccionario, nuevo_registro, indices_unicos=None):
     print(f"Insertando: {nuevo_registro}")
     print(f"En el Diccionario actual: {diccionario}")
@@ -421,52 +395,6 @@ def insertar_pais():
         print(f"Registro insertado correctamente: {paises}")
     return resultado
 
-def insertar_ciudad():
-    global paises, ciudades
-    print(ciudades)
-    cod_pais=input("Ingrese el código del país: ")
-    if not validar_pais_existe(cod_pais):
-        return False
-    cod_ciudad=input("Ingrese el código de la ciudad: ")
-    nombre=input("Ingrese el nombre de la ciudad: ")
-    resultado=insertar_en_lista(ciudades, [str(cod_pais), str(cod_ciudad), nombre], indices_unicos=[0, 1])
-    if resultado:
-        print(f"Registro insertado correctamente: {ciudades}")
-    return resultado
-def insertar_restaurante():
-    global paises, ciudades, restaurantes
-    print(restaurantes)
-    cod_pais=input("Ingrese el código del país: ")
-    if not validar_pais_existe(cod_pais):
-        return False
-    cod_ciudad=input("Ingrese el código de la ciudad: ")
-    if not validar_ciudad_existe(cod_pais, cod_ciudad):
-        return False
-    cod_rest=input("Ingrese el código del restaurante: ")
-    nombre=input("Ingrese el nombre del restaurante: ")
-    resultado=insertar_en_lista(restaurantes, [str(cod_pais), str(cod_ciudad), str(cod_rest), nombre], indices_unicos=[0, 1, 2])
-
-    if resultado:
-        print(f"Registro insertado correctamente: {restaurantes}")
-    return resultado
-def insertar_menu():
-    global paises, ciudades, restaurantes, menus
-    cod_pais=input("Ingrese el código del país: ")
-    if not validar_pais_existe(cod_pais):
-        return False
-    cod_ciudad=input("Ingrese el código de la ciudad: ")
-    if not validar_ciudad_existe(cod_pais, cod_ciudad):
-        return False
-    cod_rest=input("Ingrese el código del restaurante: ")
-    if not validar_restaurante_existe(cod_pais, cod_ciudad, cod_rest):
-        return False
-    cod_menu=input("Ingrese el código del menú: ")
-    nombre=input("Ingrese el nombre del menú: ")
-    resultado=insertar_en_lista(menus, [str(cod_pais), str(cod_ciudad), str(cod_rest), str(cod_menu), nombre],indices_unicos=[0, 1, 2, 3])
-
-    if resultado:
-        print(f"Registro insertado correctamente: {menus}")
-    return resultado
 def insertar_producto():
     global paises, ciudades, restaurantes, menus, productos
     cod_pais=input("Ingrese el código del país: ")
@@ -1115,7 +1043,9 @@ def MainMenu():
             while True:
                 mostrar_menu(subopciones)
                 y=int(input("Selecciona una sub-opción (1-7) para buscar: "))
-                if y==1:buscar_pais()
+                if y==1:
+                    cod_pais=input("Ingrese el codigo del pais a buscar: ")
+                    buscar_pais(dic, cod_pais)
                 elif y==2:buscar_ciudad()
                 elif y==3:buscar_rest()
                 elif y==4:buscar_menu()
