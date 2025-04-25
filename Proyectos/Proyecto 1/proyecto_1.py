@@ -1,20 +1,74 @@
 #Luis Andrés Acuña Pérez y Patrick Zúñiga Arroyo
 #Mantenimiento de Bases de Datos
 ####################################################################################################################
-#Cambiaar a diccionario
-def datos_a_dicc(ruta_archivo):
+def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus):
 
     diccionario={}
-    with open(ruta_archivo, "r") as archivo:
-        for line in archivo:
-            linea=line.strip()
-            if linea:
-                (llave, valor)=line.split(";")
-                diccionario[llave.strip()]=valor.strip()
-    return(diccionario)
+    with open(ruta_paises, "r") as archivo:
+        for linea in archivo:
+            linea=linea.strip()
+            if not linea:
+                continue
 
-paises=datos_a_dicc("Paises.txt")
-print(paises)
+            cod_pais, nombre_pais=linea.split(";", 1)
+            diccionario[cod_pais.strip()]= {
+                "nombre": nombre_pais,
+                "ciudades": {}
+            }
+    with open(ruta_ciudades, "r") as archivo:
+        for linea in archivo:
+            linea=linea.strip()
+            if not linea:
+                continue
+            cod_pais, cod_ciudad, nombre_ciudad=linea.split(";", 2)
+            if cod_pais in diccionario:
+                diccionario[cod_pais]["ciudades"][cod_ciudad]={
+                    "nombre": nombre_ciudad,
+                    "restaurantes": {}
+                    }
+    with open(ruta_restaurantes, "r") as archivo:
+        for linea in archivo:
+            linea=linea.strip()
+            if not linea:
+                continue
+            cod_pais, cod_ciudad, cod_rest, nombre_rest=linea.split(";", 3)
+            if cod_pais in diccionario and cod_ciudad in diccionario[cod_pais]["ciudades"]:
+                diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]= {
+                    "nombre": nombre_rest,
+                    "menus": {}
+                    }
+
+    with open(ruta_menus, "r") as archivo:
+        for linea in archivo:
+            linea=linea.strip()
+            if not linea:
+                continue
+            cod_pais, cod_ciudad, cod_rest, cod_menu, nombre_menu=linea.split(";", 4)
+            if cod_pais in diccionario and cod_ciudad in diccionario[cod_pais]["ciudades"] and cod_rest in diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"]:
+                diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]["menus"][cod_menu]=nombre_menu
+
+    return diccionario
+
+
+def imprimir_cascada(diccionario):
+    for cod_pais, info_pais in diccionario.items():
+        print(f"{cod_pais} — {info_pais['nombre']}")
+        for cod_ciudad, info_ciudad in info_pais["ciudades"].items():
+            print(f"  {cod_ciudad} — {info_ciudad['nombre']}")
+            for cod_rest, info_rest in info_ciudad["restaurantes"].items():
+                print(f"    {cod_rest} — {info_rest['nombre']}")
+                # Nivel de menús (puede estar vacío)
+                for cod_menu, nombre_menu in info_rest.get("menus", {}).items():
+                    print(f"      {cod_menu} — {nombre_menu}")
+
+
+paises="Paises.txt"
+ciudades="Ciudades.txt"
+restaurantes="Restaurantes.txt"
+menus="Menu.txt"
+dic=datos_a_dicc(paises, ciudades, restaurantes, menus)
+print(dic)
+print (imprimir_cascada(dic))
 
 def datos_a_listas(ruta_archivo):
     try:
