@@ -71,31 +71,40 @@ def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus, ruta
                     "precio": float(precio)
                     }
     return diccionario
-
-def imprimir_cascada(diccionario):
-    for cod_pais, info_pais in diccionario.items():
-        print(f"{cod_pais} — {info_pais['nombre']}")
-        for cod_ciudad, info_ciudad in info_pais["ciudades"].items():
-            print(f"  {cod_ciudad} — {info_ciudad['nombre']}")
-            for cod_rest, info_rest in info_ciudad["restaurantes"].items():
-                print(f"    {cod_rest} — {info_rest['nombre']}")
-                # Nivel de menús
-                for cod_menu, info_menu in info_rest.get("menus", {}).items():
-                    print(f"      {cod_menu} — {info_menu['nombre']}")
-                    # Nivel de productos dentro del menú
-                    for cod_prod, nombre_prod in info_menu.get("productos", {}).items():
-                        print(f"        {cod_prod} — {nombre_prod}")
-
-
+def clientes_a_dicc(ruta_clientes):
+    clientes_dicc={}
+    with open(ruta_clientes, "r") as archivo:
+        for linea in archivo:
+            linea=linea.strip()
+            if not linea:
+                continue
+            cedula, nombre=linea.split(";", 1)
+            clientes_dicc[cedula]=nombre
+    return clientes_dicc
+def imprimir_cascada(datos):
+    for pa, ip in datos.items():
+        print(f"{pa} — {ip['nombre']}")
+        for ci, ic in ip["ciudades"].items():
+            print(f"  {ci} — {ic['nombre']}")
+            for re, ir in ic["restaurantes"].items():
+                print(f"    {re} — {ir['nombre']}")
+                for me, im in ir["menus"].items():
+                    print(f"      {me} — {im['nombre']}")
+                    for pr, iprod in im.get("productos", {}).items():
+                        print(f"        {pr} — {iprod['nombre']} "
+                              f"({iprod['calorias']} cal, ₡{iprod['precio']})")
 
 paises="Paises.txt"
 ciudades="Ciudades.txt"
 restaurantes="Restaurantes.txt"
 menus="Menu.txt"
 productos="Productos.txt"
+clientes="Clientes.txt"
 dic=datos_a_dicc(paises, ciudades, restaurantes, menus, productos)
 print(dic)
 print (imprimir_cascada(dic))
+cli=clientes_a_dicc(clientes)
+print(cli)
 
 def datos_a_listas(ruta_archivo):
     try:
