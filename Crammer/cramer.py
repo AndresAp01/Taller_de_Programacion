@@ -36,7 +36,7 @@ def crammer():
         par_ordenado=None
 
     #Si detGen=0 no hay punto de interseccion
-    valorx=list(range(-10, 11))
+    valorx=list(range(-60, 60))
 
     y1=[(ecuaciones[0][2]-a1*i)/b1 for i in valorx]
     y2=[(c2-a2*i)/b2 for i in valorx]
@@ -50,10 +50,11 @@ def crammer():
     grafica.plot(valorx, y1)
     grafica.plot(valorx, y2)
     if par_ordenado is not None:
-        grafica.scatter(difx, dify)
+        grafica.scatter(difx, dify, color='red', s=100, label=f"Intersección ({difx:.2f}, {dify:.2f})")
+
     else:
         grafica.text(0, 0, "Ecuaciones paralelas")
-
+    grafica.legend()
     print(par_ordenado)
 print(crammer())
 grafica.show()
