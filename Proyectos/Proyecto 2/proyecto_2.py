@@ -156,19 +156,19 @@ def normalizar_codigo(codigo):
     return str(codigo).lstrip('-')
 #Funciones de validacion, sirven para buscar
 def validar_pais_existe(diccionario, cod_pais):
-    cod_pais=normalizar_codigo(cod_pais)
-    if cod_pais in diccionario:
-        nombre=diccionario[cod_pais]["nombre"]
-        print(f"El código {cod_pais} pertenece a: {nombre}")
-        return cod_pais in diccionario
+    cod=normalizar_codigo(cod_pais)
+    if cod in diccionario:
+        nombre=diccionario[cod]["nombre"]
+        print(f"El código {cod} pertenece a: {nombre}")
+        return cod in diccionario
     else:
-        return f"El codigo {cod_pais} no existe"
+        return f"El codigo {cod} no existe"
 #otra
 def validar_ciudad_existe(diccionario, cod_pais, cod_ciudad):
     cod_pais=normalizar_codigo(cod_pais)
-    existe_pais=validar_pais_existe(diccionario, cod_pais)
-    if existe_pais is not True:
-        return existe_pais
+    ok=validar_pais_existe(diccionario, cod_pais)
+    if ok is not True:
+        return ok
     cod_ciudad=normalizar_codigo(cod_ciudad)
     if "ciudades" not in diccionario[cod_pais]:
         return f"No hay ciudades definidas en el pais {cod_pais}"
@@ -178,21 +178,40 @@ def validar_ciudad_existe(diccionario, cod_pais, cod_ciudad):
     print(f"La ciudad {cod_ciudad}, {nombre_ciudad}, SI existe en: {cod_pais}")
     return True
 
-def validar_restaurante_existe(diccionario, cod_pais, cod_ciudad, cod_restaurante):
+def validar_restaurante_existe(diccionario, cod_pais, cod_ciudad, cod_rest):
     cod_pais=normalizar_codigo(cod_pais)
     cod_ciudad=normalizar_codigo(cod_ciudad)
-    existe_ciudad=validar_ciudad_existe(diccionario, cod_pais, cod_ciudad)
-    if existe_ciudad is not True:
-        return existe_ciudad
-    cod_restaurante=normalizar_codigo(cod_restaurante)
+    ok=validar_ciudad_existe(diccionario, cod_pais, cod_ciudad)
+    if ok is not True:
+        return ok
+    cod_rest=normalizar_codigo(cod_rest)
     ciudad_info=diccionario[cod_pais]["ciudades"][cod_ciudad]
     if "restaurantes" not in ciudad_info:
         return f'No hay restaurantes definidos en la ciudad {cod_ciudad}'
-    if cod_restaurante not in ciudad_info["restaurantes"]:
-        return f"El restaurante {cod_restaurante} no existe en la ciudad {cod_ciudad}"
-    nombre_rest=ciudad_info["restaurantes"][cod_restaurante]["nombre"]
-    print(f"El restaurante {cod_restaurante}, {nombre_rest} si existe en la ciudad {cod_ciudad}")
+    if cod_rest not in ciudad_info["restaurantes"]:
+        return f"El restaurante {cod_rest} no existe en la ciudad {cod_ciudad}"
+    nombre_rest=ciudad_info["restaurantes"][cod_rest]["nombre"]
+    print(f"El restaurante {cod_rest}, {nombre_rest} SI existe en la ciudad {cod_ciudad}")
     return True
+
+def validar_menu_existe(diccionario, cod_pais, cod_ciudad, cod_rest, cod_menu):
+    cod_pais=normalizar_codigo(cod_pais)
+    cod_ciudad=normalizar_codigo(cod_ciudad)
+    cod_rest=normalizar_codigo(cod_rest)
+    ok=validar_restaurante_existe(diccionario, cod_pais, cod_ciudad, cod_rest)
+    if ok is not True:
+        return ok
+    cod_menu=normalizar_codigo(cod_menu)
+    rest_info=diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]
+    if "menu" not in rest_info:
+        return f"No hay menús definidos en el restaurante {cod_rest}"
+    if cod_menu not in rest_info["menu"]:
+        return f"El menú {cod_menu} no existe en el restaurante {cod_rest}"
+    nombre_menu=rest_info["menu"][cod_menu]["nombre"]
+    print(f"El menú {cod_menu}, {nombre_menu}, SI existe en: {cod_rest}")
+    return True
+
+#funcion general
 
 """muestra=validar_ciudad_existe(dic,'123', "101")
 print(muestra)"""
@@ -991,7 +1010,7 @@ def MainMenu():
                     cod_ciudad=input("Ingrese el codigo de la ciudad: ")
                     cod_rest=input("Ingrese el codigo del restaurante: ")
                     cod_menu=input("Ingrese el codigo del menu a buscar: ")
-
+                    validar_menu_existe(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
                 elif y==5:
                     cod_pais=input("Ingrese el codigo del pais: ")
                     cod_ciudad=input("Ingrese el codigo de la ciudad: ")
