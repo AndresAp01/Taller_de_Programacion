@@ -44,7 +44,7 @@ def cargar_datos(paises_archivo, ciudades_archivo, restaurantes_archivo, menus_a
         # esperamos: cod_pais;cod_ciudad;cod_rest;cod_menu;cod_prod;nombre;calorias;precio
         if len(campos)!=8:
             continue
-        cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod, nombre, cal, precio = campos
+        cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod, nombre, cal, precio=campos
         if (cod_pais in diccionario and
             cod_ciudad in diccionario[cod_pais]['ciudades'] and
             cod_rest in diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes'] and
@@ -62,7 +62,7 @@ def clientes_a_dicc(ruta_clientes):
         clientes_dicc[cedula]={"nombre":nombre}
     return clientes_dicc
 #SEGUNDA MANERA
-def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus, ruta_productos):
+"""def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus, ruta_productos):
 
     diccionario={}
     with open(ruta_paises, "r") as archivo:
@@ -131,7 +131,7 @@ def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus, ruta
                     "calorias": int(float(calorias)),
                     "precio": float(precio)
                     }
-    return diccionario
+    return diccionario"""
 #FIN
 paises="Paises.txt"
 ciudades="Ciudades.txt"
@@ -203,16 +203,76 @@ def validar_menu_existe(diccionario, cod_pais, cod_ciudad, cod_rest, cod_menu):
         return ok
     cod_menu=normalizar_codigo(cod_menu)
     rest_info=diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]
-    if "menu" not in rest_info:
+    if "menus" not in rest_info:
         return f"No hay menús definidos en el restaurante {cod_rest}"
-    if cod_menu not in rest_info["menu"]:
-        return f"El menú {cod_menu} no existe en el restaurante {cod_rest}"
-    nombre_menu=rest_info["menu"][cod_menu]["nombre"]
-    print(f"El menú {cod_menu}, {nombre_menu}, SI existe en: {cod_rest}")
+    if cod_menu not in rest_info["menus"]:
+        return f"El menu {cod_menu} no existe en el restaurante {cod_rest}"
+    nombre_menu=rest_info["menus"][cod_menu]["nombre"]
+    print(f"El menu {cod_menu}, {nombre_menu}, SI existe en el restuarante: {cod_rest}")
     return True
 
 #funcion general
+def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_restaurante=None, cod_menu=None, cod_prod=None):
+    #paises
+    cod_pais=normalizar_codigo(cod_pais)
+    if cod_pais not in diccionario:
+        return f"El país {cod_pais} no existe"
+    pais_info=diccionario[cod_pais]
+    # Si solo era validar pais:
+    if cod_ciudad is None:
+        nombre=pais_info["nombre"]
+        print(f"El país {cod_pais} → {nombre} existe")
+        return True
 
+    #ciudades
+    cod_ciudad=normalizar_codigo(cod_ciudad)
+    if "ciudades" not in pais_info:
+        return f"No hay ciudades definidas en el país {cod_pais}"
+    if cod_ciudad not in pais_info["ciudades"]:
+        return f"La ciudad {cod_ciudad} no existe en el país {cod_pais}"
+    ciudad_info=pais_info["ciudades"][cod_ciudad]
+    # Si solo era validar ciudad:
+    if cod_restaurante is None:
+        nombre_ciudad=ciudad_info["nombre"]
+        print(f"La ciudad {cod_ciudad} → {nombre_ciudad} existe en {cod_pais}")
+        return True
+
+    #rests
+    cod_restaurante=normalizar_codigo(cod_restaurante)
+    if "restaurantes" not in ciudad_info:
+        return f"No hay restaurantes definidos en la ciudad {cod_ciudad}"
+    if cod_restaurante not in ciudad_info["restaurantes"]:
+        return f"El restaurante {cod_restaurante} no existe en la ciudad {cod_ciudad}"
+    rest_info=ciudad_info["restaurantes"][cod_restaurante]
+    # Si solo era validar restaurante:
+    if cod_menu is None:
+        nombre_rest=rest_info["nombre"]
+        print(f"El restaurante {cod_restaurante} → {nombre_rest} existe en {cod_ciudad}")
+        return True
+
+    #menus
+    cod_menu=normalizar_codigo(cod_menu)
+    if "menus" not in rest_info:
+        return f"No hay menús definidos en el restaurante {cod_restaurante}"
+    if cod_menu not in rest_info["menus"]:
+        return f"El menu {cod_menu} no existe en el restaurante {cod_restaurante}"
+    menu_info=rest_info["menus"][cod_menu]
+    if cod_prod is None:
+        nombre_menu=menu_info["nombre"]
+        print(f"El menu {cod_menu} → {nombre_menu} existe en {cod_restaurante}")
+        return True
+    # Éxito en nivel menú
+
+    #productos
+    cod_prod=normalizar_codigo(cod_prod)
+    if "productos" not in menu_info:
+        return f"No hay productos definidos en el menu {cod_menu}"
+    if cod_prod not in menu_info["productos"]:
+        return f"El producto {cod_prod} no existe en el menu {cod_menu}"
+    prod_info=menu_info["productos"][cod_prod]
+    nombre_prod=prod_info["nombre"]
+    print(f"El producto {cod_prod} → {nombre_prod} existe en {cod_menu}")
+    return True
 """muestra=validar_ciudad_existe(dic,'123', "101")
 print(muestra)"""
 """muestra=validar_pais_existe(dic, "123")
@@ -995,27 +1055,33 @@ def MainMenu():
                 y=int(input("Selecciona una sub-opción (1-7) para buscar: "))
                 if y==1:
                     cod_pais=input("Ingrese el codigo del pais a buscar: ")
-                    validar_pais_existe(dic, cod_pais)
+                    buscar_elemento(dic, cod_pais)
+                    """validar_pais_existe(dic, cod_pais)"""
                 elif y==2:
                     cod_pais=input("Ingrese el codigo del pais donde se encuentra la ciudad: ")
                     cod_ciudad=input("Ingrese el codigo de la ciudad a buscar: ")
-                    validar_ciudad_existe(dic, cod_pais, cod_ciudad)
+                    buscar_elemento(dic, cod_pais, cod_ciudad)
+                    #validar_ciudad_existe(dic, cod_pais, cod_ciudad)
                 elif y==3:
                     cod_pais=input("Ingrese el codigo del pais: ")
                     cod_ciudad=input("Ingrese el codigo de la ciudad: ")
                     cod_rest=input("Ingrese el codigo del restaurante a buscar: ")
-                    validar_restaurante_existe(dic, cod_pais, cod_ciudad, cod_rest)
+                    buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest)
+                    #validar_restaurante_existe(dic, cod_pais, cod_ciudad, cod_rest)
                 elif y==4:
                     cod_pais=input("Ingrese el codigo del pais: ")
                     cod_ciudad=input("Ingrese el codigo de la ciudad: ")
                     cod_rest=input("Ingrese el codigo del restaurante: ")
                     cod_menu=input("Ingrese el codigo del menu a buscar: ")
-                    validar_menu_existe(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
+                    buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
+                    #validar_menu_existe(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
                 elif y==5:
                     cod_pais=input("Ingrese el codigo del pais: ")
                     cod_ciudad=input("Ingrese el codigo de la ciudad: ")
                     cod_rest=input("Ingrese el codigo del restaurante: ")
-                    cod_menu=input("Ingrese el codigo del menu a buscar: ")
+                    cod_menu=input("Ingrese el codigo del menu: ")
+                    cod_prod=input("Ingrese el codigo del producto a buscar: ")
+                    buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod)
                 elif y==6:
                     cedula=input("Ingrese la cedula del cliente a buscar")
                 elif y==7:
