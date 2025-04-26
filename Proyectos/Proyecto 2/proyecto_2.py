@@ -2,61 +2,15 @@
 #Mantenimiento de Bases de Datos
 ####################################################################################################################
 #Construccion de diccionarios
-"""def leer_archivo(ruta):
-    filas=[]
-    with open(ruta,'r') as archivo:
-        for linea in archivo:
-            linea=linea.strip()
-            if linea:
-                filas.append(linea.split(';'))
-    return filas
-def cargar_datos(paises_archivo, ciudades_archivo, restaurantes_archivo, menus_archivo, productos_archivo):
-    diccionario={}
-    #para paises
-    for cod_pais, nombre in leer_archivo(paises_archivo):
-        diccionario[cod_pais]={'nombre':nombre, 'ciudades':{}}
-
-    #para ciudades
-    for cod_pais, cod_ciudad, nombre in leer_archivo(ciudades_archivo):
-        if cod_pais in diccionario:
-            diccionario[cod_pais]['ciudades'][cod_ciudad]={
-                'nombre': nombre,
-                'restaurantes': {}
-                }
-    #para restaurantes
-    for cod_pais, cod_ciudad, cod_rest, nombre in leer_archivo(restaurantes_archivo):
-        if cod_pais in diccionario and cod_ciudad in diccionario[cod_pais]['ciudades']:
-            diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]={
-                'nombre': nombre,
-                'menus': {}
-                }
-    #para menus
-    for cod_pais, cod_ciudad, cod_rest, cod_menu, nombre in leer_archivo(menus_archivo):
-        if (cod_pais in diccionario and
-            cod_ciudad in diccionario[cod_pais]['ciudades'] and
-            cod_rest in diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes']):
-            diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus'][cod_menu]={
-                'nombre': nombre,
-                'productos': {}
-                }
-    #para productos
-    for campos in leer_archivo(productos_archivo):
-        # esperamos: cod_pais;cod_ciudad;cod_rest;cod_menu;cod_prod;nombre;calorias;precio
-        if len(campos)!=8:
-            continue
-        cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod, nombre, cal, precio=campos
-        if (cod_pais in diccionario and
-            cod_ciudad in diccionario[cod_pais]['ciudades'] and
-            cod_rest in diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes'] and
-            cod_menu in diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus']):
-            diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus'][cod_menu]['productos'][
-                cod_prod]={
-                'nombre': nombre,
-                'calorias': int(float(cal)),
-                'precio': float(precio)
-                }
-    return diccionario
-"""
+def normalizar_codigo(codigo):
+    if not isinstance(codigo, (str, int)):
+        print(f"El codigo {codigo} no es alfanumerico")
+    else:
+        return str(codigo).lstrip('-')
+input_orig=input
+def entrada(prompt=""):
+    respuesta=input_orig(prompt)
+    return normalizar_codigo(respuesta)
 def abrir_archivo(ruta):
     try:
         with open(ruta, 'r') as archivo:
@@ -67,10 +21,8 @@ def abrir_archivo(ruta):
     except Exception as e:
         print(f"Error al leer '{ruta}': {e}")
         return []
-#Elimina espacios y convierte a mayusculas
 def normalizar(c):
     return c.strip().upper()
-
 def cargar_datos(r_paises, r_ciudades, r_restaurantes, r_menus, r_prods):
     dic={}
     #paises
@@ -83,7 +35,6 @@ def cargar_datos(r_paises, r_ciudades, r_restaurantes, r_menus, r_prods):
             "nombre":nombre_pais,
             "ciudades":{}
         }
-
     #ciudades
     for linea in abrir_archivo(r_ciudades):
         partes=linea.split(';', 2)
@@ -97,7 +48,6 @@ def cargar_datos(r_paises, r_ciudades, r_restaurantes, r_menus, r_prods):
                 'nombre': nombre_ciudad,
                 'restaurantes': {}
             }
-
     #rest
     for linea in abrir_archivo(r_restaurantes):
         partes=linea.split(';', 3)
@@ -135,15 +85,11 @@ def cargar_datos(r_paises, r_ciudades, r_restaurantes, r_menus, r_prods):
         codigo_menu=partes[3]
         codigo_producto=partes[4]
         nombre_producto=partes[5]
-
-        # Convertir valores numéricos, ignorando línea si hay error
         try:
             calorias = int(float(partes[6]))
             precio = float(partes[7])
         except ValueError:
             continue
-
-        # Verificar ruta completa hasta menú
         if (codigo_pais in dic and
                 codigo_ciudad in dic[codigo_pais]['ciudades'] and
                 codigo_restaurante in dic[codigo_pais]['ciudades'][codigo_ciudad]['restaurantes'] and
@@ -155,179 +101,21 @@ def cargar_datos(r_paises, r_ciudades, r_restaurantes, r_menus, r_prods):
                 'calorias': calorias,
                 'precio': precio
             }
-
     return dic
 dic=cargar_datos("Paises.txt", "Ciudades.txt", "Restaurantes.txt", "Menu.txt", "Productos.txt")
-
 def cargar_clientes(ruta_clientes):
-    """
-    Crea un diccionario de clientes a partir de un archivo con formato cedula;nombre
-
-    Args:
-        ruta_clientes (str): Ruta al archivo de clientes
-
-    Returns:
-        dict: Diccionario con cédulas como llaves y nombres como valores
-    """
     cli={}
-    # Procesar cada línea del archivo
     for linea in abrir_archivo(ruta_clientes):
         partes=linea.split(';', 1)
-
-        # Verificar que la línea tenga el formato correcto
         if len(partes)!=2:
             continue
-
         cedula, nombre=partes
-        # Añadir al diccionario
         cli[cedula]=nombre
-
     return cli
-
-#SEGUNDA MANERA
-"""def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus, ruta_productos):
-
-    diccionario={}
-    with open(ruta_paises, "r") as archivo:
-        for linea in archivo:
-            linea=linea.strip()
-            if not linea:
-                continue
-
-            cod_pais, nombre_pais=linea.split(";", 1)
-            diccionario[cod_pais.strip()]= {
-                "nombre": nombre_pais,
-                "ciudades": {}
-                }
-    with open(ruta_ciudades, "r") as archivo:
-        for linea in archivo:
-            linea=linea.strip()
-            if not linea:
-                continue
-            cod_pais, cod_ciudad, nombre_ciudad=linea.split(";", 2)
-            if cod_pais in diccionario:
-                diccionario[cod_pais]["ciudades"][cod_ciudad]={
-                    "nombre": nombre_ciudad,
-                    "restaurantes": {}
-                    }
-    with open(ruta_restaurantes, "r") as archivo:
-        for linea in archivo:
-            linea=linea.strip()
-            if not linea:
-                continue
-            cod_pais, cod_ciudad, cod_rest, nombre_rest=linea.split(";", 3)
-            if cod_pais in diccionario and cod_ciudad in diccionario[cod_pais]["ciudades"]:
-                diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]= {
-                    "nombre": nombre_rest,
-                    "menus": {}
-                    }
-
-    with open(ruta_menus, "r") as archivo:
-        for linea in archivo:
-            linea=linea.strip()
-            if not linea:
-                continue
-            cod_pais, cod_ciudad, cod_rest, cod_menu, nombre_menu=linea.split(";", 4)
-            if cod_pais in diccionario and cod_ciudad in diccionario[cod_pais]["ciudades"] and cod_rest in diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"]:
-                diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]["menus"][cod_menu]={
-                    "nombre": nombre_menu,
-                    "productos": {}
-                    }
-
-    with open(ruta_productos, "r") as archivo:
-        for linea in archivo:
-            linea=linea.strip()
-            if not linea:
-                continue
-
-            algo=linea.split(";", 7)
-            if len(algo)!=8:
-                continue
-
-            (cod_pais, cod_ciudad, cod_rest, cod_menu, cod_producto, nombre_producto, calorias, precio)=algo
-            if (cod_pais in diccionario
-                and cod_ciudad in diccionario[cod_pais]["ciudades"]
-                and cod_rest in diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"]
-                and cod_menu in diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]["menus"]):
-                diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]["menus"][cod_menu]["productos"][cod_producto]={
-                    "nombre": nombre_producto,
-                    "calorias": int(float(calorias)),
-                    "precio": float(precio)
-                    }
-    return diccionario"""
-#FIN
 clientes="Clientes.txt"
 cli=cargar_clientes(clientes)
-
-
-"""
-#Listas para estadisticas
-contador_busquedas_rest=[]
-contador_busquedas_menu=[]
-contador_compras_producto=[]"""
-
-def normalizar_codigo(codigo):
-    if not isinstance(codigo, (str, int)):
-        print(f"El codigo {codigo} no es alfanumerico")
-    return str(codigo).lstrip('-')
-#Funciones de validacion, sirven para buscar
-def validar_pais_existe(diccionario, cod_pais):
-    cod=normalizar_codigo(cod_pais)
-    if cod in diccionario:
-        nombre=diccionario[cod]["nombre"]
-        print(f"El código {cod} pertenece a: {nombre}")
-        return cod in diccionario
-    else:
-        return f"El codigo {cod} no existe"
-#otra
-def validar_ciudad_existe(diccionario, cod_pais, cod_ciudad):
-    cod_pais=normalizar_codigo(cod_pais)
-    ok=validar_pais_existe(diccionario, cod_pais)
-    if ok is not True:
-        return ok
-    cod_ciudad=normalizar_codigo(cod_ciudad)
-    if "ciudades" not in diccionario[cod_pais]:
-        return f"No hay ciudades definidas en el pais {cod_pais}"
-    if cod_ciudad not in diccionario[cod_pais]["ciudades"]:
-        return f"El país {cod_pais} existe, pero la ciudad {cod_ciudad} no."
-    nombre_ciudad=diccionario[cod_pais]["ciudades"][cod_ciudad]["nombre"]
-    print(f"La ciudad {cod_ciudad}, {nombre_ciudad}, SI existe en: {cod_pais}")
-    return True
-def validar_restaurante_existe(diccionario, cod_pais, cod_ciudad, cod_rest):
-    cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(cod_ciudad)
-    ok=validar_ciudad_existe(diccionario, cod_pais, cod_ciudad)
-    if ok is not True:
-        return ok
-    cod_rest=normalizar_codigo(cod_rest)
-    ciudad_info=diccionario[cod_pais]["ciudades"][cod_ciudad]
-    if "restaurantes" not in ciudad_info:
-        return f'No hay restaurantes definidos en la ciudad {cod_ciudad}'
-    if cod_rest not in ciudad_info["restaurantes"]:
-        return f"El restaurante {cod_rest} no existe en la ciudad {cod_ciudad}"
-    nombre_rest=ciudad_info["restaurantes"][cod_rest]["nombre"]
-    print(f"El restaurante {cod_rest}, {nombre_rest} SI existe en la ciudad {cod_ciudad}")
-    return True
-def validar_menu_existe(diccionario, cod_pais, cod_ciudad, cod_rest, cod_menu):
-    cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(cod_ciudad)
-    cod_rest=normalizar_codigo(cod_rest)
-    ok=validar_restaurante_existe(diccionario, cod_pais, cod_ciudad, cod_rest)
-    if ok is not True:
-        return ok
-    cod_menu=normalizar_codigo(cod_menu)
-    rest_info=diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]
-    if "menus" not in rest_info:
-        return f"No hay menús definidos en el restaurante {cod_rest}"
-    if cod_menu not in rest_info["menus"]:
-        return f"El menu {cod_menu} no existe en el restaurante {cod_rest}"
-    nombre_menu=rest_info["menus"][cod_menu]["nombre"]
-    print(f"El menu {cod_menu}, {nombre_menu}, SI existe en el restuarante: {cod_rest}")
-    return True
-#funcion general
 def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_restaurante=None, cod_menu=None, cod_prod=None):
     #paises
-    cod_pais=normalizar_codigo(cod_pais)
     if cod_pais not in diccionario:
         return f"El país {cod_pais} no existe"
     pais_info=diccionario[cod_pais]
@@ -336,9 +124,7 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_restaurante=None
         nombre=pais_info["nombre"]
         print(f"El país {cod_pais} → {nombre} existe")
         return True
-
     #ciudades
-    cod_ciudad=normalizar_codigo(cod_ciudad)
     if "ciudades" not in pais_info:
         return f"No hay ciudades definidas en el país {cod_pais}"
     if cod_ciudad not in pais_info["ciudades"]:
@@ -349,9 +135,7 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_restaurante=None
         nombre_ciudad=ciudad_info["nombre"]
         print(f"La ciudad {cod_ciudad} → {nombre_ciudad} existe en {cod_pais}")
         return True
-
     #rests
-    cod_restaurante=normalizar_codigo(cod_restaurante)
     if "restaurantes" not in ciudad_info:
         return f"No hay restaurantes definidos en la ciudad {cod_ciudad}"
     if cod_restaurante not in ciudad_info["restaurantes"]:
@@ -362,9 +146,7 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_restaurante=None
         nombre_rest=rest_info["nombre"]
         print(f"El restaurante {cod_restaurante} → {nombre_rest} existe en {cod_ciudad}")
         return True
-
     #menus
-    cod_menu=normalizar_codigo(cod_menu)
     if "menus" not in rest_info:
         return f"No hay menús definidos en el restaurante {cod_restaurante}"
     if cod_menu not in rest_info["menus"]:
@@ -374,10 +156,8 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_restaurante=None
         nombre_menu=menu_info["nombre"]
         print(f"El menu {cod_menu} → {nombre_menu} existe en {cod_restaurante}")
         return True
-    # Éxito en nivel menú
-
+    # exito en nivel menu
     #productos
-    cod_prod=normalizar_codigo(cod_prod)
     if "productos" not in menu_info:
         return f"No hay productos definidos en el menu {cod_menu}"
     if cod_prod not in menu_info["productos"]:
@@ -388,15 +168,12 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_restaurante=None
     return True
 #funciopn para buscar cliente (Porque es en otro diccionario)
 def buscar_cli(diccionario, cedula):
-
     if cedula not in diccionario:
         return f"El cliente con cedula {cedula} no existe"
     nombre=diccionario[cedula]
     print(f"El cliente {cedula} → {nombre} existe")
     return True
-
 def validar_cliente_existe(diccionario, ced):
-    ced=normalizar_codigo(ced)
     if ced in diccionario:
         nombre=diccionario[ced]
         print(f"La cedula {ced} pertenece a: {nombre}")
@@ -411,98 +188,83 @@ print(muestra)"""
 #MODIFICAR_____________________________________________________________________________________________________________#
 #funciona
 #con fiunciones de validacion
-"""def modificar_pais():
-    cod_pais=input("Ingrese el código del país a modificar: ")
-    cod_pais=normalizar_codigo(cod_pais)
-    if not validar_pais_existe(dic,cod_pais):
-        print("El pais no existe")
-        return
-    nuevo_nombre=input("Ingrese el nuevo nombre del país: ")
-    dic[cod_pais]["nombre"]=nuevo_nombre
-    print(f"El pais {cod_pais} ha sido renombrado como: {nuevo_nombre}")"""
 #funciona
 def modificar_pais():
-    cod_pais=input("Ingrese el código del país a modificar: ")
-    cod_pais=normalizar_codigo(cod_pais)
+    cod_pais=entrada("Ingrese el código del país a modificar: ")
     if cod_pais not in dic:
         print("El pais no existe")
         return
-    nuevo_nombre=input("Ingrese el nuevo nombre del país: ")
+    nuevo_nombre=entrada("Ingrese el nuevo nombre del país: ")
     dic[cod_pais]["nombre"]=nuevo_nombre
     print(f"El pais {cod_pais} ha sido renombrado como: {nuevo_nombre}")
     print(dic)
 #funciona
 def modificar_ciudad():
-    cod_pais=input("Ingrese el código del país donde se encuentra la ciudad: ")
-    cod_ciudad=input("Ingrese el codigo de la ciudad a modificar: ")
-    cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(cod_ciudad)
+    cod_pais=entrada("Ingrese el código del país donde se encuentra la ciudad: ")
+    cod_ciudad=entrada("Ingrese el codigo de la ciudad a modificar: ")
     if cod_pais not in dic:
         print("El pais no existe")
         return
     if cod_ciudad not in dic[cod_pais]["ciudades"]:
         print("La ciudad no existe")
         return
-    nuevo_nombre=input("Ingrese el nuevo nombre del ciudad: ")
+    nuevo_nombre=entrada("Ingrese el nuevo nombre del ciudad: ")
     dic[cod_pais]["ciudades"][cod_ciudad]["nombre"]=nuevo_nombre
     print(f"La ciudad {cod_ciudad} se ha renombrado como: {nuevo_nombre}")
     print(dic)
-#por hacer:
 def modificar_restaurante():
-    cod_pais=normalizar_codigo(input("Ingrese el código del país: "))
-    cod_ciudad=normalizar_codigo(input("Ingrese el código de la ciudad: "))
-    cod_rest=normalizar_codigo(input("Ingrese el código del restaurante a modificar: "))
-    ok=validar_restaurante_existe(dic, cod_pais, cod_ciudad, cod_rest)
+    cod_pais=entrada("Ingrese el código del país: ")
+    cod_ciudad=entrada("Ingrese el código de la ciudad: ")
+    cod_rest=entrada("Ingrese el código del restaurante a modificar: ")
+    ok=buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest)
     if ok is not True:
         print(ok)
         return
     # Pedir nuevo nombre y aplicar cambio
-    nuevo_nombre=input("Ingrese el nuevo nombre del restaurante: ")
+    nuevo_nombre=entrada("Ingrese el nuevo nombre del restaurante: ")
     dic[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['nombre']=nuevo_nombre
     print(f"El restaurante {cod_rest} se ha renombrado como: {nuevo_nombre}")
     print(dic)
-
 def modificar_menu():
-    cod_pais=normalizar_codigo(input("Ingrese el código del país: "))
-    cod_ciudad=normalizar_codigo(input("Ingrese el código de la ciudad: "))
-    cod_rest=normalizar_codigo(input("Ingrese el código del restaurante: "))
-    cod_menu=normalizar_codigo(input("Ingrese el código del menú a modificar: "))
+    cod_pais=entrada("Ingrese el código del país: ")
+    cod_ciudad=entrada("Ingrese el código de la ciudad: ")
+    cod_rest=entrada("Ingrese el código del restaurante: ")
+    cod_menu=entrada("Ingrese el código del menú a modificar: ")
     # Validar menú (incluye validación de niveles anteriores)
-    ok=validar_menu_existe(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
+    ok=buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
     if ok is not True:
         print(ok)
         return
     # Pedir nuevo nombre y aplicar cambio
-    nuevo_nombre=input("Ingrese el nuevo nombre del menú: ")
+    nuevo_nombre=entrada("Ingrese el nuevo nombre del menú: ")
     dic[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus'][cod_menu]['nombre']=nuevo_nombre
     print(f"El menú {cod_menu} se ha renombrado como: {nuevo_nombre}")
     print(dic)
-
 def modificar_producto():
-    cod_pais=normalizar_codigo(input("Ingrese el código del país: "))
-    cod_ciudad=normalizar_codigo(input("Ingrese el código de la ciudad: "))
-    cod_rest=normalizar_codigo(input("Ingrese el código del restaurante: "))
-    cod_menu=normalizar_codigo(input("Ingrese el código del menú: "))
-    cod_prod=normalizar_codigo(input("Ingrese el código del producto a modificar: "))
+    cod_pais=entrada("Ingrese el codigo del pais: ")
+    cod_ciudad=entrada("Ingrese el codigo de la ciudad: ")
+    cod_rest=entrada("Ingrese el codigo del restaurante: ")
+    cod_menu=entrada("Ingrese el codigo del menu: ")
+    cod_prod=entrada("Ingrese el codigo del producto a modificar: ")
     # Validar que el producto exista
-    ok = validar_menu_existe(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
+    ok=buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
     if ok is not True:
         print(ok)
         return
-    menu_info = dic[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus'][cod_menu]
+    menu_info=dic[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus'][cod_menu]
     if 'productos' not in menu_info or cod_prod not in menu_info['productos']:
         print(f"El producto {cod_prod} no existe en el menú {cod_menu}")
         return
     # Pedir nuevos datos
-    nuevo_nombre = input("Ingrese el nuevo nombre del producto: ")
+    nuevo_nombre=entrada("Ingrese el nuevo nombre del producto: ")
     try:
-        nuevas_cal  = int(input("Ingrese las nuevas calorías: "))
-        nuevo_precio = float(input("Ingrese el nuevo precio: "))
+        nuevas_cal =int(entrada("Ingrese las nuevas calorías: "))
+        nuevo_precio=float(entrada("Ingrese el nuevo precio: "))
     except ValueError:
         print("Calorías o precio inválidos.")
         return
     # Aplicar cambios
-    prod = menu_info['productos'][cod_prod]
+    prod=menu_info['productos'][cod_prod]
     prod['nombre']   = nuevo_nombre
     prod['calorias'] = nuevas_cal
     prod['precio']   = nuevo_precio
@@ -511,15 +273,13 @@ def modificar_producto():
     print(f"  Calorías: {nuevas_cal}")
     print(f"  Precio:   {nuevo_precio}")
     print(dic)
-
 #funcioooona
 def modificar_cliente():
-    cedula=input("Ingrese la cedula del cliente: ")
-    cedula=normalizar_codigo(cedula)
+    cedula=entrada("Ingrese la cedula del cliente: ")
     if cedula not in cli:
         print(f"El cliente con cedula: {cedula} no existe")
         return
-    nuevo_nombre = input("Ingrese el nuevo nombre del cliente: ")
+    nuevo_nombre = entrada("Ingrese el nuevo nombre del cliente: ")
     cli[cedula]["nombre"]=nuevo_nombre
     print(f"El cliente con cedula {cedula} ha sido renombrado como: {nuevo_nombre}")
     print(cli)
@@ -578,30 +338,30 @@ def insertar_en_diccionario(diccionario, nuevo_registro, indices_unicos=None):
                 return False
 def insertar_pais():
     print("Diccionario actual:", paises)
-    cod_pais=input("Ingrese el codigo del pais: ")
-    nombre=input("Ingrese el nombre del pais: ")
+    cod_pais=entrada("Ingrese el codigo del pais: ")
+    nombre=entrada("Ingrese el nombre del pais: ")
     resultado=insertar_en_lista
     if resultado:
         print(f"Registro insertado correctamente: {paises}")
     return resultado
 def insertar_producto():
     global paises, ciudades, restaurantes, menus, productos
-    cod_pais=input("Ingrese el código del país: ")
+    cod_pais=entrada("Ingrese el código del país: ")
     if not validar_pais_existe(cod_pais):
         return False
-    cod_ciudad=input("Ingrese el código de la ciudad: ")
+    cod_ciudad=entrada("Ingrese el código de la ciudad: ")
     if not validar_ciudad_existe(cod_pais, cod_ciudad):
         return False
-    cod_rest=input("Ingrese el código del restaurante: ")
+    cod_rest=entrada("Ingrese el código del restaurante: ")
     if not validar_restaurante_existe(cod_pais, cod_ciudad,cod_rest):
         return False
-    cod_menu=input("Ingrese el código del menú: ")
+    cod_menu=entrada("Ingrese el código del menú: ")
     if not validar_menu_existe(cod_pais, cod_ciudad, cod_rest, cod_menu):
         return False
-    cod_producto=input("Ingrese el código del producto: ")
-    nombre=input("Ingrese el nombre del producto: ")
-    calorias=float(input("Ingrese las calorías del producto: "))
-    precio=float(input("Ingrese el precio: "))
+    cod_producto=entrada("Ingrese el código del producto: ")
+    nombre=entrada("Ingrese el nombre del producto: ")
+    calorias=float(entrada("Ingrese las calorías del producto: "))
+    precio=float(entrada("Ingrese el precio: "))
     resultado=insertar_en_lista(productos, [str(cod_pais),str(cod_ciudad),str(cod_rest),str(cod_menu),str(cod_producto), nombre, calorias, precio],indices_unicos=[0, 1, 2, 3, 4])
 
     if resultado:
@@ -609,8 +369,8 @@ def insertar_producto():
     return resultado
 def insertar_cliente():
     global clientes
-    cedula=input("Ingrese la cédula del cliente: ")
-    nombre=input("Ingrese el nombre del cliente: ")
+    cedula=entrada("Ingrese la cédula del cliente: ")
+    nombre=entrada("Ingrese el nombre del cliente: ")
     resultado=insertar_en_lista(clientes, [str(cedula), nombre], indices_unicos=[0])
     if resultado:
         print(f"Registro insertado correctamente: {clientes}")
@@ -641,7 +401,7 @@ def registrar_compra_menu():
     print("\nPaíses disponibles:")
     for pais in paises:
         print(f"- {pais[0]}: {pais[1]}")
-    cod_pais=input("\nIngrese el código del país: ").strip()
+    cod_pais=entrada("\nIngrese el código del país: ").strip()
     if not validar_pais_existe(cod_pais):
         print(f"Error: País {cod_pais} no existe")
         return False
@@ -650,7 +410,7 @@ def registrar_compra_menu():
     ciudades_pais=[c for c in ciudades if c[0]==cod_pais]
     for ciudad in ciudades_pais:
         print(f"- {ciudad[1]}: {ciudad[2]}")
-    cod_ciudad=input("\nIngrese el código de la ciudad: ").strip()
+    cod_ciudad=entrada("\nIngrese el código de la ciudad: ").strip()
     if not validar_ciudad_existe(cod_pais, cod_ciudad):
         print(f"Error: Ciudad {cod_ciudad} no existe")
         return False
@@ -660,7 +420,7 @@ def registrar_compra_menu():
     restaurantes_ciudad=[r for r in restaurantes if r[0]==cod_pais and r[1]==cod_ciudad]
     for rest in restaurantes_ciudad:
         print(f"- {rest[2]}: {rest[3]}")
-    cod_restaurante=input("\nIngrese el código del restaurante: ").strip()
+    cod_restaurante=entrada("\nIngrese el código del restaurante: ").strip()
     if not validar_restaurante_existe(cod_pais, cod_ciudad, cod_restaurante):
         print(f"Error: Restaurante {cod_restaurante} no existe")
         return False
@@ -669,7 +429,7 @@ def registrar_compra_menu():
     menus_restaurante=[m for m in menus if m[0]==cod_pais and m[1]==cod_ciudad and m[2]==cod_restaurante]
     for menu in menus_restaurante:
         print(f"- {menu[3]}: {menu[4]})")
-    cod_menu=input("\nIngrese el código del menú: ").strip()
+    cod_menu=entrada("\nIngrese el código del menú: ").strip()
     if not validar_menu_existe(cod_pais, cod_ciudad, cod_restaurante, cod_menu):
         print(f"Error: Menu {cod_menu} no existe")
         return False
@@ -687,7 +447,7 @@ def registrar_compra_menu():
             print(f"│  Nombre: {prod[5]}")
             print(f"│  Precio: ${prod[7]}")
             print("└──────────────────")
-        cod_producto=input("\nIngrese el código del producto (o 'fin' para terminar): ").strip()
+        cod_producto=entrada("\nIngrese el código del producto (o 'fin' para terminar): ").strip()
         if cod_producto.lower()=='fin':
             if not productos_seleccionados:
                 print("Debe seleccionar al menos un producto")
@@ -704,7 +464,7 @@ def registrar_compra_menu():
             continue
         while True:
             try:
-                cantidad=int(input(f"\nIngrese la cantidad para {producto_encontrado[5]}: "))
+                cantidad=int(entrada(f"\nIngrese la cantidad para {producto_encontrado[5]}: "))
                 if cantidad<=0:
                     print("La cantidad debe ser mayor a 0")
                     continue
@@ -714,22 +474,22 @@ def registrar_compra_menu():
         productos_seleccionados.append({'producto': producto_encontrado, 'cantidad': cantidad})
         print(f"Producto {producto_encontrado[5]} agregado con éxito")
 
-    cedula=input("\nIngrese la cédula del cliente: ").strip()
+    cedula=entrada("\nIngrese la cédula del cliente: ").strip()
     cliente=next((c for c in clientes if c[0]==cedula), None)
     if not cliente:
         print("Error: Cliente no registrado")
         return False
     print(f"Cliente: {cliente[1]}")
 
-    orden=input("\nIngrese si la orden es para llevar o comer aqui: (llevar/aqui): ").strip().lower()
+    orden=entrada("\nIngrese si la orden es para llevar o comer aqui: (llevar/aqui): ").strip().lower()
     while orden not in ['llevar', 'aqui']:
         print("Opción no válida. Ingrese 'llevar' o 'aqui'")
-        orden=input("\nIngrese si es para llevar o comer aquí (llevar/aqui): ").strip().lower()
+        orden=entrada("\nIngrese si es para llevar o comer aquí (llevar/aqui): ").strip().lower()
 
-    metodo_pago=input("\nIngrese el metodo de pago: (efectivo/tarjeta): ").strip().lower()
+    metodo_pago=entrada("\nIngrese el metodo de pago: (efectivo/tarjeta): ").strip().lower()
     while metodo_pago not in ['efectivo', 'tarjeta']:
         print("Opcion no valida. Ingrese 'efectivo' o 'tarjeta'")
-        metodo_pago=input("\nIngrese el metodo de pago: (efectivo/tarjeta): ").strip().lower()
+        metodo_pago=entrada("\nIngrese el metodo de pago: (efectivo/tarjeta): ").strip().lower()
     # Mostrar resumen de la compra
     print("\nResumen de su compra:")
     total_compra=0
@@ -749,7 +509,7 @@ def registrar_compra_menu():
         print(f"{i}. {producto[5]} - Cantidad: {cantidad} - Subtotal: {subtotal:.2f}")
     print(f"\nTotal a pagar: {total_compra:.2f}")
 
-    modificar=input("\n¿Desea modificar la compra? (S/N): ").strip().upper()
+    modificar=entrada("\n¿Desea modificar la compra? (S/N): ").strip().upper()
     while modificar=="S":
         print("\n¿Qué desea modificar?")
         print("1. Cambiar un producto")
@@ -758,7 +518,7 @@ def registrar_compra_menu():
         print("4. Agregar otro producto")
         print("5. Terminar modificaciones")
 
-        opcion=input("\nSeleccione una opción (1-5): ").strip()
+        opcion=entrada("\nSeleccione una opción (1-5): ").strip()
 
         if opcion=="1":  # Cambiar producto
             print("\nProductos en su pedido:")
@@ -766,7 +526,7 @@ def registrar_compra_menu():
                 print(f"{i}. {item['producto'][5]} - Cantidad: {item['cantidad']}")
 
             try:
-                num=int(input("\nIngrese el número del producto a cambiar: ")) - 1
+                num= int(entrada("\nIngrese el número del producto a cambiar: ")) - 1
                 if num<0 or num>=len(productos_seleccionados):
                     print("Número de producto inválido")
                     continue
@@ -775,7 +535,7 @@ def registrar_compra_menu():
                 for producto in productos_menu:
                     print(f"- {producto[4]}: {producto[5]} (Precio: {producto[7]})")
 
-                nuevo_cod=input("\nIngrese el código del nuevo producto: ").strip()
+                nuevo_cod=entrada("\nIngrese el código del nuevo producto: ").strip()
                 nuevo_prod=next((p for p in productos_menu if p[4] == nuevo_cod), None)
 
                 if not nuevo_prod:
@@ -793,11 +553,11 @@ def registrar_compra_menu():
             for i, item in enumerate(productos_seleccionados, 1):
                 print(f"{i}. {item['producto'][5]} - Cantidad: {item['cantidad']}")
             try:
-                num=int(input("\nIngrese el número del producto a modificar: ")) - 1
+                num= int(entrada("\nIngrese el número del producto a modificar: ")) - 1
                 if num<0 or num>=len(productos_seleccionados):
                     print("Número de producto inválido")
                     continue
-                nueva_cantidad=int(input(f"\nIngrese la nueva cantidad para {productos_seleccionados[num]['producto'][5]}: "))
+                nueva_cantidad=int(entrada(f"\nIngrese la nueva cantidad para {productos_seleccionados[num]['producto'][5]}: "))
                 if nueva_cantidad<=0:
                     print("La cantidad debe ser mayor a 0")
                     continue
@@ -810,7 +570,7 @@ def registrar_compra_menu():
             for i, item in enumerate(productos_seleccionados, 1):
                 print(f"{i}. {item['producto'][5]} - Cantidad: {item['cantidad']}")
             try:
-                num=int(input("\nIngrese el número del producto a eliminar: ")) - 1
+                num= int(entrada("\nIngrese el número del producto a eliminar: ")) - 1
                 if num<0 or num>=len(productos_seleccionados):
                     print("Número de producto inválido")
                     continue
@@ -830,12 +590,12 @@ def registrar_compra_menu():
                 continue
             for producto in productos_en_menu:
                 print(f"- {producto[4]}: {producto[5]} (Precio: {producto[7]})")
-            cod_producto=input("\nIngrese el código del producto a agregar: ").strip()
+            cod_producto=entrada("\nIngrese el código del producto a agregar: ").strip()
             producto_encontrado=next((p for p in productos_en_menu if p[4]==cod_producto), None)
             if not producto_encontrado:
                 print("Error: Producto no encontrado en este menú")
                 continue
-            cantidad=int(input(f"\nIngrese la cantidad para {producto_encontrado[5]}: "))
+            cantidad=int(entrada(f"\nIngrese la cantidad para {producto_encontrado[5]}: "))
             if cantidad<= 0:
                 print("La cantidad debe ser mayor a 0")
                 continue
@@ -856,8 +616,8 @@ def registrar_compra_menu():
             print(f"{i}. {producto[5]} - Cantidad: {cantidad} - Subtotal: {subtotal:.2f}")
         print(f"\nTotal a pagar: {total_compra:.2f}")
 
-        modificar = input("\n¿Desea realizar más modificaciones? (S/N): ").strip().upper()
-    confirmar=input("\n¿Confirmar compra? (S/N): ").strip().upper()
+        modificar = entrada("\n¿Desea realizar más modificaciones? (S/N): ").strip().upper()
+    confirmar=entrada("\n¿Confirmar compra? (S/N): ").strip().upper()
     if confirmar!="S":
         print("\nCompra cancelada")
         return False
@@ -930,7 +690,7 @@ def reporte_paises():
     guardar_reporte("Lista de Países", contenido)
 def reporte_ciudades():
     global paises, ciudades
-    cod_pais = input("Ingrese el código del país: ")
+    cod_pais = entrada("Ingrese el código del país: ")
     cod_pais = normalizar_codigo(cod_pais)
     ciudades_filtradas = [ciudad for ciudad in ciudades if ciudad[0] == cod_pais]
 
@@ -943,8 +703,8 @@ def reporte_ciudades():
     guardar_reporte(f"Ciudades del País {cod_pais}", contenido)
 def reporte_restaurantes():
     global paises, ciudades, restaurantes
-    cod_pais = input("Ingrese el código del país: ")
-    cod_ciudad = input("Ingrese el ciudad: ")
+    cod_pais = entrada("Ingrese el código del país: ")
+    cod_ciudad = entrada("Ingrese el ciudad: ")
     cod_pais=normalizar_codigo(cod_pais)
     cod_ciudad=normalizar_codigo(cod_ciudad)
     restaurantes_filtrados=[rest for rest in restaurantes if rest[0]==cod_pais and rest[1]==cod_ciudad]
@@ -956,9 +716,9 @@ def reporte_restaurantes():
     guardar_reporte(f"Restaurantes en {cod_ciudad}, {cod_pais}", contenido)
 def reporte_menus():
     global paises, ciudades, restaurantes, menus
-    cod_pais = input("Ingrese el código del país: ")
-    cod_ciudad = input("Ingrese el ciudad: ")
-    cod_restaurante = input("Ingrese el restaurante: ")
+    cod_pais = entrada("Ingrese el código del país: ")
+    cod_ciudad = entrada("Ingrese el ciudad: ")
+    cod_restaurante = entrada("Ingrese el restaurante: ")
     cod_pais=normalizar_codigo(cod_pais)
     cod_restaurante = normalizar_codigo(cod_restaurante)
     cod_ciudad = normalizar_codigo(cod_ciudad)
@@ -971,10 +731,10 @@ def reporte_menus():
     guardar_reporte(f"Menus en {cod_restaurante}, {cod_pais}", contenido)
 def reporte_productos():
     global paises, ciudades, restaurantes, menus, productos
-    cod_pais=input("Ingrese el código del país: ")
-    cod_ciudad=input("Ingrese el ciudad: ")
-    cod_restaurante=input("Ingrese el restaurante: ")
-    cod_menu=input("Ingrese el menu: ")
+    cod_pais=entrada("Ingrese el código del país: ")
+    cod_ciudad=entrada("Ingrese el ciudad: ")
+    cod_restaurante=entrada("Ingrese el restaurante: ")
+    cod_menu=entrada("Ingrese el menu: ")
     cod_menu=normalizar_codigo(cod_menu)
     cod_restaurante=normalizar_codigo(cod_restaurante)
     cod_ciudad=normalizar_codigo(cod_ciudad)
@@ -1015,7 +775,7 @@ def leer_compras():
         return
 def reporte_compras_cliente():
     global compras
-    cedula=input("Ingrese la cedula del cliente: ").strip()
+    cedula=entrada("Ingrese la cedula del cliente: ").strip()
     cedula=normalizar_codigo(cedula)
     compras=leer_compras()
     if not compras:
@@ -1146,8 +906,8 @@ def reporte_facturas_extremas(mayor=True):
 def reporte_factura_menor_monto():
     pass
 def reporte_descuentos():
-    orden=input("Ingrese el tipo de servicio ('llevar' o 'aqui'): ").strip().lower()
-    metodo_pago=input("Ingrese el tipo de pago ('tarjeta' o 'efectivo'): ").strip().lower()
+    orden=entrada("Ingrese el tipo de servicio ('llevar' o 'aqui'): ").strip().lower()
+    metodo_pago=entrada("Ingrese el tipo de pago ('tarjeta' o 'efectivo'): ").strip().lower()
     descuento=None
     if orden=="llevar":
         if metodo_pago=="efectivo":
@@ -1170,7 +930,7 @@ def reporte_precio_produ():
     if precio is None:
         print("No se encontro el producto solicitado.")
         return
-    codigo=input("Confirme el codigo del producto para el reporte: ")
+    codigo=entrada("Confirme el codigo del producto para el reporte: ")
     codigo=normalizar_codigo(codigo)
     for prod in productos:
         if codigo.lower() in prod[4].lower():
@@ -1203,12 +963,12 @@ def MainMenu():
     while True:
         mostrar_menu(opciones_principales)
         print("\n Ingrese que quiere hacer: ")
-        x=int(input())
+        x=int(entrada())
         if x==1:
             print("Has seleccionado la opcion Insertar.")
             while True:
                 mostrar_menu(subopciones_insertar)
-                y=int(input("Selecciona una sub-opción (1-8) para insertar: "))
+                y=int(entrada("Selecciona una sub-opción (1-8) para insertar: "))
                 if y==1:insertar_pais()
                 elif y==2:insertar_ciudad()
                 elif y==3:insertar_restaurante()
@@ -1221,7 +981,7 @@ def MainMenu():
                         print("Operación exitosa")
                     else:
                         print("No se completó la compra")
-                    input("Presione Enter para continuar...")
+                    entrada("Presione Enter para continuar...")
                 elif y==8:
                     print("Volviendo al menú principal...")
                     break
@@ -1231,38 +991,37 @@ def MainMenu():
             print("Has seleccionado Buscar.")
             while True:
                 mostrar_menu(subopciones)
-                y=int(input("Selecciona una sub-opción (1-7) para buscar: "))
+                y=int(entrada("Selecciona una sub-opción (1-7) para buscar: "))
                 if y==1:
-                    cod_pais=input("Ingrese el codigo del pais a buscar: ")
+                    cod_pais=entrada("Ingrese el codigo del pais a buscar: ")
                     buscar_elemento(dic, cod_pais)
-                    """validar_pais_existe(dic, cod_pais)"""
                 elif y==2:
-                    cod_pais=input("Ingrese el codigo del pais donde se encuentra la ciudad: ")
-                    cod_ciudad=input("Ingrese el codigo de la ciudad a buscar: ")
+                    cod_pais=entrada("Ingrese el codigo del pais donde se encuentra la ciudad: ")
+                    cod_ciudad=entrada("Ingrese el codigo de la ciudad a buscar: ")
                     buscar_elemento(dic, cod_pais, cod_ciudad)
                     #validar_ciudad_existe(dic, cod_pais, cod_ciudad)
                 elif y==3:
-                    cod_pais=input("Ingrese el codigo del pais: ")
-                    cod_ciudad=input("Ingrese el codigo de la ciudad: ")
-                    cod_rest=input("Ingrese el codigo del restaurante a buscar: ")
+                    cod_pais=entrada("Ingrese el codigo del pais: ")
+                    cod_ciudad=entrada("Ingrese el codigo de la ciudad: ")
+                    cod_rest=entrada("Ingrese el codigo del restaurante a buscar: ")
                     buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest)
                     #validar_restaurante_existe(dic, cod_pais, cod_ciudad, cod_rest)
                 elif y==4:
-                    cod_pais=input("Ingrese el codigo del pais: ")
-                    cod_ciudad=input("Ingrese el codigo de la ciudad: ")
-                    cod_rest=input("Ingrese el codigo del restaurante: ")
-                    cod_menu=input("Ingrese el codigo del menu a buscar: ")
+                    cod_pais=entrada("Ingrese el codigo del pais: ")
+                    cod_ciudad=entrada("Ingrese el codigo de la ciudad: ")
+                    cod_rest=entrada("Ingrese el codigo del restaurante: ")
+                    cod_menu=entrada("Ingrese el codigo del menu a buscar: ")
                     buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
                     #validar_menu_existe(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
                 elif y==5:
-                    cod_pais=input("Ingrese el codigo del pais: ")
-                    cod_ciudad=input("Ingrese el codigo de la ciudad: ")
-                    cod_rest=input("Ingrese el codigo del restaurante: ")
-                    cod_menu=input("Ingrese el codigo del menu: ")
-                    cod_prod=input("Ingrese el codigo del producto a buscar: ")
+                    cod_pais=entrada("Ingrese el codigo del pais: ")
+                    cod_ciudad=entrada("Ingrese el codigo de la ciudad: ")
+                    cod_rest=entrada("Ingrese el codigo del restaurante: ")
+                    cod_menu=entrada("Ingrese el codigo del menu: ")
+                    cod_prod=entrada("Ingrese el codigo del producto a buscar: ")
                     buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod)
                 elif y==6:
-                    ced=input("Ingrese la cedula del cliente a buscar")
+                    ced=entrada("Ingrese la cedula del cliente a buscar")
                     buscar_cli(cli, ced)
                 elif y==7:
                     print("Volviendo al menú principal...")
@@ -1273,7 +1032,7 @@ def MainMenu():
             print("Has seleccionado Modificar.")
             while True:
                 mostrar_menu(subopciones)
-                y=int(input("Selecciona una sub-opción (1-7) para modificar: "))
+                y=int(entrada("Selecciona una sub-opción (1-7) para modificar: "))
                 if y==1:modificar_pais()
                 elif y==2:modificar_ciudad()
                 elif y==3:modificar_restaurante()
@@ -1287,7 +1046,7 @@ def MainMenu():
             print("Has seleccionado Reportes.")
             while True:
                 mostrar_menu(opciones_reportes)
-                y=int(input("Selecciona un reporte (1-8): "))
+                y=int(entrada("Selecciona un reporte (1-8): "))
                 if y==1:reporte_paises()
                 elif y==2:reporte_ciudades()
                 elif y==3:reporte_restaurantes()
@@ -1297,7 +1056,7 @@ def MainMenu():
                 elif y==7:
                     while True:
                         mostrar_menu(opciones_rep_estadisticas)
-                        x=int(input("Selecciona una opcion del 1-7: "))
+                        x=int(entrada("Selecciona una opcion del 1-7: "))
                         if x==1:reporte_restaurante_mas_buscado()
                         if x==2:reporte_menu_mas_buscado()
                         if x==3: reporte_producto_mas_comprado()
