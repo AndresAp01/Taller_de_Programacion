@@ -2,7 +2,7 @@
 #Mantenimiento de Bases de Datos
 ####################################################################################################################
 #Construccion de diccionarios
-def leer_archivo(ruta):
+"""def leer_archivo(ruta):
     filas=[]
     with open(ruta,'r') as archivo:
         for linea in archivo:
@@ -56,11 +56,134 @@ def cargar_datos(paises_archivo, ciudades_archivo, restaurantes_archivo, menus_a
                 'precio': float(precio)
                 }
     return diccionario
-def clientes_a_dicc(ruta_clientes):
-    clientes_dicc={}
-    for cedula, nombre in leer_archivo(ruta_clientes):
-        clientes_dicc[cedula]={"nombre":nombre}
-    return clientes_dicc
+"""
+def abrir_archivo(ruta):
+    try:
+        with open(ruta, 'r') as archivo:
+            return [linea.strip() for linea in archivo if linea.strip()]
+    except FileNotFoundError:
+        print(f"Advertencia: No se encontró el archivo '{ruta}'")
+        return []
+    except Exception as e:
+        print(f"Error al leer '{ruta}': {e}")
+        return []
+#Elimina espacios y convierte a mayusculas
+def normalizar(c):
+    return c.strip().upper()
+
+def cargar_datos(r_paises, r_ciudades, r_restaurantes, r_menus, r_prods):
+    dic={}
+    #paises
+    for linea in abrir_archivo(r_paises):
+        partes=linea.split(";", 1)
+        if len(partes)!=2:
+            continue
+        codigo_pais, nombre_pais=partes
+        dic[codigo_pais]={
+            "nombre":nombre_pais,
+            "ciudades":{}
+        }
+
+    #ciudades
+    for linea in abrir_archivo(r_ciudades):
+        partes=linea.split(';', 2)
+        if len(partes)!=3:
+            continue
+        codigo_pais, codigo_ciudad, nombre_ciudad = partes
+
+        # Verificar que el país exista antes de añadir la ciudad
+        if codigo_pais in dic:
+            dic[codigo_pais]['ciudades'][codigo_ciudad] = {
+                'nombre': nombre_ciudad,
+                'restaurantes': {}
+            }
+
+    #rest
+    for linea in abrir_archivo(r_restaurantes):
+        partes=linea.split(';', 3)
+        if len(partes)!=4:
+            continue
+        codigo_pais, codigo_ciudad, codigo_restaurante, nombre_restaurante=partes
+        # Verificar que el país y la ciudad existan
+        if codigo_pais in dic and codigo_ciudad in dic[codigo_pais]['ciudades']:
+            dic[codigo_pais]['ciudades'][codigo_ciudad]['restaurantes'][codigo_restaurante] = {
+                'nombre': nombre_restaurante,
+                'menus': {}
+            }
+    #menus
+    for linea in abrir_archivo(r_menus):
+        partes=linea.split(';', 4)
+        if len(partes)!=5:
+            continue
+        codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu, nombre_menu=partes
+        # Verificar ruta completa hasta restaurante
+        if (codigo_pais in dic and
+                codigo_ciudad in dic[codigo_pais]['ciudades'] and
+                codigo_restaurante in dic[codigo_pais]['ciudades'][codigo_ciudad]['restaurantes']):
+            dic[codigo_pais]['ciudades'][codigo_ciudad]['restaurantes'][codigo_restaurante]['menus'][codigo_menu] = {
+                'nombre': nombre_menu,
+                'productos': {}
+            }
+    #prods
+    for linea in abrir_archivo(r_prods):
+        partes=linea.split(';')
+        if len(partes)!=8:
+            continue
+        codigo_pais=partes[0]
+        codigo_ciudad=partes[1]
+        codigo_restaurante=partes[2]
+        codigo_menu=partes[3]
+        codigo_producto=partes[4]
+        nombre_producto=partes[5]
+
+        # Convertir valores numéricos, ignorando línea si hay error
+        try:
+            calorias = int(float(partes[6]))
+            precio = float(partes[7])
+        except ValueError:
+            continue
+
+        # Verificar ruta completa hasta menú
+        if (codigo_pais in dic and
+                codigo_ciudad in dic[codigo_pais]['ciudades'] and
+                codigo_restaurante in dic[codigo_pais]['ciudades'][codigo_ciudad]['restaurantes'] and
+                codigo_menu in dic[codigo_pais]['ciudades'][codigo_ciudad]['restaurantes'][codigo_restaurante][
+                    'menus']):
+            dic[codigo_pais]['ciudades'][codigo_ciudad]['restaurantes'][codigo_restaurante]['menus'][codigo_menu][
+                'productos'][codigo_producto] = {
+                'nombre': nombre_producto,
+                'calorias': calorias,
+                'precio': precio
+            }
+
+    return dic
+dic=cargar_datos("Paises.txt", "Ciudades.txt", "Restaurantes.txt", "Menu.txt", "Productos.txt")
+
+def cargar_clientes(ruta_clientes):
+    """
+    Crea un diccionario de clientes a partir de un archivo con formato cedula;nombre
+
+    Args:
+        ruta_clientes (str): Ruta al archivo de clientes
+
+    Returns:
+        dict: Diccionario con cédulas como llaves y nombres como valores
+    """
+    cli={}
+    # Procesar cada línea del archivo
+    for linea in abrir_archivo(ruta_clientes):
+        partes=linea.split(';', 1)
+
+        # Verificar que la línea tenga el formato correcto
+        if len(partes)!=2:
+            continue
+
+        cedula, nombre=partes
+        # Añadir al diccionario
+        cli[cedula]=nombre
+
+    return cli
+
 #SEGUNDA MANERA
 """def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus, ruta_productos):
 
@@ -133,17 +256,10 @@ def clientes_a_dicc(ruta_clientes):
                     }
     return diccionario"""
 #FIN
-paises="Paises.txt"
-ciudades="Ciudades.txt"
-restaurantes="Restaurantes.txt"
-menus="Menu.txt"
-productos="Productos.txt"
 clientes="Clientes.txt"
-dic=cargar_datos(paises, ciudades, restaurantes, menus, productos)
-cli=clientes_a_dicc(clientes)
-print(dic)
-for clave in dic:
-    print(clave, dic[clave])
+cli=cargar_clientes(clientes)
+
+
 """
 #Listas para estadisticas
 contador_busquedas_rest=[]
@@ -192,7 +308,6 @@ def validar_restaurante_existe(diccionario, cod_pais, cod_ciudad, cod_rest):
     nombre_rest=ciudad_info["restaurantes"][cod_rest]["nombre"]
     print(f"El restaurante {cod_rest}, {nombre_rest} SI existe en la ciudad {cod_ciudad}")
     return True
-
 def validar_menu_existe(diccionario, cod_pais, cod_ciudad, cod_rest, cod_menu):
     cod_pais=normalizar_codigo(cod_pais)
     cod_ciudad=normalizar_codigo(cod_ciudad)
@@ -273,20 +388,19 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_restaurante=None
     return True
 #funciopn para buscar cliente (Porque es en otro diccionario)
 def buscar_cli(diccionario, cedula):
-    cedula=normalizar_codigo(cedula)
+
     if cedula not in diccionario:
         return f"El cliente con cedula {cedula} no existe"
-    cli_info=diccionario[cedula]
-    nombre=cli_info["nombre"]
+    nombre=diccionario[cedula]
     print(f"El cliente {cedula} → {nombre} existe")
     return True
 
 def validar_cliente_existe(diccionario, ced):
     ced=normalizar_codigo(ced)
     if ced in diccionario:
-        nombre=diccionario[ced]["nombre"]
+        nombre=diccionario[ced]
         print(f"La cedula {ced} pertenece a: {nombre}")
-        return ced in diccionario
+        return True
     else:
         return f"El cliente {ced} no existe"
 """muestra=validar_ciudad_existe(dic,'123', "101")
@@ -334,16 +448,70 @@ def modificar_ciudad():
     print(f"La ciudad {cod_ciudad} se ha renombrado como: {nuevo_nombre}")
     print(dic)
 #por hacer:
-def modificar_restaurante(diccionario, cod_pais, cod_ciudad, cod_restaurante, nuevo_nombre):
-    # Primero validamos que exista
-    existe = validar_restaurante_existe(diccionario, cod_pais, cod_ciudad, cod_restaurante)
-    if existe is not True:
-        print(existe)  # informa por qué falló
-        return False
-    # Modificamos directamente
-    diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_restaurante]["nombre"] = nuevo_nombre
-    print(f"Restaurante {cod_restaurante} renombrado a: {nuevo_nombre}")
-    return True
+def modificar_restaurante():
+    cod_pais=normalizar_codigo(input("Ingrese el código del país: "))
+    cod_ciudad=normalizar_codigo(input("Ingrese el código de la ciudad: "))
+    cod_rest=normalizar_codigo(input("Ingrese el código del restaurante a modificar: "))
+    ok=validar_restaurante_existe(dic, cod_pais, cod_ciudad, cod_rest)
+    if ok is not True:
+        print(ok)
+        return
+    # Pedir nuevo nombre y aplicar cambio
+    nuevo_nombre=input("Ingrese el nuevo nombre del restaurante: ")
+    dic[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['nombre']=nuevo_nombre
+    print(f"El restaurante {cod_rest} se ha renombrado como: {nuevo_nombre}")
+    print(dic)
+
+def modificar_menu():
+    cod_pais=normalizar_codigo(input("Ingrese el código del país: "))
+    cod_ciudad=normalizar_codigo(input("Ingrese el código de la ciudad: "))
+    cod_rest=normalizar_codigo(input("Ingrese el código del restaurante: "))
+    cod_menu=normalizar_codigo(input("Ingrese el código del menú a modificar: "))
+    # Validar menú (incluye validación de niveles anteriores)
+    ok=validar_menu_existe(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
+    if ok is not True:
+        print(ok)
+        return
+    # Pedir nuevo nombre y aplicar cambio
+    nuevo_nombre=input("Ingrese el nuevo nombre del menú: ")
+    dic[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus'][cod_menu]['nombre']=nuevo_nombre
+    print(f"El menú {cod_menu} se ha renombrado como: {nuevo_nombre}")
+    print(dic)
+
+def modificar_producto():
+    cod_pais=normalizar_codigo(input("Ingrese el código del país: "))
+    cod_ciudad=normalizar_codigo(input("Ingrese el código de la ciudad: "))
+    cod_rest=normalizar_codigo(input("Ingrese el código del restaurante: "))
+    cod_menu=normalizar_codigo(input("Ingrese el código del menú: "))
+    cod_prod=normalizar_codigo(input("Ingrese el código del producto a modificar: "))
+    # Validar que el producto exista
+    ok = validar_menu_existe(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
+    if ok is not True:
+        print(ok)
+        return
+    menu_info = dic[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus'][cod_menu]
+    if 'productos' not in menu_info or cod_prod not in menu_info['productos']:
+        print(f"El producto {cod_prod} no existe en el menú {cod_menu}")
+        return
+    # Pedir nuevos datos
+    nuevo_nombre = input("Ingrese el nuevo nombre del producto: ")
+    try:
+        nuevas_cal  = int(input("Ingrese las nuevas calorías: "))
+        nuevo_precio = float(input("Ingrese el nuevo precio: "))
+    except ValueError:
+        print("Calorías o precio inválidos.")
+        return
+    # Aplicar cambios
+    prod = menu_info['productos'][cod_prod]
+    prod['nombre']   = nuevo_nombre
+    prod['calorias'] = nuevas_cal
+    prod['precio']   = nuevo_precio
+    print(f"El producto {cod_prod} ha sido actualizado:")
+    print(f"  Nombre:   {nuevo_nombre}")
+    print(f"  Calorías: {nuevas_cal}")
+    print(f"  Precio:   {nuevo_precio}")
+    print(dic)
+
 #funcioooona
 def modificar_cliente():
     cedula=input("Ingrese la cedula del cliente: ")
