@@ -186,161 +186,161 @@ print(muestra)"""
 print(muestra)"""
 #--------------------------------------------------------------------------------------------------
 #MODIFICAR_____________________________________________________________________________________________________________#
-#funciona
-#con fiunciones de validacion
-#funciona
-def modificar_pais():
-    cod_pais=entrada("Ingrese el código del país a modificar: ")
-    if cod_pais not in dic:
-        print("El pais no existe")
-        return
-    nuevo_nombre=entrada("Ingrese el nuevo nombre del país: ")
-    dic[cod_pais]["nombre"]=nuevo_nombre
-    print(f"El pais {cod_pais} ha sido renombrado como: {nuevo_nombre}")
-    print(dic)
-#funciona
-def modificar_ciudad():
-    cod_pais=entrada("Ingrese el código del país donde se encuentra la ciudad: ")
-    cod_ciudad=entrada("Ingrese el codigo de la ciudad a modificar: ")
-    if cod_pais not in dic:
-        print("El pais no existe")
-        return
-    if cod_ciudad not in dic[cod_pais]["ciudades"]:
-        print("La ciudad no existe")
-        return
-    nuevo_nombre=entrada("Ingrese el nuevo nombre del ciudad: ")
-    dic[cod_pais]["ciudades"][cod_ciudad]["nombre"]=nuevo_nombre
-    print(f"La ciudad {cod_ciudad} se ha renombrado como: {nuevo_nombre}")
-    print(dic)
-def modificar_restaurante():
-    cod_pais=entrada("Ingrese el código del país: ")
-    cod_ciudad=entrada("Ingrese el código de la ciudad: ")
-    cod_rest=entrada("Ingrese el código del restaurante a modificar: ")
-    ok=buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest)
-    if ok is not True:
-        print(ok)
-        return
-    # Pedir nuevo nombre y aplicar cambio
-    nuevo_nombre=entrada("Ingrese el nuevo nombre del restaurante: ")
-    dic[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['nombre']=nuevo_nombre
-    print(f"El restaurante {cod_rest} se ha renombrado como: {nuevo_nombre}")
-    print(dic)
-def modificar_menu():
-    cod_pais=entrada("Ingrese el código del país: ")
-    cod_ciudad=entrada("Ingrese el código de la ciudad: ")
-    cod_rest=entrada("Ingrese el código del restaurante: ")
-    cod_menu=entrada("Ingrese el código del menú a modificar: ")
-    # Validar menú (incluye validación de niveles anteriores)
-    ok=buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
-    if ok is not True:
-        print(ok)
-        return
-    # Pedir nuevo nombre y aplicar cambio
-    nuevo_nombre=entrada("Ingrese el nuevo nombre del menú: ")
-    dic[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus'][cod_menu]['nombre']=nuevo_nombre
-    print(f"El menú {cod_menu} se ha renombrado como: {nuevo_nombre}")
-    print(dic)
-def modificar_producto():
-    cod_pais=entrada("Ingrese el codigo del pais: ")
-    cod_ciudad=entrada("Ingrese el codigo de la ciudad: ")
-    cod_rest=entrada("Ingrese el codigo del restaurante: ")
-    cod_menu=entrada("Ingrese el codigo del menu: ")
-    cod_prod=entrada("Ingrese el codigo del producto a modificar: ")
-    # Validar que el producto exista
-    ok=buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
-    if ok is not True:
-        print(ok)
-        return
-    menu_info=dic[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus'][cod_menu]
-    if 'productos' not in menu_info or cod_prod not in menu_info['productos']:
-        print(f"El producto {cod_prod} no existe en el menú {cod_menu}")
-        return
-    # Pedir nuevos datos
-    nuevo_nombre=entrada("Ingrese el nuevo nombre del producto: ")
+
+def insertar_en_diccionario(registro, nivel):
+    """
+    Inserta un nuevo registro en el diccionario anidado `dic` según el nivel:
+      nivel 1 = país          → registro = [cod_pais, nombre]
+      nivel 2 = ciudad        → registro = [cod_pais, cod_ciudad, nombre]
+      nivel 3 = restaurante    → registro = [cod_pais, cod_ciudad, cod_rest, nombre]
+      nivel 4 = menú          → registro = [cod_pais, cod_ciudad, cod_rest, cod_menu, nombre]
+      nivel 5 = producto      → registro = [cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod, nombre, calorias, precio]
+    Devuelve True si se inserta, False en caso de error.
+    """
+    # Validar que registro sea lista
+    if not isinstance(registro, list):
+        print("Error: El registro debe ser una lista.")
+        return False
+
+    # Normalizar todos los códigos y extraer campos
     try:
-        nuevas_cal =int(entrada("Ingrese las nuevas calorías: "))
-        nuevo_precio=float(entrada("Ingrese el nuevo precio: "))
-    except ValueError:
-        print("Calorías o precio inválidos.")
-        return
-    # Aplicar cambios
-    prod=menu_info['productos'][cod_prod]
-    prod['nombre']   = nuevo_nombre
-    prod['calorias'] = nuevas_cal
-    prod['precio']   = nuevo_precio
-    print(f"El producto {cod_prod} ha sido actualizado:")
-    print(f"  Nombre:   {nuevo_nombre}")
-    print(f"  Calorías: {nuevas_cal}")
-    print(f"  Precio:   {nuevo_precio}")
-    print(dic)
-#funcioooona
-def modificar_cliente():
-    cedula=entrada("Ingrese la cedula del cliente: ")
-    if cedula not in cli:
-        print(f"El cliente con cedula: {cedula} no existe")
-        return
-    nuevo_nombre = entrada("Ingrese el nuevo nombre del cliente: ")
-    cli[cedula]["nombre"]=nuevo_nombre
-    print(f"El cliente con cedula {cedula} ha sido renombrado como: {nuevo_nombre}")
-    print(cli)
+        cod_p = normalizar_codigo(registro[0])
+        if nivel >= 2: cod_c = normalizar_codigo(registro[1])
+        if nivel >= 3: cod_r = normalizar_codigo(registro[2])
+        if nivel >= 4: cod_m = normalizar_codigo(registro[3])
+        if nivel == 5:
+            cod_pr = normalizar_codigo(registro[4])
+            nombre  = registro[5]
+            calorias = int(registro[6])
+            precio   = float(registro[7])
+    except Exception as e:
+        print(f"Error al normalizar campos: {e}")
+        return False
+
+    # Nivel 1: país
+    if nivel == 1:
+        nombre = registro[1]
+        if cod_p in dic:
+            print(f"Error: El país {cod_p} ya existe.")
+            return False
+        dic[cod_p] = {'nombre': nombre, 'ciudades': {}}
+        print(f"País {cod_p} – {nombre} insertado.")
+        return True
+
+    # Nivel ≥ 2: validar padre país
+    ok = buscar_elemento(dic, cod_p)
+    if ok is not True:
+        print(ok)
+        return False
+
+    # Nivel 2: ciudad
+    if nivel == 2:
+        nombre = registro[2]
+        ciudades = dic[cod_p].setdefault('ciudades', {})
+        if cod_c in ciudades:
+            print(f"Error: La ciudad {cod_c} ya existe en {cod_p}.")
+            return False
+        ciudades[cod_c] = {'nombre': nombre, 'restaurantes': {}}
+        print(f"Ciudad {cod_c} – {nombre} insertada en {cod_p}.")
+        return True
+
+    # Nivel ≥ 3: validar padre ciudad
+    ok = buscar_elemento(dic, cod_p, cod_c)
+    if ok is not True:
+        print(ok)
+        return False
+
+    # Nivel 3: restaurante
+    if nivel == 3:
+        nombre = registro[3]
+        resto = dic[cod_p]['ciudades'][cod_c].setdefault('restaurantes', {})
+        if cod_r in resto:
+            print(f"Error: El restaurante {cod_r} ya existe en {cod_c}.")
+            return False
+        resto[cod_r] = {'nombre': nombre, 'menus': {}}
+        print(f"Restaurante {cod_r} – {nombre} insertado en {cod_c}.")
+        return True
+
+    # Nivel ≥ 4: validar padre restaurante
+    ok = buscar_elemento(dic, cod_p, cod_c, cod_r)
+    if ok is not True:
+        print(ok)
+        return False
+
+    # Nivel 4: menú
+    if nivel == 4:
+        nombre = registro[4]
+        men = dic[cod_p]['ciudades'][cod_c]['restaurantes'][cod_r].setdefault('menus', {})
+        if cod_m in men:
+            print(f"Error: El menú {cod_m} ya existe en {cod_r}.")
+            return False
+        men[cod_m] = {'nombre': nombre, 'productos': {}}
+        print(f"Menú {cod_m} – {nombre} insertado en {cod_r}.")
+        return True
+
+    # Nivel 5: validar padre menú
+    ok = buscar_elemento(dic, cod_p, cod_c, cod_r, cod_m)
+    if ok is not True:
+        print(ok)
+        return False
+
+    # Nivel 5: producto
+    prod = dic[cod_p]['ciudades'][cod_c]['restaurantes'][cod_r]['menus'][cod_m].setdefault('productos', {})
+    if cod_pr in prod:
+        print(f"Error: El producto {cod_pr} ya existe en {cod_m}.")
+        return False
+    prod[cod_pr] = {
+        'nombre':   nombre,
+        'calorias': calorias,
+        'precio':   precio
+    }
+    print(f"Producto {cod_pr} – {nombre} insertado en {cod_m}.")
+    return True
+
+
+# Wrappers para cada nivel:
+def insertar_pais():
+    codigo = entrada("Código de país: ")
+    nombre = input("Nombre de país: ")
+    return insertar_en_diccionario([codigo, nombre], nivel=1)
+
+def insertar_ciudad():
+    codigo = entrada("Código de país: ")
+    codigo_c = entrada("Código de ciudad: ")
+    nombre  = input("Nombre de ciudad: ")
+    return insertar_en_diccionario([codigo, codigo_c, nombre], nivel=2)
+
+def insertar_restaurante():
+    codigo   = entrada("Código de país: ")
+    codigo_c = entrada("Código de ciudad: ")
+    codigo_r = entrada("Código de restaurante: ")
+    nombre   = input("Nombre de restaurante: ")
+    return insertar_en_diccionario([codigo, codigo_c, codigo_r, nombre], nivel=3)
+
+def insertar_menu():
+    codigo   = entrada("Código de país: ")
+    codigo_c = entrada("Código de ciudad: ")
+    codigo_r = entrada("Código de restaurante: ")
+    codigo_m = entrada("Código de menú: ")
+    nombre   = input("Nombre de menú: ")
+    return insertar_en_diccionario([codigo, codigo_c, codigo_r, codigo_m, nombre], nivel=4)
+
+def insertar_producto():
+    codigo   = entrada("Código de país: ")
+    codigo_c = entrada("Código de ciudad: ")
+    codigo_r = entrada("Código de restaurante: ")
+    codigo_m = entrada("Código de menú: ")
+    codigo_p = entrada("Código de producto: ")
+    nombre   = input("Nombre de producto: ")
+    calorias = input("Calorías: ")
+    precio   = input("Precio: ")
+    return insertar_en_diccionario(
+        [codigo, codigo_c, codigo_r, codigo_m, codigo_p, nombre, calorias, precio],
+        nivel=5
+    )
 #______________________________________________________________________________________________________________________#
 #INSERCIONES___________________________________________________________________________________________________________#
-def insertar_en_diccionario(diccionario, nuevo_registro, indices_unicos=None):
-    print(f"Insertando: {nuevo_registro}")
-    print(f"En el Diccionario actual: {diccionario}")
-    if not isinstance(diccionario, dict):
-        print("Error: El primer parámetro debe ser un diccionario")
-        return False
-    if indices_unicos is not None:
-        for clave in diccionario:
-            coincide=True
-            for ix in indices_unicos:
-                if diccionario(nuevo_registro)!=nuevo_registro:
-                    coincide=False
-                    break
-            if coincide:
-                valores=[nuevo_registro[ix] for ix in indices_unicos]
-                print(f"Error: Ya existe un registro con los valores {valores}")
-                return False
-def insertar_pais():
-    print("Diccionario actual:", paises)
-    cod_pais=entrada("Ingrese el codigo del pais: ")
-    nombre=entrada("Ingrese el nombre del pais: ")
-    resultado=insertar_en_lista
-    if resultado:
-        print(f"Registro insertado correctamente: {paises}")
-    return resultado
-def insertar_producto():
-    global paises, ciudades, restaurantes, menus, productos
-    cod_pais=entrada("Ingrese el código del país: ")
-    if not validar_pais_existe(cod_pais):
-        return False
-    cod_ciudad=entrada("Ingrese el código de la ciudad: ")
-    if not validar_ciudad_existe(cod_pais, cod_ciudad):
-        return False
-    cod_rest=entrada("Ingrese el código del restaurante: ")
-    if not validar_restaurante_existe(cod_pais, cod_ciudad,cod_rest):
-        return False
-    cod_menu=entrada("Ingrese el código del menú: ")
-    if not validar_menu_existe(cod_pais, cod_ciudad, cod_rest, cod_menu):
-        return False
-    cod_producto=entrada("Ingrese el código del producto: ")
-    nombre=entrada("Ingrese el nombre del producto: ")
-    calorias=float(entrada("Ingrese las calorías del producto: "))
-    precio=float(entrada("Ingrese el precio: "))
-    resultado=insertar_en_lista(productos, [str(cod_pais),str(cod_ciudad),str(cod_rest),str(cod_menu),str(cod_producto), nombre, calorias, precio],indices_unicos=[0, 1, 2, 3, 4])
 
-    if resultado:
-        print(f"Registro insertado correctamente: {productos}")
-    return resultado
-def insertar_cliente():
-    global clientes
-    cedula=entrada("Ingrese la cédula del cliente: ")
-    nombre=entrada("Ingrese el nombre del cliente: ")
-    resultado=insertar_en_lista(clientes, [str(cedula), nombre], indices_unicos=[0])
-    if resultado:
-        print(f"Registro insertado correctamente: {clientes}")
-    return resultado
 #______________________________________________________________________________________________________________________#
 #REGISTRO
 #Funcion para leer el ultimo codigo de factura
