@@ -177,7 +177,6 @@ def validar_ciudad_existe(diccionario, cod_pais, cod_ciudad):
     nombre_ciudad=diccionario[cod_pais]["ciudades"][cod_ciudad]["nombre"]
     print(f"La ciudad {cod_ciudad}, {nombre_ciudad}, SI existe en: {cod_pais}")
     return True
-
 def validar_restaurante_existe(diccionario, cod_pais, cod_ciudad, cod_rest):
     cod_pais=normalizar_codigo(cod_pais)
     cod_ciudad=normalizar_codigo(cod_ciudad)
@@ -210,7 +209,6 @@ def validar_menu_existe(diccionario, cod_pais, cod_ciudad, cod_rest, cod_menu):
     nombre_menu=rest_info["menus"][cod_menu]["nombre"]
     print(f"El menu {cod_menu}, {nombre_menu}, SI existe en el restuarante: {cod_rest}")
     return True
-
 #funcion general
 def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_restaurante=None, cod_menu=None, cod_prod=None):
     #paises
@@ -273,6 +271,24 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_restaurante=None
     nombre_prod=prod_info["nombre"]
     print(f"El producto {cod_prod} → {nombre_prod} existe en {cod_menu}")
     return True
+#funciopn para buscar cliente (Porque es en otro diccionario)
+def buscar_cli(diccionario, cedula):
+    cedula=normalizar_codigo(cedula)
+    if cedula not in diccionario:
+        return f"El cliente con cedula {cedula} no existe"
+    cli_info=diccionario[cedula]
+    nombre=cli_info["nombre"]
+    print(f"El cliente {cedula} → {nombre} existe")
+    return True
+
+def validar_cliente_existe(diccionario, ced):
+    ced=normalizar_codigo(ced)
+    if ced in diccionario:
+        nombre=diccionario[ced]["nombre"]
+        print(f"La cedula {ced} pertenece a: {nombre}")
+        return ced in diccionario
+    else:
+        return f"El cliente {ced} no existe"
 """muestra=validar_ciudad_existe(dic,'123', "101")
 print(muestra)"""
 """muestra=validar_pais_existe(dic, "123")
@@ -328,11 +344,6 @@ def modificar_restaurante(diccionario, cod_pais, cod_ciudad, cod_restaurante, nu
     diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_restaurante]["nombre"] = nuevo_nombre
     print(f"Restaurante {cod_restaurante} renombrado a: {nuevo_nombre}")
     return True
-def modificar_menu():
-    pass
-def modificar_producto():
-    pass
-
 #funcioooona
 def modificar_cliente():
     cedula=input("Ingrese la cedula del cliente: ")
@@ -1083,7 +1094,8 @@ def MainMenu():
                     cod_prod=input("Ingrese el codigo del producto a buscar: ")
                     buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod)
                 elif y==6:
-                    cedula=input("Ingrese la cedula del cliente a buscar")
+                    ced=input("Ingrese la cedula del cliente a buscar")
+                    buscar_cli(cli, ced)
                 elif y==7:
                     print("Volviendo al menú principal...")
                     break  # Salir del submenú y volver al menú principal
