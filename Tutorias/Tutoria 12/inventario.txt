@@ -1,0 +1,15 @@
+manzana;3.24;FVR001
+plátano;3.4;FVR002
+cereza;1.32;FVR003
+kiwi;3.75;FVR004
+mango;3.14;FVR005
+zanahoria;2.88;FVR006
+lechuga;1.88;FVR007
+pepino;1.23;FVR008
+tomate;4.45;FVR009
+espinaca;1.29;FVR010
+pera;2.06;FVR011
+uva;4.94;FVR012
+papaya;1.92;FVR013
+brócoli;2.21;FVR014
+cebolla;1.37;FVR015
