@@ -53,6 +53,4 @@ def eliminar(codigo):
     else:
         del inventario[codigo]
 
-while True:
-
 

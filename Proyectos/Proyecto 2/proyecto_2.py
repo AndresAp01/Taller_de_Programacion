@@ -187,16 +187,10 @@ print(muestra)"""
 #--------------------------------------------------------------------------------------------------
 #MODIFICAR_____________________________________________________________________________________________________________#
 
+#______________________________________________________________________________________________________________________#
+#INSERCIONES___________________________________________________________________________________________________________#
+
 def insertar_en_diccionario(registro, nivel):
-    """
-    Inserta un nuevo registro en el diccionario anidado `dic` según el nivel:
-      nivel 1 = país          → registro = [cod_pais, nombre]
-      nivel 2 = ciudad        → registro = [cod_pais, cod_ciudad, nombre]
-      nivel 3 = restaurante    → registro = [cod_pais, cod_ciudad, cod_rest, nombre]
-      nivel 4 = menú          → registro = [cod_pais, cod_ciudad, cod_rest, cod_menu, nombre]
-      nivel 5 = producto      → registro = [cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod, nombre, calorias, precio]
-    Devuelve True si se inserta, False en caso de error.
-    """
     # Validar que registro sea lista
     if not isinstance(registro, list):
         print("Error: El registro debe ser una lista.")
@@ -297,7 +291,6 @@ def insertar_en_diccionario(registro, nivel):
     print(f"Producto {cod_pr} – {nombre} insertado en {cod_m}.")
     return True
 
-
 # Wrappers para cada nivel:
 def insertar_pais():
     codigo = entrada("Código de país: ")
@@ -338,9 +331,6 @@ def insertar_producto():
         [codigo, codigo_c, codigo_r, codigo_m, codigo_p, nombre, calorias, precio],
         nivel=5
     )
-#______________________________________________________________________________________________________________________#
-#INSERCIONES___________________________________________________________________________________________________________#
-
 #______________________________________________________________________________________________________________________#
 #REGISTRO
 #Funcion para leer el ultimo codigo de factura
