@@ -1,80 +1,169 @@
 #Luis Andrés Acuña Pérez y Patrick Zúñiga Arroyo
 #Mantenimiento de Bases de Datos
 ####################################################################################################################
-#Cambiaar a diccionario
-def datos_a_dicc(ruta_archivo):
-
-    diccionario={}
-    with open(ruta_archivo, "r") as archivo:
-        for line in archivo:
-            linea=line.strip()
+def leer_archivo(ruta):
+    filas=[]
+    with open(ruta,'r') as archivo:
+        for linea in archivo:
+            linea=linea.strip()
             if linea:
-                (llave, valor)=line.split(";")
-                diccionario[llave.strip()]=valor.strip()
-    return(diccionario)
+                filas.append(linea.split(';'))
+    return filas
+def datos_a_dicc(ruta_paises, ruta_ciudades, ruta_restaurantes, ruta_menus, ruta_productos):
+    diccionario={}
+    with open(ruta_paises, "r") as archivo:
+        for linea in archivo:
+            linea=linea.strip()
+            if not linea:
+                continue
 
-paises=datos_a_dicc("Paises.txt")
-print(paises)
+            cod_pais, nombre_pais=linea.split(";", 1)
+            diccionario[cod_pais.strip()]= {
+                "nombre": nombre_pais,
+                "ciudades": {}
+                }
+    with open(ruta_ciudades, "r") as archivo:
+        for linea in archivo:
+            linea=linea.strip()
+            if not linea:
+                continue
+            cod_pais, cod_ciudad, nombre_ciudad=linea.split(";", 2)
+            if cod_pais in diccionario:
+                diccionario[cod_pais]["ciudades"][cod_ciudad]={
+                    "nombre": nombre_ciudad,
+                    "restaurantes": {}
+                    }
+    with open(ruta_restaurantes, "r") as archivo:
+        for linea in archivo:
+            linea=linea.strip()
+            if not linea:
+                continue
+            cod_pais, cod_ciudad, cod_rest, nombre_rest=linea.split(";", 3)
+            if cod_pais in diccionario and cod_ciudad in diccionario[cod_pais]["ciudades"]:
+                diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]= {
+                    "nombre": nombre_rest,
+                    "menus": {}
+                    }
 
-def datos_a_listas(ruta_archivo):
-    try:
-        #paises_unicos para las claves de paises
-        with open(ruta_archivo, "r") as archivo:
-            texto=archivo.read()
-            lista_lineas=texto.split("\n")
-            matriz_datos=[]
-            paises_unicos=[]
-            ciudades_unicas=[]
-            restaurantes_unicos=[]
-            menus_unicos=[]
-            productos_unicos=[]
-            for linea in lista_lineas:
-                if not linea.strip():
-                    continue
-                campos=linea.split(";")
-                if len(campos)<2:
-                    continue
-                #Las claves unicas
-                if len(campos)==2:  #Para paises
-                    clave=[campos[0]]
-                    if clave in paises_unicos:
-                        continue
-                    paises_unicos.append(clave)
-                elif len(campos)==3:    #Para ciudades
-                    clave=[campos[0], campos[1]]
-                    if clave in ciudades_unicas:
-                        continue
-                    ciudades_unicas.append(clave)
-                elif len(campos)==4:    #Para restaurantes
-                    clave = [campos[0], campos[1], campos[2]]
-                    if clave in restaurantes_unicos:
-                        continue
-                    restaurantes_unicos.append(clave)
-                elif len(campos)==5:    #Para menus
-                    clave=[campos[0], campos[1], campos[2], campos[3]]
-                    if clave in menus_unicos:
-                        continue
-                    menus_unicos.append(clave)
-                elif len(campos)>=6:    #Para producto
-                    clave = [campos[0], campos[1], campos[2], campos[3], campos[4]]
-                    if clave in productos_unicos:
-                        continue
-                    productos_unicos.append(clave)
-                else:
-                    continue
+    with open(ruta_menus, "r") as archivo:
+        for linea in archivo:
+            linea=linea.strip()
+            if not linea:
+                continue
+            cod_pais, cod_ciudad, cod_rest, cod_menu, nombre_menu=linea.split(";", 4)
+            if cod_pais in diccionario and cod_ciudad in diccionario[cod_pais]["ciudades"] and cod_rest in diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"]:
+                diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]["menus"][cod_menu]={
+                    "nombre": nombre_menu,
+                    "productos": {}
+                    }
 
-                matriz_datos.append(campos)
-            return matriz_datos
-    except FileNotFoundError:
-        print(f"El archivo {ruta_archivo} no existe")
-        return None
-paises=datos_a_listas("Paises.txt")
-ciudades=datos_a_listas("Ciudades.txt")
-restaurantes=datos_a_listas("Restaurantes.txt")
-menus=datos_a_listas("Menu.txt")
-productos=datos_a_listas("Productos.txt")
-clientes=datos_a_listas("Clientes.txt")
-compras=datos_a_listas("registro_compras.txt")
+    with open(ruta_productos, "r") as archivo:
+        for linea in archivo:
+            linea=linea.strip()
+            if not linea:
+                continue
+
+            algo=linea.split(";", 7)
+            if len(algo)!=8:
+                continue
+
+            (cod_pais, cod_ciudad, cod_rest, cod_menu, cod_producto, nombre_producto, calorias, precio)=algo
+            if (cod_pais in diccionario
+                and cod_ciudad in diccionario[cod_pais]["ciudades"]
+                and cod_rest in diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"]
+                and cod_menu in diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]["menus"]):
+                diccionario[cod_pais]["ciudades"][cod_ciudad]["restaurantes"][cod_rest]["menus"][cod_menu]["productos"][cod_producto]={
+                    "nombre": nombre_producto,
+                    "calorias": int(float(calorias)),
+                    "precio": float(precio)
+                    }
+    return diccionario
+def clientes_a_dicc(ruta_clientes):
+    clientes_dicc={}
+    with open(ruta_clientes, "r") as archivo:
+        for linea in archivo:
+            linea=linea.strip()
+            if not linea:
+                continue
+            cedula, nombre=linea.split(";", 1)
+            clientes_dicc[cedula]=nombre
+    return clientes_dicc
+def cargar_datos(paises_archivo, ciudades_archivo, restaurantes_archivo, menus_archivo, productos_archivo):
+    diccionario={}
+    #para paises
+    for cod_pais, nombre in leer_archivo(paises_archivo):
+        diccionario[cod_pais]={'nombre':nombre, 'ciudades':{}}
+
+    #para ciudades
+    for cod_pais, cod_ciudad, nombre in leer_archivo(ciudades_archivo):
+        if cod_pais in diccionario:
+            diccionario[cod_pais]['ciudades'][cod_ciudad]={
+                'nombre': nombre,
+                'restaurantes': {}
+                }
+    #para restaurantes
+    for cod_pais, cod_ciudad, cod_rest, nombre in leer_archivo(restaurantes_archivo):
+        if cod_pais in diccionario and cod_ciudad in diccionario[cod_pais]['ciudades']:
+            diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]={
+                'nombre': nombre,
+                'menus': {}
+                }
+    #para menus
+    for cod_pais, cod_ciudad, cod_rest, cod_menu, nombre in leer_archivo(menus_archivo):
+        if (cod_pais in diccionario and
+            cod_ciudad in diccionario[cod_pais]['ciudades'] and
+            cod_rest in diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes']):
+            diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus'][cod_menu]={
+                'nombre': nombre,
+                'productos': {}
+                }
+    #para productos
+    for campos in leer_archivo(productos_archivo):
+        # esperamos: cod_pais;cod_ciudad;cod_rest;cod_menu;cod_prod;nombre;calorias;precio
+        if len(campos)!=8:
+            continue
+        cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod, nombre, cal, precio = campos
+        if (cod_pais in diccionario and
+            cod_ciudad in diccionario[cod_pais]['ciudades'] and
+            cod_rest in diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes'] and
+            cod_menu in diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus']):
+            diccionario[cod_pais]['ciudades'][cod_ciudad]['restaurantes'][cod_rest]['menus'][cod_menu]['productos'][
+                cod_prod]={
+                'nombre': nombre,
+                'calorias': int(float(cal)),
+                'precio': float(precio)
+                }
+    return diccionario
+"""
+#Para probar:
+def imprimir_cascada(datos):
+    for pa, ip in datos.items():
+        print(f"{pa} — {ip['nombre']}")
+        for ci, ic in ip["ciudades"].items():
+            print(f"  {ci} — {ic['nombre']}")
+            for re, ir in ic["restaurantes"].items():
+                print(f"    {re} — {ir['nombre']}")
+                for me, im in ir["menus"].items():
+                    print(f"      {me} — {im['nombre']}")
+                    for pr, iprod in im.get("productos", {}).items():
+                        print(f"        {pr} — {iprod['nombre']} "
+                              f"({iprod['calorias']} cal, ₡{iprod['precio']})")
+"""
+paises="Paises.txt"
+ciudades="Ciudades.txt"
+restaurantes="Restaurantes.txt"
+menus="Menu.txt"
+productos="Productos.txt"
+clientes="Clientes.txt"
+dic=datos_a_dicc(paises, ciudades, restaurantes, menus, productos)
+cli=clientes_a_dicc(clientes)
+#para probar
+"""
+print(dic)
+print(cli)
+muestra=cargar_datos(paises, ciudades, restaurantes, menus, productos)
+print(imprimir_cascada(muestra))"""
+
 #Listas para estadisticas
 contador_busquedas_rest=[]
 contador_busquedas_menu=[]
@@ -84,63 +173,33 @@ def normalizar_codigo(codigo):
     if not isinstance(codigo, (str, int)):
         print(f"El codigo {codigo} no es alfanumerico")
     return str(codigo).lstrip('-')
-def validar_pais_existe(cod_pais):
-    cod_pais=normalizar_codigo(cod_pais)
-    for i in range(len(paises)):
-        #Se accede al elemento i, indice 0. Se usan dos porque es una lista de listas
-        if paises[i][0]==cod_pais:
-            return True
-    print(f"Error: No existe un país con código '{cod_pais}'")
-    return False
-def validar_ciudad_existe(cod_pais, cod_ciudad):
-    global paises, ciudades
-    cod_pais = normalizar_codigo(cod_pais)
-    cod_ciudad = normalizar_codigo(cod_ciudad)
-    for i in range(len(ciudades)):
-        if ciudades[i][0]==cod_pais and ciudades[i][1]==cod_ciudad:
-            return True
-    print(f"Error: No existe una ciudad con código '{cod_ciudad}' en el país '{cod_pais}'")
-    return False
 
-def validar_restaurante_existe(cod_pais, cod_ciudad, cod_rest):
-    global paises, ciudades, restaurantes
+def validar_pais_existe(diccionario, cod_pais):
     cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(cod_ciudad)
-    cod_rest=normalizar_codigo(cod_rest)
-    for i in range(len(restaurantes)):
-        if restaurantes[i][0]==cod_pais and restaurantes[i][1]==cod_ciudad and restaurantes[i][2]==cod_rest:
-            return True
-    print(f"Error: No existe un restaurante con codigo '{cod_rest}' en la ciudad '{cod_ciudad}'")
-    return False
-def validar_menu_existe(cod_pais, cod_ciudad, cod_rest, cod_menu):
-    global paises, ciudades, restaurantes, menus
+    if cod_pais in diccionario:
+        nombre = diccionario[cod_pais]["nombre"]
+        return f"El código {cod_pais} pertenece a: {nombre}"
+    else:
+        return f"El codigo {cod_pais} no existe"
+
+"""muestra=validar_pais_existe(dic, "123")
+print(muestra)"""
+
+def validar_ciudad_existe(diccionario, cod_pais, ciudad):
     cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(cod_ciudad)
-    cod_rest=normalizar_codigo(cod_rest)
-    cod_menu=normalizar_codigo(cod_menu)
-    for i in range(len(menus)):
-        if menus[i][0]==cod_pais and menus[i][1]==cod_ciudad and menus[i][2]==cod_rest and menus[i][3]==cod_menu:
-            return True
-    print(f"Error: No existe un menu con codigo '{cod_menu}' en el restaurante '{cod_rest}'")
-    return False
-def validar_producto_existe(cod_pais, cod_ciudad, cod_rest, cod_menu, cod_producto):
-    global paises, ciudades, restaurantes, menus, productos
-    cod_pais=normalizar_codigo(cod_pais)
-    cod_ciudad=normalizar_codigo(cod_ciudad)
-    cod_rest=normalizar_codigo(cod_rest)
-    cod_menu=normalizar_codigo(cod_menu)
-    cod_producto=normalizar_codigo(cod_producto)
-    if not any(producto[0]==cod_pais and producto[1]==cod_ciudad and producto[2]==cod_rest and producto[3]==cod_menu and producto[4]==cod_producto for producto in productos):
-        print(f"Error: No existe un producto con código '{cod_producto}' en el menú '{cod_menu}' del restaurante '{cod_rest}' de la ciudad '{cod_ciudad}' del país '{cod_pais}'")
-        return False
-    return True
-def validar_cliente_existe(cedula):
-    global clientes
-    cedula=normalizar_codigo(cedula)
-    if not any(cliente[0]==cedula for cliente in clientes):
-        print(f"Error: No existe un cliente con cédula '{cedula}'")
-        return False
-    return True
+    cod_ciudad=normalizar_codigo(ciudad)
+    if cod_pais not in diccionario:
+        return f"El pais {cod_pais} no existe"
+    ciudades=diccionario[cod_pais]["ciudades"]
+    if cod_ciudad not in ciudades:
+        return f"El pais {cod_pais} existe, pero la ciudad {cod_ciudad} no."
+    else:
+        nombre_ciudad=ciudades[cod_ciudad]["nombre"]
+        return f"La ciudad {cod_ciudad}, {nombre_ciudad} si existe en el pais {cod_pais}"
+
+"""muestra=validar_ciudad_existe(dic,'123', "101")
+print(muestra)"""
+
 #--------------------------------------------------------------------------------------------------
 #MODIFICAR_____________________________________________________________________________________________________________#
 def modificar_pais():

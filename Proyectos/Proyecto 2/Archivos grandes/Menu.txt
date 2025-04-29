@@ -1,0 +1,40 @@
+123;101;1;5;Hamburguesas
+123;101;1;2;Bebidas
+123;101;1;3;Mariscos
+123;101;1;4;Postres
+123;101;2;1;Ceviches
+123;101;2;2;Bebidas
+123;101;2;3;Platos Fuertes
+123;101;2;4;Ensaladas
+123;102;3;1;Pollo
+123;102;3;2;Hamburguesas
+123;102;3;3;Acompanamientos
+123;102;3;4;Bebidas
+123;103;4;1;Comida Tipica
+123;103;4;2;Bebidas
+123;103;4;3;Sopas
+123;103;4;4;Postres
+345;201;5;1;Hamburguesas
+345;201;5;2;Acompanamientos
+345;201;5;3;Bebidas
+345;201;5;4;Ensaladas
+345;201;6;1;Cafes
+345;201;6;2;Reposteria
+345;201;6;3;Sandwiches
+345;201;6;4;Bebidas Frias
+345;202;7;1;Parrilladas
+345;202;7;2;Acompanamientos
+345;202;7;3;Bebidas
+345;202;7;4;Postres
+345;203;8;1;Pizzas
+345;203;8;2;Acompanamientos
+345;203;8;3;Bebidas
+345;203;8;4;Ensaladas
+4567;301;9;1;Menu Degustacion
+4567;301;9;2;Bebidas
+4567;301;9;3;Postres
+4567;301;9;4;Especialidades
+4567;301;10;1;Desayunos
+4567;301;10;2;Comida Tradicional
+4567;301;10;3;Bebidas
+4567;301;10;4;Postres
