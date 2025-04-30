@@ -53,4 +53,57 @@ def eliminar(codigo):
     else:
         del inventario[codigo]
 
+#MENU
+while True:
+    op = input("---MENU---\n 1. Insercion, 2. Busqueda, 3. Modificacion, 4. Eliminacion, 5. Ver inventario, 6. Salir")
+    if op == "1":
+        codigo = input("Ingrese el codigo: ")
+        nombre = input("Ingrese el nombre: ")
+        try:
+            cantidad=int(input("Ingrese la cantidad: "))
+            insertar(codigo, nombre, cantidad)
+            print("Insercion exitosa")
+        except ValueError:
+            input("Error, no es un numero.")
+    elif op == "2":
+        codigo = input("Ingrese el codigo: ")
+        resultado=buscar(codigo)
+        if resultado:
+            nombre=resultado["nombre"]
+            cantidad=resultado["cantidad"]
+            print(f"El producto existe: {nombre}, canditad: {cantidad}")
+        else:
+            input("El codigo no existe")
+        print(buscar(codigo))
+    elif op == "3":
+        codigo=input("Ingrese el codigo: ")
+        nombre=input("Ingrese el nombre: ")
+        try:
+            cantidad=int(input("Ingrese la cantidad: "))
+            resultado=modificar(codigo, nombre, cantidad)
+            if resultado:
+                input("Modificado correctamente")
+            else:
+                print("El codigo no existe")
+        except ValueError:
+            input("Error, no es un numero.")
+    elif op == "4":
+        codigo=input("Ingrese el codigo: ")
+        resultado=buscar(codigo)
+        if resultado:
+            op=input"Seguro que sdesea eliminarlo? s/n"
+            if op.upper() == "s":
+                eliminar(codigo)
+                print("Eliminado correctamente")
+            elif op.upper()=="n":
+                input("Operacion cancelada")
+            else:
+                input("Error, no es una opcion valida")
+        else:
+            input("El codigo no existe")
+    elif op == "5":
+        print(inventario)
+    elif op == "6":
+        break
+
 

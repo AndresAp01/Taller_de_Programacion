@@ -186,7 +186,48 @@ print(muestra)"""
 print(muestra)"""
 #--------------------------------------------------------------------------------------------------
 #MODIFICAR_____________________________________________________________________________________________________________#
+def modificar_pais(codigo_pais, nuevo_nombre):
+    if buscar_elemento(dic, codigo_pais) is not True:
+        return f"Error: El país {codigo_pais} no existe."
+    else:
+        dic[codigo_pais]['nombre'] = nuevo_nombre
+        return f"País {codigo_pais} modificado exitosamente."
 
+def modificar_ciudad(codigo_pais, codigo_ciudad, nuevo_nombre):
+    if buscar_elemento(dic, codigo_pais, codigo_ciudad) is not True:
+        return f"Error: La ciudad {codigo_ciudad} en el país {codigo_pais} no existe."
+    dic[codigo_pais]['ciudades'][codigo_ciudad]['nombre'] = nuevo_nombre
+    return f"Ciudad {codigo_ciudad} modificada exitosamente."
+
+def modificar_restaurante(codigo_pais, codigo_ciudad, codigo_restaurante, nuevo_nombre):
+    if buscar_elemento(dic, codigo_pais, codigo_ciudad, codigo_restaurante) is not True:
+        return f"Error: El restaurante {codigo_restaurante} en {codigo_ciudad}, {codigo_pais} no existe."
+    dic[codigo_pais]['ciudades'][codigo_ciudad]['restaurantes'][codigo_restaurante]['nombre'] = nuevo_nombre
+    return f"Restaurante {codigo_restaurante} modificado exitosamente."
+
+def modificar_menu(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu, nuevo_nombre):
+    if buscar_elemento(dic, codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu) is not True:
+        return f"Error: El menú {codigo_menu} en restaurante {codigo_restaurante} no existe."
+    dic[codigo_pais]['ciudades'][codigo_ciudad]['restaurantes'][codigo_restaurante]['menus'][codigo_menu]['nombre'] = nuevo_nombre
+    return f"Menú {codigo_menu} modificado exitosamente."
+
+def modificar_producto(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu, codigo_producto, nuevo_nombre=None, nuevas_calorias=None, nuevo_precio=None):
+    if buscar_elemento(dic, codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu, codigo_producto) is not True:
+        return f"Error: El producto {codigo_producto} en menú {codigo_menu} no existe."
+    producto = dic[codigo_pais]['ciudades'][codigo_ciudad]['restaurantes'][codigo_restaurante]['menus'][codigo_menu]['productos'][codigo_producto]
+    if nuevo_nombre is not None:
+        producto['nombre'] = nuevo_nombre
+    if nuevas_calorias is not None:
+        producto['calorias'] = nuevas_calorias
+    if nuevo_precio is not None:
+        producto['precio'] = nuevo_precio
+    return f"Producto {codigo_producto} modificado exitosamente."
+
+def modificar_cliente(cedula_cliente, nuevo_nombre):
+    if buscar_cli(cli, cedula_cliente) is not True:
+        return f"Error: El cliente {cedula_cliente} no existe."
+    cli[cedula_cliente] = nuevo_nombre
+    return f"Cliente {cedula_cliente} modificado exitosamente."
 #______________________________________________________________________________________________________________________#
 #INSERCIONES___________________________________________________________________________________________________________#
 
@@ -334,301 +375,7 @@ def insertar_producto():
 #______________________________________________________________________________________________________________________#
 #REGISTRO
 #Funcion para leer el ultimo codigo de factura
-def obtener_ultimo_codigo_factura(archivo):
-    try:
-        with open(archivo, 'r') as archivo:
-            lineas=archivo.readlines()
-            if lineas:
-                ultima_linea=lineas[-1]
-                ultimo_codigo=int(ultima_linea.split(';')[0])
-                return ultimo_codigo
-            else: #Si el archivo existiera pero esta vacio
-                return 234500
-    except FileNotFoundError:
-        print("Error al cargar el archivo, verifica que se haya registrado al menos una factura")
-        with open(archivo, 'w') as nuevo_archivo:
-            pass
-    return 234500
-def registrar_compra_menu():
-    global paises, ciudades, restaurantes, menus, productos, clientes
-    print("\n=== REGISTRAR NUEVA COMPRA ===")
-    print("Por favor ingrese los siguientes datos:")
-    #Mostrar paises disponibles
-    print("\nPaíses disponibles:")
-    for pais in paises:
-        print(f"- {pais[0]}: {pais[1]}")
-    cod_pais=entrada("\nIngrese el código del país: ").strip()
-    if not validar_pais_existe(cod_pais):
-        print(f"Error: País {cod_pais} no existe")
-        return False
-    #ciudades disponibles para ese pais
-    print("\nCiudades disponibles en este país:")
-    ciudades_pais=[c for c in ciudades if c[0]==cod_pais]
-    for ciudad in ciudades_pais:
-        print(f"- {ciudad[1]}: {ciudad[2]}")
-    cod_ciudad=entrada("\nIngrese el código de la ciudad: ").strip()
-    if not validar_ciudad_existe(cod_pais, cod_ciudad):
-        print(f"Error: Ciudad {cod_ciudad} no existe")
-        return False
 
-    #restaurantes disponibles en esa ciudad
-    print("\nRestaurantes disponibles en esta ciudad:")
-    restaurantes_ciudad=[r for r in restaurantes if r[0]==cod_pais and r[1]==cod_ciudad]
-    for rest in restaurantes_ciudad:
-        print(f"- {rest[2]}: {rest[3]}")
-    cod_restaurante=entrada("\nIngrese el código del restaurante: ").strip()
-    if not validar_restaurante_existe(cod_pais, cod_ciudad, cod_restaurante):
-        print(f"Error: Restaurante {cod_restaurante} no existe")
-        return False
-    #  menus disponibles en ese restaurante
-    print("\nMenus disponibles en este restaurante:")
-    menus_restaurante=[m for m in menus if m[0]==cod_pais and m[1]==cod_ciudad and m[2]==cod_restaurante]
-    for menu in menus_restaurante:
-        print(f"- {menu[3]}: {menu[4]})")
-    cod_menu=entrada("\nIngrese el código del menú: ").strip()
-    if not validar_menu_existe(cod_pais, cod_ciudad, cod_restaurante, cod_menu):
-        print(f"Error: Menu {cod_menu} no existe")
-        return False
-    # productos disp[onibles en ese menu
-    productos_seleccionados = []
-    while True:
-        productos_menu=[prod for prod in productos if prod[0]==cod_pais and prod[1]==cod_ciudad and prod[2]==cod_restaurante and prod[3]==cod_menu]
-        if not productos_menu:
-            print("\nNo hay productos disponibles en este menu.")
-            return False
-
-        print(f"\n Productos disponibles en este menu {cod_menu}: ")
-        for prod in productos_menu:
-            print(f"├─ Código: {prod[4]}")
-            print(f"│  Nombre: {prod[5]}")
-            print(f"│  Precio: ${prod[7]}")
-            print("└──────────────────")
-        cod_producto=entrada("\nIngrese el código del producto (o 'fin' para terminar): ").strip()
-        if cod_producto.lower()=='fin':
-            if not productos_seleccionados:
-                print("Debe seleccionar al menos un producto")
-                continue
-            break
-        producto_encontrado = None
-        for p in productos_menu:
-            if str(p[4])==str(cod_producto):
-                producto_encontrado = p
-                break
-        if not producto_encontrado:
-            print(f"\nError: Código {cod_producto} no válido")
-            print("Códigos disponibles:", ", ".join([str(p[4]) for p in productos_menu]))
-            continue
-        while True:
-            try:
-                cantidad=int(entrada(f"\nIngrese la cantidad para {producto_encontrado[5]}: "))
-                if cantidad<=0:
-                    print("La cantidad debe ser mayor a 0")
-                    continue
-                break
-            except ValueError:
-                print("Por favor ingrese un número válido")
-        productos_seleccionados.append({'producto': producto_encontrado, 'cantidad': cantidad})
-        print(f"Producto {producto_encontrado[5]} agregado con éxito")
-
-    cedula=entrada("\nIngrese la cédula del cliente: ").strip()
-    cliente=next((c for c in clientes if c[0]==cedula), None)
-    if not cliente:
-        print("Error: Cliente no registrado")
-        return False
-    print(f"Cliente: {cliente[1]}")
-
-    orden=entrada("\nIngrese si la orden es para llevar o comer aqui: (llevar/aqui): ").strip().lower()
-    while orden not in ['llevar', 'aqui']:
-        print("Opción no válida. Ingrese 'llevar' o 'aqui'")
-        orden=entrada("\nIngrese si es para llevar o comer aquí (llevar/aqui): ").strip().lower()
-
-    metodo_pago=entrada("\nIngrese el metodo de pago: (efectivo/tarjeta): ").strip().lower()
-    while metodo_pago not in ['efectivo', 'tarjeta']:
-        print("Opcion no valida. Ingrese 'efectivo' o 'tarjeta'")
-        metodo_pago=entrada("\nIngrese el metodo de pago: (efectivo/tarjeta): ").strip().lower()
-    # Mostrar resumen de la compra
-    print("\nResumen de su compra:")
-    total_compra=0
-    for i, item in enumerate(productos_seleccionados, 1):
-        producto=item['producto']
-        cantidad=item['cantidad']
-        subtotal=float(producto[7])*cantidad
-        total_compra+=subtotal
-        if orden=="llevar" and metodo_pago=="efectivo":
-            total_compra=total_compra
-        elif orden=="llevar" and metodo_pago=="tarjeta":
-            total_compra*=0.92
-        elif orden=="aqui" and metodo_pago=="efectivo":
-            total_compra=total_compra
-        else:
-            total_compra*=0.95
-        print(f"{i}. {producto[5]} - Cantidad: {cantidad} - Subtotal: {subtotal:.2f}")
-    print(f"\nTotal a pagar: {total_compra:.2f}")
-
-    modificar=entrada("\n¿Desea modificar la compra? (S/N): ").strip().upper()
-    while modificar=="S":
-        print("\n¿Qué desea modificar?")
-        print("1. Cambiar un producto")
-        print("2. Cambiar la cantidad de un producto")
-        print("3. Eliminar un producto")
-        print("4. Agregar otro producto")
-        print("5. Terminar modificaciones")
-
-        opcion=entrada("\nSeleccione una opción (1-5): ").strip()
-
-        if opcion=="1":  # Cambiar producto
-            print("\nProductos en su pedido:")
-            for i, item in enumerate(productos_seleccionados, 1):
-                print(f"{i}. {item['producto'][5]} - Cantidad: {item['cantidad']}")
-
-            try:
-                num= int(entrada("\nIngrese el número del producto a cambiar: ")) - 1
-                if num<0 or num>=len(productos_seleccionados):
-                    print("Número de producto inválido")
-                    continue
-
-                print("\nSeleccione el nuevo producto:")
-                for producto in productos_menu:
-                    print(f"- {producto[4]}: {producto[5]} (Precio: {producto[7]})")
-
-                nuevo_cod=entrada("\nIngrese el código del nuevo producto: ").strip()
-                nuevo_prod=next((p for p in productos_menu if p[4] == nuevo_cod), None)
-
-                if not nuevo_prod:
-                    print("Producto no encontrado")
-                    continue
-                #Para Mantener la misma cantidad
-                cantidad_actual = productos_seleccionados[num]['cantidad']
-                productos_seleccionados[num] = {'producto': nuevo_prod,'cantidad': cantidad_actual}
-                print(f"Producto cambiado a {nuevo_prod[5]}")
-            except ValueError:
-                print("Por favor ingrese un número válido")
-
-        elif opcion=="2":  # Paracambiar cantidad
-            print("\nProductos en su pedido:")
-            for i, item in enumerate(productos_seleccionados, 1):
-                print(f"{i}. {item['producto'][5]} - Cantidad: {item['cantidad']}")
-            try:
-                num= int(entrada("\nIngrese el número del producto a modificar: ")) - 1
-                if num<0 or num>=len(productos_seleccionados):
-                    print("Número de producto inválido")
-                    continue
-                nueva_cantidad=int(entrada(f"\nIngrese la nueva cantidad para {productos_seleccionados[num]['producto'][5]}: "))
-                if nueva_cantidad<=0:
-                    print("La cantidad debe ser mayor a 0")
-                    continue
-                productos_seleccionados[num]['cantidad']=nueva_cantidad
-                print("Cantidad actualizada")
-            except ValueError:
-                print("Por favor ingrese un número válido")
-        elif opcion=="3":  # Para eliminar producto
-            print("\nProductos en su pedido:")
-            for i, item in enumerate(productos_seleccionados, 1):
-                print(f"{i}. {item['producto'][5]} - Cantidad: {item['cantidad']}")
-            try:
-                num= int(entrada("\nIngrese el número del producto a eliminar: ")) - 1
-                if num<0 or num>=len(productos_seleccionados):
-                    print("Número de producto inválido")
-                    continue
-                producto_eliminado=productos_seleccionados.pop(num)
-                print(f"Producto {producto_eliminado['producto'][5]} eliminado")
-                if not productos_seleccionados:
-                    print("No hay productos en el pedido. Volviendo al menú principal...")
-                    return False
-            except ValueError:
-                print("Por favor ingrese un número válido")
-
-        elif opcion=="4":  # Agregar producto
-            print("\nProductos disponibles en este menú:")
-            productos_en_menu=[prod for prod in productos if prod[0]==cod_pais and prod[1]==cod_ciudad and prod[2]==cod_restaurante and prod[3] == cod_menu]
-            if not productos_en_menu:
-                print("No hay productos disponibles en este menú")
-                continue
-            for producto in productos_en_menu:
-                print(f"- {producto[4]}: {producto[5]} (Precio: {producto[7]})")
-            cod_producto=entrada("\nIngrese el código del producto a agregar: ").strip()
-            producto_encontrado=next((p for p in productos_en_menu if p[4]==cod_producto), None)
-            if not producto_encontrado:
-                print("Error: Producto no encontrado en este menú")
-                continue
-            cantidad=int(entrada(f"\nIngrese la cantidad para {producto_encontrado[5]}: "))
-            if cantidad<= 0:
-                print("La cantidad debe ser mayor a 0")
-                continue
-            productos_seleccionados.append({'producto': producto_encontrado,'cantidad': cantidad})
-            print(f"Producto {producto_encontrado[5]} agregado")
-        elif opcion=="5":  # Terminar modificaciones
-            break
-        else:
-            print("Opción no válida. Por favor seleccione 1-5")
-
-        print("\nResumen actualizado de su compra:")
-        total_compra=0
-        for i, item in enumerate(productos_seleccionados, 1):
-            producto=item['producto']
-            cantidad=item['cantidad']
-            subtotal=float(producto[7])*cantidad
-            total_compra+=subtotal
-            print(f"{i}. {producto[5]} - Cantidad: {cantidad} - Subtotal: {subtotal:.2f}")
-        print(f"\nTotal a pagar: {total_compra:.2f}")
-
-        modificar = entrada("\n¿Desea realizar más modificaciones? (S/N): ").strip().upper()
-    confirmar=entrada("\n¿Confirmar compra? (S/N): ").strip().upper()
-    if confirmar!="S":
-        print("\nCompra cancelada")
-        return False
-
-
-    registro_compras=f"registro_compras.txt"
-    codigo_factura=obtener_ultimo_codigo_factura(registro_compras)+1
-
-    with open(registro_compras,"a") as archivo:
-        for item in productos_seleccionados:
-            producto=item['producto']
-            cantidad=item['cantidad']
-            subtotal=float(producto[7])
-            total=subtotal*cantidad
-            if orden=="llevar" and metodo_pago=="efectivo":
-                total=total
-            elif orden=="llevar" and metodo_pago=="tarjeta":
-                total*=0.92
-            elif orden=="aqui" and metodo_pago=="efectivo":
-                total=total
-            else:
-                total*=0.95
-            archivo.write(
-                f"{codigo_factura};"
-                f"{cliente[0]};{cliente[1]};"
-                f"{cod_pais};{cod_ciudad};{cod_restaurante};"
-                f"{cod_menu};{producto[4]};{producto[5]};"
-                f"{cantidad};{subtotal:.2f};{total:.2f};{orden}\n"
-            )
-        print("\nCompra registrada exitosamente!")
-    # Un archivo para cada cliente
-    nombre_archivo=f"factura_{cedula}_{codigo_factura}.txt"
-    with open(nombre_archivo, "a") as archivo:
-        for item in productos_seleccionados:
-            producto=item['producto']
-            cantidad=item['cantidad']
-            subtotal=float(producto[7])
-            total=subtotal*cantidad
-            if orden=="llevar" and metodo_pago=="efectivo":
-                total=total
-            elif orden=="llevar" and metodo_pago=="tarjeta":
-                total*=0.92
-            elif orden=="aqui" and metodo_pago=="efectivo":
-                total=total
-            else:
-                total*=0.95
-            archivo.write(
-                f"{codigo_factura};"
-                f"{cliente[0]};{cliente[1]};"
-                f"{cod_pais};{cod_ciudad};{cod_restaurante};"
-                f"{cod_menu};{producto[4]};{producto[5]};"
-                f"{cantidad};{subtotal:.2f};{total:.2f};{orden}\n"
-            )
-        print(f"\nCompra registrada exitosamente! Factura #{codigo_factura}, Total: ${total_compra:.2f}")
-    return True
 #______________________________________________________________________________________________________________________#
 #REPORTES
 #______________________________________________________________________________________________________________________#
