@@ -91,7 +91,7 @@ while True:
         codigo=input("Ingrese el codigo: ")
         resultado=buscar(codigo)
         if resultado:
-            op=input"Seguro que sdesea eliminarlo? s/n"
+            op=input("Seguro que sdesea eliminarlo? s/n")
             if op.upper() == "s":
                 eliminar(codigo)
                 print("Eliminado correctamente")

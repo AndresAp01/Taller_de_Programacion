@@ -1,3 +1,4 @@
+#Luis Andres Acunna Perez verificacion 12
 palabras = {
     "manzana": {
         "inglés": "apple",
