@@ -137,73 +137,41 @@ def UNO(lista):
 #digito_unidad1 y 2 el digito de las unidades
 #suma es la suma de matrices 1 y2
 def DOS(num1, num2):
-    if isinstance(num1, int) and (num2, int):
-        num1=abs(num1)
-        num2=abs(num2)
-        print(f"Numeros originales: {num1, num2}")
-        if largofor(num1)!=largofor(num2):
-            return False
-        elif largofor(num1 or num2)%5!=0:
-            return "Los numeros deben ser multiplos de 5"
-        elif largofor(num1 or num2)%2==0:
-            return "Los numeros deben tener largo impar"
-        else:
-            nuevo_num1=0
-            nuevo_num2=0
-            n=largofor(num1)
-            for i in range(n):
-                digitos1=(num1//(10**(n-i-1)))%10
-                digitos2=(num2//(10**(n-i-1)))%10
-                digitos1inverso=(num1//(10**i))%10
-                digitos2inverso=(num2//(10**i))%10
-                if i%2==0:
-                    nuevo_num1=nuevo_num1*10+digitos1
-                    nuevo_num2=nuevo_num2*10+digitos2inverso
-                else:
-                    nuevo_num1=nuevo_num1*10+digitos2
-                    nuevo_num2=nuevo_num2*10+digitos1inverso
-            print(f"Numeros nuevos: {nuevo_num1, nuevo_num2}")
-            nuevo_largo=largofor(nuevo_num1)
-            if nuevo_largo%5==0 and nuevo_largo%3==0:
-                matriz_1=[]
-                matriz_2=[]
-                grupos=nuevo_largo//3
-                for j in range(grupos):
-                    desplazamiento=nuevo_largo-(j+1)*3
-                    valor_bloque_1=(nuevo_num1//(10**desplazamiento))%1000
-                    valor_bloque_2=(nuevo_num2//(10**desplazamiento))%1000
-                    digito_centena_1=valor_bloque_1//100
-                    digito_decena_1=(valor_bloque_1//10)%10
-                    digito_unidad_1=valor_bloque_1%10
+    if not isinstance(num1, int) or not (num2, int):
+        return "Ambos parametros deben ser numeros enteros"
 
-                    digito_centena_2=valor_bloque_2//100
-                    digito_decena_2=(valor_bloque_2//10)%10
-                    digito_unidad_2=valor_bloque_2%10
-
-                    sub1=[digito_centena_1**2, digito_decena_1**3, digito_unidad_1**2]
-                    sub2=[digito_centena_2**2, digito_decena_2**3, digito_unidad_2**2]
-                    matriz_1=matriz_1+[sub1]
-                    matriz_2=matriz_2+[sub2]
-                    print(f"matrices generadas: {matriz_1, matriz_2}")
-                if not (valida_matriz(matriz_1) and valida_matriz(matriz_2)):
-                    return "Matrices inválidas"
-
-                    # 2) Sumarlas elemento a elemento
-                suma = []
-                for i in range(len(matriz_1)):
-                    fila_suma = []
-                    for j in range(len(matriz_1[i])):
-                        fila_suma = fila_suma + [matriz_1[i][j] + matriz_2[i][j]]
-                    suma = suma + [fila_suma]
-
-                return suma
-            elif largofor(nuevo_num1)!=largofor(nuevo_num2):
-                return "Los nuevos numeros quedaron de diferentes largos, no se puede construir la lista"
-            elif nuevo_largo%5==0 and nuevo_largo%3!=0:
-                matriz_1=[]
-                matriz_2=[]
-                center=nuevo_largo//2
-                desplazamiento=nuevo_largo-3
+    num1=abs(num1)
+    num2=abs(num2)
+    print(f"Numeros originales: {num1, num2}")
+    if largofor(num1)!=largofor(num2):
+        return "Los numeros deben tener el mismo tamanno"
+    elif largofor(num1 or num2)%5!=0:
+        return "Los numeros deben ser multiplos de 5"
+    elif largofor(num1 or num2)%2==0:
+        return "Los numeros deben tener largo impar"
+    else:
+        nuevo_num1=0
+        nuevo_num2=0
+        n=largofor(num1)
+        for i in range(n):
+            digitos1=(num1//(10**(n-i-1)))%10
+            digitos2=(num2//(10**(n-i-1)))%10
+            digitos1inverso=(num1//(10**i))%10
+            digitos2inverso=(num2//(10**i))%10
+            if i%2==0:
+                nuevo_num1=nuevo_num1*10+digitos1
+                nuevo_num2=nuevo_num2*10+digitos2inverso
+            else:
+                nuevo_num1=nuevo_num1*10+digitos2
+                nuevo_num2=nuevo_num2*10+digitos1inverso
+        print(f"Numeros nuevos: {nuevo_num1, nuevo_num2}")
+        nuevo_largo=largofor(nuevo_num1)
+        if nuevo_largo%5==0 and nuevo_largo%3==0:
+            matriz_1=[]
+            matriz_2=[]
+            grupos=nuevo_largo//3
+            for j in range(grupos):
+                desplazamiento=nuevo_largo-(j+1)*3
                 valor_bloque_1=(nuevo_num1//(10**desplazamiento))%1000
                 valor_bloque_2=(nuevo_num2//(10**desplazamiento))%1000
                 digito_centena_1=valor_bloque_1//100
@@ -214,46 +182,98 @@ def DOS(num1, num2):
                 digito_decena_2=(valor_bloque_2//10)%10
                 digito_unidad_2=valor_bloque_2%10
 
-                matriz_1=matriz_1+[[digito_centena_1**2, digito_decena_1**3, digito_unidad_1**2]]
-                matriz_2=matriz_2+[[digito_centena_2**2, digito_decena_2**3, digito_unidad_2**2]]
-                # segunda sublista
-                desplazamiento_bloque2=nuevo_largo-(center+3)
-                valor_bloque_1=(nuevo_num1//(10**desplazamiento_bloque2))%1000
-                valor_bloque_2=(nuevo_num2//(10**desplazamiento_bloque2))%1000
+                sub1=[digito_centena_1**2, digito_decena_1**3, digito_unidad_1**2]
+                sub2=[digito_centena_2**2, digito_decena_2**3, digito_unidad_2**2]
+                matriz_1=matriz_1+[sub1]
+                matriz_2=matriz_2+[sub2]
+            if not (ValidaMatriz(matriz_1) and ValidaMatriz(matriz_2)):
+                return "Matrices inválidas"
 
-                digito_centena_1=valor_bloque_1//100
-                digito_decena_1=(valor_bloque_1//10)%10
-                digito_unidad_1=valor_bloque_1%10
+                # 2) Sumarlas elemento a elemento
+            suma=[]
+            for i in range(len(matriz_1)):
+                fila_suma=[]
+                for j in range(len(matriz_1[i])):
+                    fila_suma=fila_suma+[matriz_1[i][j] + matriz_2[i][j]]
+                suma=suma+[fila_suma]
+            print(f"matrices generadas: {matriz_1, matriz_2}")
+            print("Suma de matrices:")
+            return suma
+        elif largofor(nuevo_num1)!=largofor(nuevo_num2):
+            return "Los nuevos numeros quedaron de diferentes largos, no se puede construir la lista"
+        elif nuevo_largo%5==0 and nuevo_largo%3!=0:
+            matriz_1=[]
+            matriz_2=[]
+            center=nuevo_largo//2
+            desplazamiento=nuevo_largo-3
+            valor_bloque_1=(nuevo_num1//(10**desplazamiento))%1000
+            valor_bloque_2=(nuevo_num2//(10**desplazamiento))%1000
+            digito_centena_1=valor_bloque_1//100
+            digito_decena_1=(valor_bloque_1//10)%10
+            digito_unidad_1=valor_bloque_1%10
 
-                digito_centena_2=valor_bloque_2//100
-                digito_decena_2=(valor_bloque_2//10)%10
-                digito_unidad_2=valor_bloque_2%10
+            digito_centena_2=valor_bloque_2//100
+            digito_decena_2=(valor_bloque_2//10)%10
+            digito_unidad_2=valor_bloque_2%10
 
-                matriz_1=matriz_1+[[digito_centena_1**2, digito_decena_1**3, digito_unidad_1**2]]
-                matriz_2=matriz_2+[[digito_centena_2**2, digito_decena_2**3, digito_unidad_2**2]]
-                print(f"matrices generadas: {matriz_1, matriz_2}")
-                if not (valida_matriz(matriz_1) and valida_matriz(matriz_2)):
-                    return "Matrices invalidas"
-                suma=[]
-                for i in range(len(matriz_1)):
-                    fila_suma=[]
-                    for j in range(len(matriz_1[i])):
-                        fila_suma=fila_suma+[matriz_1[i][j] + matriz_2[i][j]]
-                    suma=suma+[fila_suma]
-                print("Suma de matrices:")
-                return suma
-            else:
-                return "Algo no previsto ha pasao"
-    else:
-        return "Los numeros no son enteros"
+            matriz_1=matriz_1+[[digito_centena_1**2, digito_decena_1**3, digito_unidad_1**2]]
+            matriz_2=matriz_2+[[digito_centena_2**2, digito_decena_2**3, digito_unidad_2**2]]
+            # segunda sublista
+            desplazamiento_bloque2=nuevo_largo-(center+3)
+            valor_bloque_1=(nuevo_num1//(10**desplazamiento_bloque2))%1000
+            valor_bloque_2=(nuevo_num2//(10**desplazamiento_bloque2))%1000
 
-print(DOS(61257,89102))
+            digito_centena_1=valor_bloque_1//100
+            digito_decena_1=(valor_bloque_1//10)%10
+            digito_unidad_1=valor_bloque_1%10
+
+            digito_centena_2=valor_bloque_2//100
+            digito_decena_2=(valor_bloque_2//10)%10
+            digito_unidad_2=valor_bloque_2%10
+
+            matriz_1=matriz_1+[[digito_centena_1**2, digito_decena_1**3, digito_unidad_1**2]]
+            matriz_2=matriz_2+[[digito_centena_2**2, digito_decena_2**3, digito_unidad_2**2]]
+            if not (ValidaMatriz(matriz_1) and ValidaMatriz(matriz_2)):
+                return "Matrices invalidas"
+            suma=[]
+            for i in range(len(matriz_1)):
+                fila_suma=[]
+                for j in range(len(matriz_1[i])):
+                    fila_suma=fila_suma+[matriz_1[i][j] + matriz_2[i][j]]
+                suma=suma+[fila_suma]
+            print(f"matrices generadas: {matriz_1, matriz_2}")
+            print("Suma de matrices:")
+            return suma
+        else:
+            return "Algo no previsto ha pasao"
+
+print(DOS(1212,12345))
 #Prueba 1: print(DOS(61257,89102))
-#Imprime: [[40, 854, 5], [5, 1, 113]]
+#Imprime:
+"""
+Numeros originales: (61257, 89102)
+Numeros nuevos: (69207, 25118)
+matrices generadas: ([[36, 729, 4], [4, 0, 49]], [[4, 125, 1], [1, 1, 64]])
+Suma de matrices:
+[[40, 854, 5], [5, 1, 113]]
+"""
 
 #Prueba 2: print(DOS(133557789214365,745230987664422))
-#Imprime: [[5, 280, 25], [20, 341, 4], [98, 1024, 162], [85, 28, 41], [34, 35, 74]]
+#Imprime:
+"""
+Numeros originales: (133557789214365, 745230987664422)
+Numeros nuevos: (143250789614325, 264462789735537)
+matrices generadas: ([[1, 64, 9], [4, 125, 0], [49, 512, 81], [36, 1, 16], [9, 8, 25]], [[4, 216, 16], [16, 216, 4], [49, 512, 81], [49, 27, 25], [25, 27, 49]])
+Suma de matrices:
+[[5, 280, 25], [20, 341, 4], [98, 1024, 162], [85, 28, 41], [34, 35, 74]]
+"""
 
+#Prueba 3:print(DOS("aaaa",12345))
+#Imprime: Ambos parametros deben ser numeros enteros
+
+#Prueba 4: print(DOS(1212,12345))
+#Imprime: Numeros originales: (1212, 12345)
+#         Los numeros deben tener el mismo tamanno
 
 #_______________________________________________________________________________
 def TRES():
