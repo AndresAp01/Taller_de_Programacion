@@ -123,7 +123,6 @@ def DOS(num1, num2):
                 if i%2==0:
                     nuevo_num1=nuevo_num1*10+digitos1
                     nuevo_num2=nuevo_num2*10+digitos2
-
     else:
         return "Los numeros no son enteros"
 
