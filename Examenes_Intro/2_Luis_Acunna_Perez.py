@@ -2,20 +2,26 @@
 #Segundo examen parcial
 
 #funciones auxiliares copiadas y pegadas del archivo de la profe:
-#validacion de matriz
+#Funcion aux suma de matrices
+import copy
 
-def valida_matriz(matriz):
-    if not isinstance(matriz, list) or len(matriz) == 0:
-        return False
-    primera = matriz[0]
-    if not isinstance(primera, list) or len(primera) == 0:
-        return False
-    cols = len(primera)
-    for fila in matriz:
-        if not isinstance(fila, list) or len(fila) != cols:
-            return False
-    return True
+def sumatrices(ma1, ma2):
+    if ValidaMatriz(ma1)==False or ValidaMatriz(ma2)==False or len(ma1[0])!=len(ma2[0]) or len(ma1)!=len(ma2):
+        print("matrices no validas")
+    else:
+        filas=len(ma1)
+        columnas=len(ma1[0])
+        filas1=len(ma2)
+        columnas1=len(ma2[0])
+        matriznueva=copy.deepcopy(ma1)
+        for i in range(filas):
+            for j in range(columnas):
+                matriznueva[i][j]=ma1[i][j]+ma2[i][j]
+        return matriznueva
+#Para que sumatrices funcione correctamente le cambio el nombre de ValidaMatrizSI por ValidaMatriz
+#Tambien, le cambio el print por un return y le quito que me imprima ademas la ma1. No hace falta, solo quiero que me retorne la suma de matrices.
 
+#Funcion aux validacion de matrices
 def ValidaMatriz(matriz):
     a = 0
     b = 0
@@ -39,23 +45,20 @@ def ValidaMatriz(matriz):
         return False
 # validacion de conjuntos NO es conjunto
 def conjunto(lista):  # [3,2,1,3]
-    largo = 0  # 0
-    pos = 0  # 0
-
-    # largo      pos       lista
-    while largo < len(lista):  # Afuera o Externo mas lento
-        while pos < len(lista):  # Adentro o Interno, corre mas rapido
-            if largo != pos:  #
-                if lista[pos] == lista[largo]:
-                    return (False)
+    largo=0
+    pos=0
+    while largo<len(lista):
+        while pos<len(lista):
+            if largo!=pos:
+                if lista[pos]==lista[largo]:
+                    return False
                 else:
-                    pos = pos + 1
+                    pos=pos+1
             else:
-                pos = pos + 1
-        # Antes del externo
-        pos = 0
-        largo = largo + 1
-    return (True)
+                pos=pos+1
+        pos=0
+        largo=largo+1
+    return True
 
 def largofor(num):
     if isinstance(num,int):
@@ -73,6 +76,27 @@ def largofor(num):
     else:
         print("Parametro incorrecto")
 
+#Funcion centro entregada en clase
+#SE CAMBIA el nombre de largo por largofor para que FUNCIONE
+def centronum(num):
+    if isinstance(num, int):
+        num=abs(num)
+        if largofor(num)%2!=0:
+            larg=(largofor(num)-1)//2
+            cont=largofor(num)-1
+
+            while num!=0:
+                temp=num%10
+                if cont==larg:
+                    centro=temp
+                    break
+                num=num//10
+                cont=cont-1
+            return centro
+        else:
+            print("Tamaño incorrecto")
+    else:
+        print("Parametro incorrecto")
 # _______________________________________________________________________________
 
 #primera funcion
@@ -188,17 +212,9 @@ def DOS(num1, num2):
                 matriz_2=matriz_2+[sub2]
             if not (ValidaMatriz(matriz_1) and ValidaMatriz(matriz_2)):
                 return "Matrices inválidas"
+            print(f"Matrices generadas: {matriz_1, matriz_2}")
+            return sumatrices(matriz_1, matriz_2)
 
-                # 2) Sumarlas elemento a elemento
-            suma=[]
-            for i in range(len(matriz_1)):
-                fila_suma=[]
-                for j in range(len(matriz_1[i])):
-                    fila_suma=fila_suma+[matriz_1[i][j] + matriz_2[i][j]]
-                suma=suma+[fila_suma]
-            print(f"matrices generadas: {matriz_1, matriz_2}")
-            print("Suma de matrices:")
-            return suma
         elif largofor(nuevo_num1)!=largofor(nuevo_num2):
             return "Los nuevos numeros quedaron de diferentes largos, no se puede construir la lista"
         elif nuevo_largo%5==0 and nuevo_largo%3!=0:
@@ -235,19 +251,11 @@ def DOS(num1, num2):
             matriz_2=matriz_2+[[digito_centena_2**2, digito_decena_2**3, digito_unidad_2**2]]
             if not (ValidaMatriz(matriz_1) and ValidaMatriz(matriz_2)):
                 return "Matrices invalidas"
-            suma=[]
-            for i in range(len(matriz_1)):
-                fila_suma=[]
-                for j in range(len(matriz_1[i])):
-                    fila_suma=fila_suma+[matriz_1[i][j] + matriz_2[i][j]]
-                suma=suma+[fila_suma]
-            print(f"matrices generadas: {matriz_1, matriz_2}")
-            print("Suma de matrices:")
-            return suma
+            print(f"Matrices generadas: {matriz_1, matriz_2}")
+            return sumatrices(matriz_1, matriz_2)
         else:
             return "Algo no previsto ha pasao"
-
-print(DOS(1212,12345))
+print(DOS(61257,89102))
 #Prueba 1: print(DOS(61257,89102))
 #Imprime:
 """
@@ -276,8 +284,74 @@ Suma de matrices:
 #         Los numeros deben tener el mismo tamanno
 
 #_______________________________________________________________________________
-def TRES():
-    pass
+
+#Comentarios de funcion TRES
+#num1, num2 y num3 son los parametros que recibe la funcion
+#centro1, centro2 y centro3 son los centros de los numeros
+#lista es la lista donde se crearan las demas listas
+
+
+def TRES(num1, num2, num3):
+    num1=abs(num1)
+    num2=abs(num2)
+    num3=abs(num3)
+
+    if not isinstance(num1, int) or not (num2, int) or not (num3, int):
+        return "Ambos parametros deben ser numeros enteros"
+    elif largofor(num1)!=largofor(num2) or largofor(num2)!=largofor(num3):
+        return "Los numeros deben tener el mismo tamanno"
+    elif largofor(num1 or num2 or num3)%2==0:
+        return "Los numeros deben tener largo impar"
+    elif largofor(num1 or num2 or num3)<3:
+        return "Los numeros deben tener al menos 3 digitos"
+    else:
+        centro1=centronum(num1)
+        centro2=centronum(num2)
+        centro3=centronum(num3)
+        lista=[]
+        largo=largofor(num1)
+        patron1=1,0,1
+        patron2=-1,0,-1
+        iteraciones=largo//2
+        for i in range(iteraciones):
+            digito_inicio_num3=(num3//(10**(largo-1-i)))%10
+            digito_final_num3=(num3//(10**i))%10
+            lista=lista+[[1,0,1, (digito_inicio_num3 + centro3)**2, -1,0,-1]]
+            lista=lista+[[1,0,1, (digito_final_num3+centro3)**2, -1,0,-1 ]]
+
+            digito_inicio_num2=(num2//(10**(largo-1-i)))%10
+            digito_final_num2=(num2//(10**i))%10
+            lista=lista+[[-2,0,-2, (digito_final_num2-centro2)**3, 2,0,2]]
+            lista=lista+[[-2,0,-2, (digito_inicio_num2-centro2)**3, 2,0,2]]
+
+            digito_inicio_num1=(num1//(10**(largo-1-i)))%10
+            digito_final_num1=(num1//(10**i))%10
+            lista=lista+[[3,0,3, (digito_inicio_num1*centro1)**2, -3,0,-3]]
+            lista=lista+[[3,0,3, (digito_final_num1*centro1)**2, -3,0,-3]]
+        print(f"Numeros originales: {num1, num2, num3}")
+        return lista
+
+#print(TRES(1234,3456,4567))
+#Primera prubea
+#print(TRES(61245,18973,81027))
+#Salida:
+#Numeros originales: (61245, 18973, 81027)
+#[[1, 0, 1, 64, -1, 0, -1], [1, 0, 1, 49, -1, 0, -1], [-2, 0, -2, -216, 2, 0, 2], [-2, 0, -2, -512, 2, 0, 2], [3, 0, 3, 144, -3, 0, -3], [3, 0, 3, 100, -3, 0, -3], [1, 0, 1, 1, -1, 0, -1], [1, 0, 1, 4, -1, 0, -1], [-2, 0, -2, -8, 2, 0, 2], [-2, 0, -2, -1, 2, 0, 2], [3, 0, 3, 4, -3, 0, -3], [3, 0, 3, 64, -3, 0, -3]]
+
+#Segunda prueba
+#print(TRES(123,234,345))
+#Numeros originales: (123, 234, 345)
+#[[1, 0, 1, 49, -1, 0, -1], [1, 0, 1, 81, -1, 0, -1], [-2, 0, -2, 1, 2, 0, 2], [-2, 0, -2, -1, 2, 0, 2], [3, 0, 3, 4, -3, 0, -3], [3, 0, 3, 36, -3, 0, -3]]
+
+#tercera prueba
+#print(TRES(12,18973,81027))
+#salida: Los numeros deben tener el mismo tamanno
+
+#cuarta prueba
+#print(TRES(1234,3456,4567))
+#salida: Los numeros deben tener largo impar
+
+
 #_______________________________________________________________________________
 #Comentarios de funcion CUATRO
 #elem es el elemento a duplicar
