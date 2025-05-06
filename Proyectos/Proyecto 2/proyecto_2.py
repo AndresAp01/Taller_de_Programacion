@@ -192,25 +192,21 @@ def modificar_pais(codigo_pais, nuevo_nombre):
     else:
         dic[codigo_pais]['nombre'] = nuevo_nombre
         return f"País {codigo_pais} modificado exitosamente."
-
 def modificar_ciudad(codigo_pais, codigo_ciudad, nuevo_nombre):
     if buscar_elemento(dic, codigo_pais, codigo_ciudad) is not True:
         return f"Error: La ciudad {codigo_ciudad} en el país {codigo_pais} no existe."
     dic[codigo_pais]['ciudades'][codigo_ciudad]['nombre'] = nuevo_nombre
     return f"Ciudad {codigo_ciudad} modificada exitosamente."
-
 def modificar_restaurante(codigo_pais, codigo_ciudad, codigo_restaurante, nuevo_nombre):
     if buscar_elemento(dic, codigo_pais, codigo_ciudad, codigo_restaurante) is not True:
         return f"Error: El restaurante {codigo_restaurante} en {codigo_ciudad}, {codigo_pais} no existe."
     dic[codigo_pais]['ciudades'][codigo_ciudad]['restaurantes'][codigo_restaurante]['nombre'] = nuevo_nombre
     return f"Restaurante {codigo_restaurante} modificado exitosamente."
-
 def modificar_menu(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu, nuevo_nombre):
     if buscar_elemento(dic, codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu) is not True:
         return f"Error: El menú {codigo_menu} en restaurante {codigo_restaurante} no existe."
     dic[codigo_pais]['ciudades'][codigo_ciudad]['restaurantes'][codigo_restaurante]['menus'][codigo_menu]['nombre'] = nuevo_nombre
     return f"Menú {codigo_menu} modificado exitosamente."
-
 def modificar_producto(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu, codigo_producto, nuevo_nombre=None, nuevas_calorias=None, nuevo_precio=None):
     if buscar_elemento(dic, codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu, codigo_producto) is not True:
         return f"Error: El producto {codigo_producto} en menú {codigo_menu} no existe."
@@ -222,7 +218,6 @@ def modificar_producto(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_me
     if nuevo_precio is not None:
         producto['precio'] = nuevo_precio
     return f"Producto {codigo_producto} modificado exitosamente."
-
 def modificar_cliente(cedula_cliente, nuevo_nombre):
     if buscar_cli(cli, cedula_cliente) is not True:
         return f"Error: El cliente {cedula_cliente} no existe."
@@ -230,7 +225,6 @@ def modificar_cliente(cedula_cliente, nuevo_nombre):
     return f"Cliente {cedula_cliente} modificado exitosamente."
 #______________________________________________________________________________________________________________________#
 #INSERCIONES___________________________________________________________________________________________________________#
-
 def insertar_en_diccionario(registro, nivel):
     # Validar que registro sea lista
     if not isinstance(registro, list):
@@ -337,20 +331,17 @@ def insertar_pais():
     codigo = entrada("Código de país: ")
     nombre = input("Nombre de país: ")
     return insertar_en_diccionario([codigo, nombre], nivel=1)
-
 def insertar_ciudad():
     codigo = entrada("Código de país: ")
     codigo_c = entrada("Código de ciudad: ")
     nombre  = input("Nombre de ciudad: ")
     return insertar_en_diccionario([codigo, codigo_c, nombre], nivel=2)
-
 def insertar_restaurante():
     codigo   = entrada("Código de país: ")
     codigo_c = entrada("Código de ciudad: ")
     codigo_r = entrada("Código de restaurante: ")
     nombre   = input("Nombre de restaurante: ")
     return insertar_en_diccionario([codigo, codigo_c, codigo_r, nombre], nivel=3)
-
 def insertar_menu():
     codigo   = entrada("Código de país: ")
     codigo_c = entrada("Código de ciudad: ")
@@ -358,7 +349,6 @@ def insertar_menu():
     codigo_m = entrada("Código de menú: ")
     nombre   = input("Nombre de menú: ")
     return insertar_en_diccionario([codigo, codigo_c, codigo_r, codigo_m, nombre], nivel=4)
-
 def insertar_producto():
     codigo   = entrada("Código de país: ")
     codigo_c = entrada("Código de ciudad: ")

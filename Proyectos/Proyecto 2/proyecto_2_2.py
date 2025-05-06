@@ -9,15 +9,18 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import LETTER
 
 #Construccion de diccionarios
+#----------------------------
 def normalizar_codigo(codigo):
     if not isinstance(codigo, (str, int)):
         print(f"El codigo {codigo} no es alfanumerico")
     else:
         return str(codigo).lstrip('-')
+#Funcion para normalizar cada entrada del usuario
 input_orig=input
 def entrada(prompt=""):
     respuesta=input_orig(prompt)
     return normalizar_codigo(respuesta)
+#Funcion para abrir archivos
 def abrir_archivo(ruta):
     try:
         with open(ruta, 'r') as archivo:
@@ -28,8 +31,8 @@ def abrir_archivo(ruta):
     except Exception as e:
         print(f"Error al leer '{ruta}': {e}")
         return []
-def normalizar(c):
-    return c.strip().upper()
+#funcion para crear el diccionario a partir de los archivos
+#r_ son rutas
 def cargar_datos(r_paises, r_ciudades, r_restaurantes, r_menus, r_prods):
     dic={}
     # Países
@@ -108,8 +111,7 @@ def cargar_datos(r_paises, r_ciudades, r_restaurantes, r_menus, r_prods):
                 "stock": stock
             }
     return dic
-dic=cargar_datos("Paises.txt", "Ciudades.txt", "Restaurantes.txt", "Menu.txt", "Productos.txt")
-print(dic)
+dic=cargar_datos("Paises.txt", "Ciudades.txt", "Restaurantes.txt", "Menu.txt", "Productos.txt") #Diccionario general
 def cargar_clientes(ruta_clientes):
     cli={}
     for linea in abrir_archivo(ruta_clientes):
@@ -119,13 +121,13 @@ def cargar_clientes(ruta_clientes):
         cedula, nombre=partes
         cli[cedula]=nombre
     return cli
-clientes="Clientes.txt"
-cli=cargar_clientes(clientes)
-total_restaurante_busquedas = {}
-total_menu_busquedas = {}
-total_producto_busquedas = {}
-
+cli=cargar_clientes("Clientes.txt") #Diccionario de clientes
+total_restaurante_busquedas={}
+total_menu_busquedas={}
+total_producto_busquedas={}
+#Funcion para buscar general
 def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_rest=None, cod_menu=None, cod_prod=None):
+    # Se usa .get
     if cod_pais not in dic:
         print(f"Error: país '{cod_pais}' no existe.")
         return False
@@ -140,44 +142,41 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_rest=None, cod_m
         print(f"Error: ciudad '{cod_ciudad}' no existe en país '{cod_pais}'.")
         return False
     # Confirmación ciudad
-    ciudad = pais['ciudades'][cod_ciudad]
+    ciudad=pais['ciudades'][cod_ciudad]
     print(f"Ciudad encontrada: {cod_ciudad} → {ciudad.get('nombre', '<sin nombre>')}")
     if cod_rest is None:
         return True
-
-    # Nivel restaurante
-    rest_dict = ciudad.get('restaurantes', {})
+    #Restaurantes
+    rest_dict=ciudad.get('restaurantes', {})
     if cod_rest not in rest_dict:
         print(f"Error: restaurante '{cod_rest}' no existe en ciudad '{cod_ciudad}'.")
         return False
-    # Contador restaurante
-    total_restaurante_busquedas[cod_rest] = total_restaurante_busquedas.get(cod_rest, 0) + 1
-    # Confirmación restaurante
-    rest = rest_dict[cod_rest]
+    # Contador bsuqueda de restaurantes
+    total_restaurante_busquedas[cod_rest]=total_restaurante_busquedas.get(cod_rest, 0) + 1
+    # Confirmacion restaurante
+    rest=rest_dict[cod_rest]
     print(f"Restaurante encontrado: {cod_rest} → {rest.get('nombre', '<sin nombre>')}")
     if cod_menu is None:
         return True
-
-    # Nivel menú
-    menu_dict = rest.get('menus', {})
+    #Menus
+    menu_dict=rest.get('menus', {})
     if cod_menu not in menu_dict:
         print(f"Error: menú '{cod_menu}' no existe en restaurante '{cod_rest}'.")
         return False
-    # Contador menú
-    total_menu_busquedas[cod_menu] = total_menu_busquedas.get(cod_menu, 0) + 1
+    # Contador menu
+    total_menu_busquedas[cod_menu]=total_menu_busquedas.get(cod_menu, 0) + 1
     # Confirmación menú
-    menu = menu_dict[cod_menu]
+    menu=menu_dict[cod_menu]
     print(f"Menú encontrado: {cod_menu} → {menu.get('nombre', '<sin nombre>')}")
     if cod_prod is None:
         return True
-
     # Nivel producto
-    prod_dict = menu.get('productos', {})
+    prod_dict=menu.get('productos', {})
     if cod_prod not in prod_dict:
         print(f"Error: producto '{cod_prod}' no existe en menú '{cod_menu}'.")
         return False
-    # Contador producto
-    total_producto_busquedas[cod_prod] = total_producto_busquedas.get(cod_prod, 0) + 1
+    # Contador productos buscados
+    total_producto_busquedas[cod_prod] =total_producto_busquedas.get(cod_prod, 0) + 1
     # Confirmación producto
     prod = prod_dict[cod_prod]
     print(f"Producto encontrado: {cod_prod} → {prod.get('nombre', '<sin nombre>')}")
@@ -214,10 +213,8 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_rest=None, cod_m
         print(f"Error: producto '{cod_prod}' no existe en menú '{cod_menu}'.")
         return False
     # Contador producto
-    total_producto_busquedas[cod_prod] = total_producto_busquedas.get(cod_prod, 0) + 1
+    total_producto_busquedas[cod_prod]=total_producto_busquedas.get(cod_prod, 0) + 1
     return True
-
-
 #funciopn para buscar cliente (Porque es en otro diccionario)
 def buscar_cli(diccionario, cedula):
     if cedula not in diccionario:
@@ -232,12 +229,7 @@ def validar_cliente_existe(diccionario, ced):
         return True
     else:
         return f"El cliente {ced} no existe"
-"""muestra=validar_ciudad_existe(dic,'123', "101")
-print(muestra)"""
-"""muestra=validar_pais_existe(dic, "123")
-print(muestra)"""
-
-#--------------------------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------------------------------#
 #MODIFICAR_____________________________________________________________________________________________________________#
 def modificar_pais(codigo_pais, nuevo_nombre):
     if buscar_elemento(dic, codigo_pais) is not True:
@@ -276,8 +268,7 @@ def modificar_cliente(cedula_cliente, nuevo_nombre):
         return f"Error: El cliente {cedula_cliente} no existe."
     cli[cedula_cliente] = nuevo_nombre
     return f"Cliente {cedula_cliente} modificado exitosamente."
-
-#ELIMINACIONES______________________________________________________________________________________________________________________"
+#ELIMINACIONES_________________________________________________________________________________________________________#
 def eliminar_pais(codigo_pais):
     if codigo_pais in dic:
         del dic[codigo_pais]
@@ -313,7 +304,6 @@ def eliminar_menu(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu):
     except KeyError:
         print(f"No se encontró el menú {codigo_menu} para eliminar.")
         return False
-
 def eliminar_producto(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu, codigo_producto):
     try:
         del dic[codigo_pais]["ciudades"][codigo_ciudad]["restaurantes"][codigo_restaurante]["menus"][codigo_menu]["productos"][codigo_producto]
@@ -322,7 +312,6 @@ def eliminar_producto(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_men
     except KeyError:
         print(f"No se encontró el producto {codigo_producto} para eliminar.")
         return False
-
 def eliminar_cliente(cedula):
     if cedula in cli:
         del cli[cedula]
@@ -331,7 +320,6 @@ def eliminar_cliente(cedula):
     else:
         print(f"El cliente {cedula} no existe.")
         return False
-
 #______________________________________________________________________________________________________________________#
 #INSERCIONES___________________________________________________________________________________________________________#
 def insertar_en_diccionario(registro, nivel):
@@ -344,15 +332,14 @@ def insertar_en_diccionario(registro, nivel):
         if nivel >= 3: cod_r = normalizar_codigo(registro[2])
         if nivel >= 4: cod_m = normalizar_codigo(registro[3])
         if nivel == 5:
-            cod_pr = normalizar_codigo(registro[4])
-            nombre  = registro[5]
+            cod_pr   = normalizar_codigo(registro[4])
+            nombre   = registro[5]
             calorias = int(registro[6])
             precio   = float(registro[7])
     except Exception as e:
         print(f"Error al normalizar campos: {e}")
         return False
-
-    # Nivel 1: país
+    # nivel 1 pais
     if nivel == 1:
         nombre = registro[1]
         if cod_p in dic:
@@ -362,12 +349,12 @@ def insertar_en_diccionario(registro, nivel):
         print(f"País {cod_p} – {nombre} insertado.")
         return True
 
-    # Nivel ≥ 2: validar padre país
+    # Nivel ≥ 2: validar padre pais
     ok = buscar_elemento(dic, cod_p)
     if ok is not True:
         print(ok)
         return False
-    # Nivel 2: ciudad
+    # nivel 2 ciudad
     if nivel == 2:
         nombre = registro[2]
         ciudades = dic[cod_p].setdefault('ciudades', {})
@@ -384,10 +371,10 @@ def insertar_en_diccionario(registro, nivel):
         print(ok)
         return False
 
-    # Nivel 3: restaurante
+    # Nivel 3 restaurante
     if nivel == 3:
         nombre = registro[3]
-        resto = dic[cod_p]['ciudades'][cod_c].setdefault('restaurantes', {})
+        resto  = dic[cod_p]['ciudades'][cod_c].setdefault('restaurantes', {})
         if cod_r in resto:
             print(f"Error: El restaurante {cod_r} ya existe en {cod_c}.")
             return False
@@ -395,13 +382,13 @@ def insertar_en_diccionario(registro, nivel):
         print(f"Restaurante {cod_r} – {nombre} insertado en {cod_c}.")
         return True
 
-    # Nivel ≥ 4: validar padre restaurante
+    # Nivel ≥ 4 validar padre restaurante
     ok = buscar_elemento(dic, cod_p, cod_c, cod_r)
     if ok is not True:
         print(ok)
         return False
 
-    # Nivel 4: menú
+    # Nivel 4 menus
     if nivel == 4:
         nombre = registro[4]
         men = dic[cod_p]['ciudades'][cod_c]['restaurantes'][cod_r].setdefault('menus', {})
@@ -412,13 +399,13 @@ def insertar_en_diccionario(registro, nivel):
         print(f"Menú {cod_m} – {nombre} insertado en {cod_r}.")
         return True
 
-    # Nivel 5: validar padre menú
+    # Nivel 5 validar padre menú
     ok = buscar_elemento(dic, cod_p, cod_c, cod_r, cod_m)
     if ok is not True:
         print(ok)
         return False
 
-    # Nivel 5: producto
+    # Nivel 5 producto
     prod = dic[cod_p]['ciudades'][cod_c]['restaurantes'][cod_r]['menus'][cod_m].setdefault('productos', {})
     if cod_pr in prod:
         print(f"Error: El producto {cod_pr} ya existe en {cod_m}.")
@@ -430,42 +417,38 @@ def insertar_en_diccionario(registro, nivel):
     }
     print(f"Producto {cod_pr} – {nombre} insertado en {cod_m}.")
     return True
-# Wrappers para cada nivel:
 def insertar_pais():
-    codigo = entrada("Código de país: ")
-    nombre = input("Nombre de país: ")
+    codigo =entrada("Código de país: ")
+    nombre =input("Nombre de país: ")
     return insertar_en_diccionario([codigo, nombre], nivel=1)
 def insertar_ciudad():
-    codigo = entrada("Código de país: ")
-    codigo_c = entrada("Código de ciudad: ")
-    nombre  = input("Nombre de ciudad: ")
+    codigo   =entrada("Código de país: ")
+    codigo_c =entrada("Código de ciudad: ")
+    nombre   =input("Nombre de ciudad: ").upper()
     return insertar_en_diccionario([codigo, codigo_c, nombre], nivel=2)
 def insertar_restaurante():
-    codigo   = entrada("Código de país: ")
-    codigo_c = entrada("Código de ciudad: ")
-    codigo_r = entrada("Código de restaurante: ")
-    nombre   = input("Nombre de restaurante: ")
+    codigo   =entrada("Código de país: ")
+    codigo_c =entrada("Código de ciudad: ")
+    codigo_r =entrada("Código de restaurante: ")
+    nombre   =input("Nombre de restaurante: ")
     return insertar_en_diccionario([codigo, codigo_c, codigo_r, nombre], nivel=3)
 def insertar_menu():
-    codigo   = entrada("Código de país: ")
-    codigo_c = entrada("Código de ciudad: ")
-    codigo_r = entrada("Código de restaurante: ")
-    codigo_m = entrada("Código de menú: ")
-    nombre   = input("Nombre de menú: ")
+    codigo   =entrada("Código de país: ")
+    codigo_c =entrada("Código de ciudad: ")
+    codigo_r =entrada("Código de restaurante: ")
+    codigo_m =entrada("Código de menú: ")
+    nombre   =input("Nombre de menú: ").upper()
     return insertar_en_diccionario([codigo, codigo_c, codigo_r, codigo_m, nombre], nivel=4)
 def insertar_producto():
-    codigo   = entrada("Código de país: ")
-    codigo_c = entrada("Código de ciudad: ")
-    codigo_r = entrada("Código de restaurante: ")
-    codigo_m = entrada("Código de menú: ")
-    codigo_p = entrada("Código de producto: ")
-    nombre   = input("Nombre de producto: ")
-    calorias = input("Calorías: ")
-    precio   = input("Precio: ")
-    return insertar_en_diccionario(
-        [codigo, codigo_c, codigo_r, codigo_m, codigo_p, nombre, calorias, precio],
-        nivel=5
-    )
+    codigo   =entrada("Código de país: ")
+    codigo_c =entrada("Código de ciudad: ")
+    codigo_r =entrada("Código de restaurante: ")
+    codigo_m =entrada("Código de menú: ")
+    codigo_p =entrada("Código de producto: ")
+    nombre   =input("Nombre de producto: ")
+    calorias =input("Calorías: ")
+    precio   =input("Precio: ")
+    return insertar_en_diccionario([codigo, codigo_c, codigo_r, codigo_m, codigo_p, nombre, calorias, precio],nivel=5)
 def insertar_cliente(cli_dict, cedula, nombre):
     if cedula in cli_dict:
         print(f"Cliente con cédula {cedula} ya existe como '{cli_dict[cedula]}'")
@@ -582,7 +565,6 @@ def registrar_compra_menu(dic, cli, entrada, archivo_facturas="facturas.txt"):
     return True
 #______________________________________________________________________________________________________________________#
 #REPORTES
-
 def reporte_paises(data_dict, nombre):
     documento=SimpleDocTemplate(nombre, pagesize=LETTER)
     styles=getSampleStyleSheet()
@@ -735,7 +717,6 @@ def reporte_compras_cliente(cedula, facturas_r, reporte_ruta):
     msg = f"PDF de reporte de compras guardado en: {reporte_ruta}"
     print(msg)
     return True
-
 def reporte_rest_mas(ruta):
 
     if not total_restaurante_busquedas:
@@ -753,7 +734,6 @@ def reporte_rest_mas(ruta):
     doc.build(story)
     print(f"PDF de restaurante más buscado generado en: {ruta}")
     return True
-
 def reporte_menu_mas(ruta):
 
     if not total_menu_busquedas:
@@ -771,7 +751,6 @@ def reporte_menu_mas(ruta):
     doc.build(story)
     print(f"PDF de menú más buscado generado en: {ruta}")
     return True
-
 def reporte_producto_mas(ruta, top_n=5):
     if not total_producto_busquedas:
         print("No hay búsquedas de productos registradas.")
@@ -789,14 +768,12 @@ def reporte_producto_mas(ruta, top_n=5):
     doc.build(story)
     print(f"PDF de productos más buscados generado en: {ruta}")
     return True
-
 #______________________________________________________________________________________________________________________#
 #MENU__________________________________________________________________________________________________________________#
 def mostrar_menu(opciones):
     print(f"\n=== Bienvenido al menu de Mantenimiento de Bases de Datos ===")
     for i, opcion in enumerate(opciones, start=1):
         print(f"{i}. {opcion}")
-
 def MainMenu():
     opciones_principales=["Inserción", "Buscar", "Modificar","Eliminar","Reportes", "Salir"]
     subopciones=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Regresar al mantenimiento"] #Para poder ingresar a otro ciclo y muestre un segundo menu
