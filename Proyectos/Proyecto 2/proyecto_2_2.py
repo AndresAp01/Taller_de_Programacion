@@ -136,7 +136,6 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_rest=None, cod_m
     print(f"País encontrado: {cod_pais} → {pais.get('nombre', '<sin nombre>')}")
     if cod_ciudad is None:
         return True
-
     # Nivel ciudad
     if cod_ciudad not in pais.get('ciudades', {}):
         print(f"Error: ciudad '{cod_ciudad}' no existe en país '{cod_pais}'.")
@@ -165,7 +164,7 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_rest=None, cod_m
         return False
     # Contador menu
     total_menu_busquedas[cod_menu]=total_menu_busquedas.get(cod_menu, 0) + 1
-    # Confirmación menú
+    # Confirmacion menú
     menu=menu_dict[cod_menu]
     print(f"Menú encontrado: {cod_menu} → {menu.get('nombre', '<sin nombre>')}")
     if cod_prod is None:
@@ -177,11 +176,10 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_rest=None, cod_m
         return False
     # Contador productos buscados
     total_producto_busquedas[cod_prod] =total_producto_busquedas.get(cod_prod, 0) + 1
-    # Confirmación producto
+    # Confirmacion producto
     prod = prod_dict[cod_prod]
     print(f"Producto encontrado: {cod_prod} → {prod.get('nombre', '<sin nombre>')}")
     return True
-
     pais = dic[cod_pais]
     # Nivel ciudad
     if cod_ciudad not in pais.get('ciudades', {}):
@@ -189,7 +187,6 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_rest=None, cod_m
         return False
     if cod_rest is None:
         return True
-
     rest_dict = pais['ciudades'][cod_ciudad].get('restaurantes', {})
     if cod_rest not in rest_dict:
         print(f"Error: restaurante '{cod_rest}' no existe en ciudad '{cod_ciudad}'.")
@@ -198,16 +195,14 @@ def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_rest=None, cod_m
     total_restaurante_busquedas[cod_rest] = total_restaurante_busquedas.get(cod_rest, 0) + 1
     if cod_menu is None:
         return True
-
     menu_dict = rest_dict[cod_rest].get('menus', {})
     if cod_menu not in menu_dict:
         print(f"Error: menú '{cod_menu}' no existe en restaurante '{cod_rest}'.")
         return False
-    # Contador menú
+    # Contador men
     total_menu_busquedas[cod_menu] = total_menu_busquedas.get(cod_menu, 0) + 1
     if cod_prod is None:
         return True
-
     prod_dict = menu_dict[cod_menu].get('productos', {})
     if cod_prod not in prod_dict:
         print(f"Error: producto '{cod_prod}' no existe en menú '{cod_menu}'.")
@@ -336,6 +331,7 @@ def insertar_en_diccionario(registro, nivel):
             nombre   = registro[5]
             calorias = int(registro[6])
             precio   = float(registro[7])
+            stock    = int(registro[8])
     except Exception as e:
         print(f"Error al normalizar campos: {e}")
         return False
@@ -348,7 +344,6 @@ def insertar_en_diccionario(registro, nivel):
         dic[cod_p] = {'nombre': nombre, 'ciudades': {}}
         print(f"País {cod_p} – {nombre} insertado.")
         return True
-
     # Nivel ≥ 2: validar padre pais
     ok = buscar_elemento(dic, cod_p)
     if ok is not True:
@@ -364,13 +359,11 @@ def insertar_en_diccionario(registro, nivel):
         ciudades[cod_c] = {'nombre': nombre, 'restaurantes': {}}
         print(f"Ciudad {cod_c} – {nombre} insertada en {cod_p}.")
         return True
-
     # Nivel ≥ 3: validar padre ciudad
     ok = buscar_elemento(dic, cod_p, cod_c)
     if ok is not True:
         print(ok)
         return False
-
     # Nivel 3 restaurante
     if nivel == 3:
         nombre = registro[3]
@@ -381,13 +374,11 @@ def insertar_en_diccionario(registro, nivel):
         resto[cod_r] = {'nombre': nombre, 'menus': {}}
         print(f"Restaurante {cod_r} – {nombre} insertado en {cod_c}.")
         return True
-
     # Nivel ≥ 4 validar padre restaurante
     ok = buscar_elemento(dic, cod_p, cod_c, cod_r)
     if ok is not True:
         print(ok)
         return False
-
     # Nivel 4 menus
     if nivel == 4:
         nombre = registro[4]
@@ -398,13 +389,11 @@ def insertar_en_diccionario(registro, nivel):
         men[cod_m] = {'nombre': nombre, 'productos': {}}
         print(f"Menú {cod_m} – {nombre} insertado en {cod_r}.")
         return True
-
     # Nivel 5 validar padre menú
     ok = buscar_elemento(dic, cod_p, cod_c, cod_r, cod_m)
     if ok is not True:
         print(ok)
         return False
-
     # Nivel 5 producto
     prod = dic[cod_p]['ciudades'][cod_c]['restaurantes'][cod_r]['menus'][cod_m].setdefault('productos', {})
     if cod_pr in prod:
@@ -413,7 +402,8 @@ def insertar_en_diccionario(registro, nivel):
     prod[cod_pr] = {
         'nombre':   nombre,
         'calorias': calorias,
-        'precio':   precio
+        'precio':   precio,
+        'stock':    stock
     }
     print(f"Producto {cod_pr} – {nombre} insertado en {cod_m}.")
     return True
@@ -448,7 +438,8 @@ def insertar_producto():
     nombre   =input("Nombre de producto: ")
     calorias =input("Calorías: ")
     precio   =input("Precio: ")
-    return insertar_en_diccionario([codigo, codigo_c, codigo_r, codigo_m, codigo_p, nombre, calorias, precio],nivel=5)
+    stock    =input("Stock(Cuanta cantidad hay): ")
+    return insertar_en_diccionario([codigo, codigo_c, codigo_r, codigo_m, codigo_p, nombre, calorias, precio, stock],nivel=5)
 def insertar_cliente(cli_dict, cedula, nombre):
     if cedula in cli_dict:
         print(f"Cliente con cédula {cedula} ya existe como '{cli_dict[cedula]}'")
@@ -465,11 +456,19 @@ def registrar_compra_menu(dic, cli, entrada, archivo_facturas="facturas.txt"):
     if ced not in cli:
         print("El cliente no está registrado.")
         return False
+    #preguntar llevar o aqui
+    condicion=entrada("¿Es para llevar? (s/n): ").strip().lower() == 's'
+    pago=""
+    while pago not in ("1", "2"):
+        pago=entrada("Método de pago (1=Efectivo, 2=Tarjeta): ").strip()
+        if pago not in ("1", "2"):
+            print("Debe ingresar 1 para Efectivo o 2 para Tarjeta.")
+    es_efectivo=(pago=="1")
+
     productos_seleccionados = []
     total = 0
-
     while True:
-        # 1) País
+        #pais
         print("\nPaíses disponibles:")
         for c, info in dic.items(): print(f"  {c}: {info.get('nombre','<sin nombre>')}")
         cod_pais = entrada("Código del país: ").strip()
@@ -477,8 +476,7 @@ def registrar_compra_menu(dic, cli, entrada, archivo_facturas="facturas.txt"):
             print("Inténtelo de nuevo.")
             continue
         pais = dic[cod_pais]
-
-        # 2) Ciudad
+        #ciudad
         print("Ciudades en", cod_pais)
         for c, info in pais.get('ciudades', {}).items(): print(f"  {c}: {info.get('nombre','<sin nombre>')}")
         cod_ciudad = entrada("Código de la ciudad: ").strip()
@@ -486,8 +484,7 @@ def registrar_compra_menu(dic, cli, entrada, archivo_facturas="facturas.txt"):
             print("Inténtelo de nuevo.")
             continue
         ciudad = pais['ciudades'][cod_ciudad]
-
-        # 3) Restaurante
+        #restaurante
         print("Restaurantes en", cod_ciudad)
         for c, info in ciudad.get('restaurantes', {}).items(): print(f"  {c}: {info.get('nombre','<sin nombre>')}")
         cod_rest = entrada("Código del restaurante: ").strip()
@@ -495,8 +492,7 @@ def registrar_compra_menu(dic, cli, entrada, archivo_facturas="facturas.txt"):
             print("Inténtelo de nuevo.")
             continue
         rest = ciudad['restaurantes'][cod_rest]
-
-        # 4) Menú
+        #menu
         print("Menús en", cod_rest)
         for c, info in rest.get('menus', {}).items(): print(f"  {c}: {info.get('nombre','<sin nombre>')}")
         cod_menu = entrada("Código del menú: ").strip()
@@ -504,8 +500,7 @@ def registrar_compra_menu(dic, cli, entrada, archivo_facturas="facturas.txt"):
             print("Inténtelo de nuevo.")
             continue
         menu = rest['menus'][cod_menu]
-
-        # 5) Producto
+        #producto
         print("Productos en", cod_menu)
         for c, info in menu.get('productos', {}).items(): print(f"  {c}: {info.get('nombre','<sin nombre>')}")
         cod_prod = entrada("Código del producto: ").strip()
@@ -527,7 +522,6 @@ def registrar_compra_menu(dic, cli, entrada, archivo_facturas="facturas.txt"):
         except ValueError:
             print("Cantidad inválida.")
             continue
-
         # Actualizar stock y acumular
         prod['stock'] = stock_disp - cantidad
         subtotal = cantidad * prod.get('precio', 0)
@@ -542,45 +536,62 @@ def registrar_compra_menu(dic, cli, entrada, archivo_facturas="facturas.txt"):
             'precio': prod.get('precio',0),
             'cantidad': cantidad
         })
-
-        # ¿Más productos?
+        #Preguntar si hay mas
         if entrada("¿Desea agregar otro producto? (s/n): ").strip().lower() != 's':
             break
-
     if not productos_seleccionados:
         print("No se seleccionaron productos. Compra cancelada.")
         return False
+    #calcular
+    if condicion:
+        if es_efectivo:
+            descuento=0.03
+        else:
+            descuento=0.08
+    else:
+        if es_efectivo:
+            descuento=0.01
+        else:
+            descuento=0.05
 
-    # Guardar cada línea de factura en archivo
-    with open(archivo_facturas, 'a', encoding='utf-8') as f:
+    monto_descontado=total*descuento
+    monto_final=total-monto_descontado
+    #Guardar cada factura
+    with open(archivo_facturas, "a") as f:
         for item in productos_seleccionados:
-            line = (
+            linea = (
                 f"{ced};{item['pais']};{item['ciudad']};{item['restaurante']};"
-                f"{item['menu']};{item['codigo']};{item['cantidad']};{item['precio']}\n"
+                f"{item['menu']};{item['codigo']};{item['cantidad']};"
+                f"{item['precio']:.2f};{pago};"
+                f"{'llevar' if condicion else 'local'};{monto_final}\n"
             )
-            f.write(line)
-
+            f.write(linea)
     # Mostrar resumen
-    print(f"\nCompra registrada. Total a pagar: {total:.2f}")
+    print(f"\nSubtotal: {total:.2f}")
+    #.0f para redondear al mas cercano, sin decimales
+    #.2f para ver los dos decimales
+    print(f"Descuento aplicado: ({descuento*100:.0f}%): {monto_descontado:.2f}")
+    print(f"Total a pagar: {monto_final:.2f}")
     return True
+
 #______________________________________________________________________________________________________________________#
 #REPORTES
 def reporte_paises(data_dict, nombre):
     documento=SimpleDocTemplate(nombre, pagesize=LETTER)
-    styles=getSampleStyleSheet()
-    story=[]
+    estilo=getSampleStyleSheet()
+    cuerpo=[]
     # Titulo
-    story.append(Paragraph("Reporte de Países", styles['Title']))
-    story.append(Spacer(1, 12))
+    cuerpo.append(Paragraph("Reporte de Países", estilo['Title']))
+    cuerpo.append(Spacer(1, 12))
     # Iterar
     for i, (code, info) in enumerate(data_dict.items(), start=1):
         # Obtener el nombre desde info
         country_name=info.get('nombre', '<sin nombre>')
-        text=f"{i}. Código: {code}   Nombre: {country_name}"
-        story.append(Paragraph(text, styles['Normal']))
-        story.append(Spacer(1, 6))
+        texto=f"{i}. Código: {code}   Nombre: {country_name}"
+        cuerpo.append(Paragraph(texto, estilo['Normal']))
+        cuerpo.append(Spacer(1, 6))
     # Construccion del PDF
-    documento.build(story)
+    documento.build(cuerpo)
     # Mensaje de confirmacion
     mensaje_confirma=f"PDF generado correctamente en: {nombre}"
     print(mensaje_confirma)
@@ -593,19 +604,19 @@ def reporte_ciudades(dict, cod_pais, nombre):
     cities = country_info.get('ciudades', {})
     doc    = SimpleDocTemplate(nombre, pagesize=LETTER)
     styles = getSampleStyleSheet()
-    story  = []
-    story.append(Paragraph(f"Reporte de Ciudades - {nombre_pais} ({cod_pais})", styles['Title']))
-    story.append(Spacer(1, 12))
+    cuerpo  = []
+    cuerpo.append(Paragraph(f"Reporte de Ciudades - {nombre_pais} ({cod_pais})", styles['Title']))
+    cuerpo.append(Spacer(1, 12))
     if not cities:
-        story.append(Paragraph("<i>No hay ciudades registradas para este país.</i>", styles['Normal']))
-        story.append(Spacer(1, 6))
+        cuerpo.append(Paragraph("<i>No hay ciudades registradas para este país.</i>", styles['Normal']))
+        cuerpo.append(Spacer(1, 6))
     else:
         for i, (cod_ciudad, info_ciudad) in enumerate(cities.items(), start=1):
             nombre_ciudad = info_ciudad.get('nombre', '<sin nombre>')
             text = f"{i}. Código: {cod_ciudad}   Nombre: {nombre_ciudad}"
-            story.append(Paragraph(text, styles['Normal']))
-            story.append(Spacer(1, 6))
-    doc.build(story)
+            cuerpo.append(Paragraph(text, styles['Normal']))
+            cuerpo.append(Spacer(1, 6))
+    doc.build(cuerpo)
     mensaje_confirma = f"PDF de ciudades generado correctamente en: {nombre}"
     print(mensaje_confirma)
     return mensaje_confirma
@@ -621,48 +632,45 @@ def reporte_restaurantes(dict, cod_pais, cod_ciudad, nombre):
     nombre_ciudad   = info_ciudad.get('nombre', '<sin nombre>')
     restaurantes    = info_ciudad.get('restaurantes', {})
     documento=SimpleDocTemplate(nombre, pagesize=LETTER)
-    styles=getSampleStyleSheet()
-    story=[]
-    story.append(Paragraph(f"Reporte de Restaurantes - {nombre_ciudad} ({cod_ciudad}) - {nombre_pais} ({cod_pais})",
-                           styles['Title']))
-    story.append(Spacer(1, 12))
+    estilo=getSampleStyleSheet()
+    cuerpo=[]
+    cuerpo.append(Paragraph(f"Reporte de Restaurantes - {nombre_ciudad} ({cod_ciudad}) - {nombre_pais} ({cod_pais})",
+                           estilo['Title']))
+    cuerpo.append(Spacer(1, 12))
     if not restaurantes:
-        story.append(Paragraph("<i>No hay restaurantes registrados para esta ciudad.</i>", styles['Normal']))
-        story.append(Spacer(1, 6))
+        cuerpo.append(Paragraph("<i>No hay restaurantes registrados para esta ciudad.</i>", estilo['Normal']))
+        cuerpo.append(Spacer(1, 6))
     else:
-        for i, (rest_code, info_rest) in enumerate(restaurantes.items(), start=1):
+        for i, (cod_rest, info_rest) in enumerate(restaurantes.items(), start=1):
             nombre_rest = info_rest.get('nombre', '<sin nombre>')
-            text = f"{i}. Código: {rest_code}   Nombre: {nombre_rest}"
-            story.append(Paragraph(text, styles['Normal']))
-            story.append(Spacer(1, 6))
-    documento.build(story)
+            text = f"{i}. Código: {cod_rest}   Nombre: {nombre_rest}"
+            cuerpo.append(Paragraph(text, estilo['Normal']))
+            cuerpo.append(Spacer(1, 6))
+    documento.build(cuerpo)
     mensaje_confirma = f"PDF de restaurantes generado correctamente en: {nombre}"
     print(mensaje_confirma)
     return mensaje_confirma
 def reporte_clientes(dict, nombre):
     documento = SimpleDocTemplate(nombre, pagesize=LETTER)
-    styles = getSampleStyleSheet()
-    story = []
-
-    story.append(Paragraph("Reporte de Clientes", styles['Title']))
-    story.append(Spacer(1, 12))
-
+    estilo = getSampleStyleSheet()
+    cuerpo = []
+    cuerpo.append(Paragraph("Reporte de Clientes", estilo['Title']))
+    cuerpo.append(Spacer(1, 12))
     if not dict:
-        story.append(Paragraph("<i>No hay clientes registrados.</i>", styles['Normal']))
-        story.append(Spacer(1, 6))
+        cuerpo.append(Paragraph("<i>No hay clientes registrados.</i>", estilo['Normal']))
+        cuerpo.append(Spacer(1, 6))
     else:
         for i, (cedula, nombre_cliente) in enumerate(dict.items(), start=1):
             text = f"{i}. Código: {cedula}   Nombre: {nombre_cliente}"
-            story.append(Paragraph(text, styles['Normal']))
-            story.append(Spacer(1, 6))
-
-    documento.build(story)
+            cuerpo.append(Paragraph(text, estilo['Normal']))
+            cuerpo.append(Spacer(1, 6))
+    documento.build(cuerpo)
     mensaje_confirma = f"PDF de clientes generado correctamente en: {nombre}"
     print(mensaje_confirma)
     return mensaje_confirma
 def reporte_compras_cliente(cedula, facturas_r, reporte_ruta):
     # Leer facturas y filtrar por cédula
-    compras = []
+    compras=[]
     try:
         with open(facturas_r, 'r', encoding='utf-8') as f:
             for linea in f:
@@ -672,37 +680,33 @@ def reporte_compras_cliente(cedula, facturas_r, reporte_ruta):
     except FileNotFoundError:
         print(f"Archivo de facturas no encontrado: {facturas_r}")
         return False
-
-    count = len(compras)
-
-    # Generar PDF
-    doc = SimpleDocTemplate(reporte_ruta, pagesize=LETTER)
-    styles = getSampleStyleSheet()
-    story = []
-
-    story.append(Paragraph(f"Reporte de Compras - Cliente {cedula}", styles['Title']))
-    story.append(Spacer(1, 12))
-    story.append(Paragraph(f"Total de compras realizadas: {count}", styles['Normal']))
-    story.append(Spacer(1, 12))
-
-    # Detallar cada compra
-    if count > 0:
-        story.append(Paragraph("Detalle de compras:", styles['Heading2']))
-        story.append(Spacer(1, 6))
+    cuenta = len(compras)
+    #generar pdf
+    doc     = SimpleDocTemplate(reporte_ruta, pagesize=LETTER)
+    estilo  = getSampleStyleSheet()
+    cuerpo   = []
+    cuerpo.append(Paragraph(f"Reporte de Compras - Cliente {cedula}", estilo['Title']))
+    cuerpo.append(Spacer(1, 12))
+    cuerpo.append(Paragraph(f"Total de compras realizadas: {cuenta}", estilo['Normal']))
+    cuerpo.append(Spacer(1, 12))
+    #compras
+    if cuenta > 0:
+        cuerpo.append(Paragraph("Detalle de compras:", estilo['Heading2']))
+        cuerpo.append(Spacer(1, 6))
         for i, compra in enumerate(compras, start=1):
             # campos: cedula,pais,ciudad,restaurante,menu,producto,cantidad,precio
             texto = (
                 f"{i}. País: {compra[1]}, Ciudad: {compra[2]}, Restaurante: {compra[3]}, "
                 f"Menú: {compra[4]}, Producto: {compra[5]}, Cantidad: {compra[6]}, Precio: {compra[7]}"
             )
-            story.append(Paragraph(texto, styles['Normal']))
-            story.append(Spacer(1, 6))
+            cuerpo.append(Paragraph(texto, estilo['Normal']))
+            cuerpo.append(Spacer(1, 6))
     else:
-        story.append(Paragraph("<i>No se encontraron compras para este cliente.</i>", styles['Normal']))
+        cuerpo.append(Paragraph("<i>No se encontraron compras para este cliente.</i>", estilo['Normal']))
 
-    doc.build(story)
-    msg = f"PDF de reporte de compras guardado en: {reporte_ruta}"
-    print(msg)
+    doc.build(cuerpo)
+    mensaje = f"PDF de reporte de compras guardado en: {reporte_ruta}"
+    print(mensaje)
     return True
 def reporte_rest_mas(ruta):
 
@@ -714,11 +718,11 @@ def reporte_rest_mas(ruta):
 
     doc = SimpleDocTemplate(ruta, pagesize=LETTER)
     styles = getSampleStyleSheet()
-    story = []
-    story.append(Paragraph(f"Restaurante más buscado: {top_rest}", styles['Title']))
-    story.append(Spacer(1, 12))
-    story.append(Paragraph(f"Veces buscado: {count}", styles['Normal']))
-    doc.build(story)
+    cuerpo = []
+    cuerpo.append(Paragraph(f"Restaurante más buscado: {top_rest}", styles['Title']))
+    cuerpo.append(Spacer(1, 12))
+    cuerpo.append(Paragraph(f"Veces buscado: {count}", styles['Normal']))
+    doc.build(cuerpo)
     print(f"PDF de restaurante más buscado generado en: {ruta}")
     return True
 def reporte_menu_mas(ruta):
@@ -731,11 +735,11 @@ def reporte_menu_mas(ruta):
 
     doc = SimpleDocTemplate(ruta, pagesize=LETTER)
     styles = getSampleStyleSheet()
-    story = []
-    story.append(Paragraph(f"Menú más buscado: {top_menu}", styles['Title']))
-    story.append(Spacer(1, 12))
-    story.append(Paragraph(f"Veces buscado: {count}", styles['Normal']))
-    doc.build(story)
+    cuerpo = []
+    cuerpo.append(Paragraph(f"Menú más buscado: {top_menu}", styles['Title']))
+    cuerpo.append(Spacer(1, 12))
+    cuerpo.append(Paragraph(f"Veces buscado: {count}", styles['Normal']))
+    doc.build(cuerpo)
     print(f"PDF de menú más buscado generado en: {ruta}")
     return True
 def reporte_producto_mas(ruta, top_n=5):
@@ -746,13 +750,13 @@ def reporte_producto_mas(ruta, top_n=5):
     sorted_prods = sorted(total_producto_busquedas.items(), key=lambda x: x[1], reverse=True)
     doc = SimpleDocTemplate(ruta, pagesize=LETTER)
     styles = getSampleStyleSheet()
-    story = []
-    story.append(Paragraph("Productos más buscados", styles['Title']))
-    story.append(Spacer(1, 12))
+    cuerpo = []
+    cuerpo.append(Paragraph("Productos más buscados", styles['Title']))
+    cuerpo.append(Spacer(1, 12))
     for i, (prod, cnt) in enumerate(sorted_prods[:top_n], start=1):
-        story.append(Paragraph(f"{i}. {prod} — Veces buscado: {cnt}", styles['Normal']))
-        story.append(Spacer(1, 6))
-    doc.build(story)
+        cuerpo.append(Paragraph(f"{i}. {prod} — Veces buscado: {cnt}", styles['Normal']))
+        cuerpo.append(Spacer(1, 6))
+    doc.build(cuerpo)
     print(f"PDF de productos más buscados generado en: {ruta}")
     return True
 #______________________________________________________________________________________________________________________#
