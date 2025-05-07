@@ -1,5 +1,70 @@
-123;345;David
-345;987;Orlando
-4567;234;Guadalajara
-12;34;Bocas del Toro
-123;345;X
+123;101;Ciudad de Panama
+123;101;Pavas
+123;102;Colon
+123;103;Santiago
+345;201;Nueva York
+345;202;Los Angeles
+345;203;Chicago
+4567;301;Ciudad de México
+4567;302;Monterrey
+4567;303;Puebla
+12;401;Bocas del Toro
+12;402;Changuinola
+12;403;Almirante
+789;501;Lima
+789;502;Arequipa
+789;503;Cuzco
+101;601;Buenos Aires
+101;602;Cordoba
+101;603;Rosario
+112;701;Santiago
+112;702;Valparaiso
+112;703;Concepcion
+131;801;Bogota
+131;802;Medellin
+131;803;Cali
+141;901;Sao Paulo
+141;902;Rio de Janeiro
+141;903;Brasilia
+151;1001;Madrid
+151;1002;Barcelona
+151;1003;Valencia
+161;1101;Paris
+161;1102;Marsella
+161;1103;Lyon
+171;1201;Berlin
+171;1202;Munich
+171;1203;Hamburgo
+181;1301;Roma
+181;1302;Milan
+181;1303;Napoles
+191;1401;Londres
+191;1402;Manchester
+191;1403;Birmingham
+202;1501;Toronto
+202;1502;Montreal
+202;1503;Vancouver
+212;1601;Sidney
+212;1602;Melbourne
+212;1603;Brisbane
+223;1701;Auckland
+223;1702;Wellington
+223;1703;Christchurch
+233;1801;Tokio
+233;1802;Osaka
+233;1803;Kioto
+243;1901;Pekin
+243;1902;Shanghai
+243;1903;Canton
+253;2001;Nueva Delhi
+253;2002;Bombay
+253;2003;Bangalore
+263;2101;Moscu
+263;2102;San Petersburgo
+263;2103;Novosibirsk
+273;2201;Ciudad del Cabo
+273;2202;Johannesburgo
+273;2203;Durban
+282;2301;El Cairo
+282;2302;Alejandria
+282;2303;Giza

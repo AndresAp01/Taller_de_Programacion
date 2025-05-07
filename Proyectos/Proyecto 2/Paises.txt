@@ -1,4 +1,51 @@
 123;Panama
+123;Armenia
 345;Estados Unidos
 4567;Mexico
-123;Peru
+789;Peru
+101;Argentina
+112;Chile
+131;Colombia
+141;Brasil
+151;Espanna
+161;Francia
+171;Alemania
+181;Italia
+191;Reino Unido
+202;Canada
+212;Australia
+223;Nueva Zelanda
+233;Japon
+243;China
+253;India
+263;Rusia
+273;Sudafrica
+282;Egipto
+292;Nigeria
+303;Kenia
+313;Marruecos
+323;Grecia
+333;Portugal
+343;Suiza
+353;Suecia
+363;Noruega
+373;Dinamarca
+383;Finlandia
+393;Belgica
+404;Paises Bajos
+414;Irlanda
+424;Austria
+434;Polonia
+444;Ucrania
+454;Republica Checa
+464;Hungria
+474;Rumania
+484;Bulgaria
+494;Croacia
+505;Serbia
+515;Turquia
+525;Israel
+535;Arabia Saudita
+545;Iran
+555;Corea del Sur
+565;Tailandia
