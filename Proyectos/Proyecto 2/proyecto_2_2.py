@@ -569,11 +569,9 @@ def reporte_paises(data_dict, nombre):
     documento=SimpleDocTemplate(nombre, pagesize=LETTER)
     styles=getSampleStyleSheet()
     story=[]
-
     # Titulo
     story.append(Paragraph("Reporte de Países", styles['Title']))
     story.append(Spacer(1, 12))
-
     # Iterar
     for i, (code, info) in enumerate(data_dict.items(), start=1):
         # Obtener el nombre desde info
@@ -581,10 +579,8 @@ def reporte_paises(data_dict, nombre):
         text=f"{i}. Código: {code}   Nombre: {country_name}"
         story.append(Paragraph(text, styles['Normal']))
         story.append(Spacer(1, 6))
-
     # Construccion del PDF
     documento.build(story)
-
     # Mensaje de confirmacion
     mensaje_confirma=f"PDF generado correctamente en: {nombre}"
     print(mensaje_confirma)
@@ -592,18 +588,14 @@ def reporte_paises(data_dict, nombre):
 def reporte_ciudades(dict, cod_pais, nombre):
     if cod_pais not in dict:
         raise ValueError(f"Código de país '{cod_pais}' no encontrado en los datos.")
-
     country_info = dict[cod_pais]
-    nombre_pais = country_info.get('nombre', '<sin nombre>')
+    nombre_pais  = country_info.get('nombre', '<sin nombre>')
     cities = country_info.get('ciudades', {})
-
-    doc = SimpleDocTemplate(nombre, pagesize=LETTER)
+    doc    = SimpleDocTemplate(nombre, pagesize=LETTER)
     styles = getSampleStyleSheet()
-    story = []
-
+    story  = []
     story.append(Paragraph(f"Reporte de Ciudades - {nombre_pais} ({cod_pais})", styles['Title']))
     story.append(Spacer(1, 12))
-
     if not cities:
         story.append(Paragraph("<i>No hay ciudades registradas para este país.</i>", styles['Normal']))
         story.append(Spacer(1, 6))
@@ -613,25 +605,21 @@ def reporte_ciudades(dict, cod_pais, nombre):
             text = f"{i}. Código: {cod_ciudad}   Nombre: {nombre_ciudad}"
             story.append(Paragraph(text, styles['Normal']))
             story.append(Spacer(1, 6))
-
     doc.build(story)
-    confirmation_msg = f"PDF de ciudades generado correctamente en: {nombre}"
-    print(confirmation_msg)
-    return confirmation_msg
+    mensaje_confirma = f"PDF de ciudades generado correctamente en: {nombre}"
+    print(mensaje_confirma)
+    return mensaje_confirma
 def reporte_restaurantes(dict, cod_pais, cod_ciudad, nombre):
     if cod_pais not in dict:
         raise ValueError(f"Código de país '{cod_pais}' no encontrado en los datos.")
     info_paises = dict[cod_pais]
     nombre_pais = info_paises.get('nombre', '<sin nombre>')
-
-    ciudades = info_paises.get('ciudades', {})
+    ciudades    = info_paises.get('ciudades', {})
     if cod_ciudad not in ciudades:
         raise ValueError(f"Código de ciudad '{cod_ciudad}' no encontrado para el país {cod_pais}.")
-    info_ciudad = ciudades[cod_ciudad]
-    nombre_ciudad = info_ciudad.get('nombre', '<sin nombre>')
-
-    restaurantes = info_ciudad.get('restaurantes', {})
-
+    info_ciudad     = ciudades[cod_ciudad]
+    nombre_ciudad   = info_ciudad.get('nombre', '<sin nombre>')
+    restaurantes    = info_ciudad.get('restaurantes', {})
     documento=SimpleDocTemplate(nombre, pagesize=LETTER)
     styles=getSampleStyleSheet()
     story=[]
@@ -647,7 +635,6 @@ def reporte_restaurantes(dict, cod_pais, cod_ciudad, nombre):
             text = f"{i}. Código: {rest_code}   Nombre: {nombre_rest}"
             story.append(Paragraph(text, styles['Normal']))
             story.append(Spacer(1, 6))
-
     documento.build(story)
     mensaje_confirma = f"PDF de restaurantes generado correctamente en: {nombre}"
     print(mensaje_confirma)
