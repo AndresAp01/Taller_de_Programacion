@@ -7,7 +7,6 @@ from reportlab.platypus.doctemplate import SimpleDocTemplate
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import LETTER
-
 #Construccion de diccionarios
 #----------------------------
 def normalizar_codigo(codigo):
@@ -125,6 +124,13 @@ cli=cargar_clientes("Clientes.txt") #Diccionario de clientes
 total_restaurante_busquedas={}
 total_menu_busquedas={}
 total_producto_busquedas={}
+descuentos = {
+    "Pago con tarjeta":                0.05,
+    "Para llevar - efectivo":          0.03,
+    "Para llevar - tarjeta":           0.08,
+    "Comer en restaurante - efectivo": 0.01,
+    "Comer en restaurante - tarjeta":  0.05,
+}
 #Funcion para buscar general
 def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_rest=None, cod_menu=None, cod_prod=None):
     # Se usa .get
@@ -573,7 +579,6 @@ def registrar_compra_menu(dic, cli, entrada, archivo_facturas="facturas.txt"):
     print(f"Descuento aplicado: ({descuento*100:.0f}%): {monto_descontado:.2f}")
     print(f"Total a pagar: {monto_final:.2f}")
     return True
-
 #______________________________________________________________________________________________________________________#
 #REPORTES
 def reporte_paises(data_dict, nombre):
@@ -708,6 +713,58 @@ def reporte_compras_cliente(cedula, facturas_r, reporte_ruta):
     mensaje = f"PDF de reporte de compras guardado en: {reporte_ruta}"
     print(mensaje)
     return True
+def reporte_todas_compras(ruta_pdf, archivo_facturas="facturas.txt"):
+    documento = SimpleDocTemplate(ruta_pdf, pagesize=LETTER)
+    estilo    = getSampleStyleSheet()
+    cuerpo    = []
+    cuerpo.append(Paragraph("Reporte de Todas las Compras", estilo['Title']))
+    cuerpo.append(Spacer(1, 12))
+
+    try:
+        with open(archivo_facturas, "r") as f:
+            lineas = [l.strip() for l in f if l.strip()]
+    except FileNotFoundError:
+        print(f"Archivo no encontrado: {archivo_facturas}")
+        return False
+
+    if not lineas:
+        cuerpo.append(Paragraph("<i>No hay registros de compras.</i>", estilo['Normal']))
+        cuerpo.append(Spacer(1, 6))
+    else:
+        for i, linea in enumerate(lineas, start=1):
+            partes = linea.split(";")
+            if len(partes) < 10:
+                continue
+            cedula, pais, ciudad, rest, menu, prod, cant_str, precio_str, pago, servicio = partes[:10]
+            try:
+                cantidad     = int(cant_str)
+                precio_unit  = float(precio_str)
+            except ValueError:
+                continue
+            total_field = None
+            if len(partes) >= 11:
+                try:
+                    total_field = float(partes[10])
+                except ValueError:
+                    total_field = None
+            total = total_field if total_field is not None else cantidad * precio_unit
+
+            metodo_pago = "Efectivo" if pago == "1" else "Tarjeta"
+
+            texto = (
+                f"{i}. Cédula: {cedula}   País: {pais}   Ciudad: {ciudad}   "
+                f"Restaurante: {rest}   Menú: {menu}   Producto: {prod}   "
+                f"Cantidad: {cantidad}   Precio unit.: {precio_unit:.2f}   "
+                f"Método pago: {metodo_pago}   Servicio: {servicio}   "
+                f"Total: {total:.2f}"
+            )
+            cuerpo.append(Paragraph(texto, estilo['Normal']))
+            cuerpo.append(Spacer(1, 6))
+    # Construcción del PDF
+    documento.build(cuerpo)
+    mensaje = f"PDF de reporte de todas las compras generado en: {ruta_pdf}"
+    print(mensaje)
+    return mensaje
 def reporte_rest_mas(ruta):
 
     if not total_restaurante_busquedas:
@@ -726,24 +783,165 @@ def reporte_rest_mas(ruta):
     print(f"PDF de restaurante más buscado generado en: {ruta}")
     return True
 def reporte_menu_mas(ruta):
-
     if not total_menu_busquedas:
         print("No hay búsquedas de menús registradas.")
         return False
     top_menu = max(total_menu_busquedas, key=total_menu_busquedas.get)
-    count = total_menu_busquedas[top_menu]
-
-    doc = SimpleDocTemplate(ruta, pagesize=LETTER)
-    styles = getSampleStyleSheet()
-    cuerpo = []
+    cuenta = total_menu_busquedas[top_menu]
+    doc=SimpleDocTemplate(ruta, pagesize=LETTER)
+    styles=getSampleStyleSheet()
+    cuerpo=[]
     cuerpo.append(Paragraph(f"Menú más buscado: {top_menu}", styles['Title']))
     cuerpo.append(Spacer(1, 12))
-    cuerpo.append(Paragraph(f"Veces buscado: {count}", styles['Normal']))
+    cuerpo.append(Paragraph(f"Veces buscado: {cuenta}", styles['Normal']))
     doc.build(cuerpo)
     print(f"PDF de menú más buscado generado en: {ruta}")
     return True
-def reporte_producto_mas():
+def reporte_producto_mas(ruta):
+    if not total_producto_busquedas:
+        print("No hay búsquedas de productos registradas.")
+        return False
+    top_prod = max(total_producto_busquedas, key=total_producto_busquedas.get)
+    count    = total_producto_busquedas[top_prod]
 
+    doc    = SimpleDocTemplate(ruta, pagesize=LETTER)
+    styles = getSampleStyleSheet()
+    cuerpo = []
+    cuerpo.append(Paragraph(f"Producto más buscado: {top_prod}", styles['Title']))
+    cuerpo.append(Spacer(1, 12))
+    cuerpo.append(Paragraph(f"Veces buscado: {count}", styles['Normal']))
+    doc.build(cuerpo)
+    print(f"PDF de producto más buscado generado en: {ruta}")
+    return True
+def reporte_factura_precio_extremo(ruta_pdf, archivo_facturas="facturas.txt", mayor=False):
+    total_extremo = None
+    factura_extremo = None
+    with open(archivo_facturas, "r") as f:
+        for linea in f:
+            partes = linea.strip().split(";")
+            if len(partes) < 11:
+                continue
+            try:
+                total = float(partes[-1])
+            except ValueError:
+                continue
+
+            if total_extremo is None:
+                total_extremo = total
+                factura_extremo = partes
+            else:
+                if mayor and total > total_extremo:
+                    total_extremo = total
+                    factura_extremo = partes
+                elif not mayor and total < total_extremo:
+                    total_extremo = total
+                    factura_extremo = partes
+    if factura_extremo is None:
+        print("No se encontró ninguna factura válida en el archivo.")
+        return False
+    (
+        cedula,
+        cod_pais,
+        cod_ciudad,
+        cod_rest,
+        cod_menu,
+        cod_prod,
+        cantidad,
+        precio_uni,
+        pago,
+        servicio,
+        _
+    ) = factura_extremo
+    metodo_pago = "Efectivo" if pago == "1" else "Tarjeta"
+    total = total_extremo
+    titulo = "Factura de MAYOR precio" if mayor else "Factura de MENOR precio"
+
+    # Construir PDF
+    doc    = SimpleDocTemplate(ruta_pdf, pagesize=LETTER)
+    styles = getSampleStyleSheet()
+    cuerpo = []
+    cuerpo.append(Paragraph(titulo, styles["Title"]))
+    cuerpo.append(Spacer(1, 12))
+    cuerpo.append(Paragraph(f"Cédula:          {cedula}", styles["Normal"]))
+    cuerpo.append(Paragraph(f"País:            {cod_pais}", styles["Normal"]))
+    cuerpo.append(Paragraph(f"Ciudad:          {cod_ciudad}", styles["Normal"]))
+    cuerpo.append(Paragraph(f"Restaurante:     {cod_rest}", styles["Normal"]))
+    cuerpo.append(Paragraph(f"Menú:            {cod_menu}", styles["Normal"]))
+    cuerpo.append(Paragraph(f"Producto:        {cod_prod}", styles["Normal"]))
+    cuerpo.append(Paragraph(f"Cantidad:        {cantidad}", styles["Normal"]))
+    cuerpo.append(Paragraph(f"Precio unitario: {float(precio_uni):.2f}", styles["Normal"]))
+    cuerpo.append(Paragraph(f"Método de pago:  {metodo_pago}", styles["Normal"]))
+    cuerpo.append(Paragraph(f"Servicio:        {servicio}", styles["Normal"]))
+    cuerpo.append(Paragraph(f"Total factura:   {total:.2f}", styles["Normal"]))
+
+    doc.build(cuerpo)
+
+    tipo = "mayor" if mayor else "menor"
+    print(f"PDF de factura de {tipo} precio generado en: {ruta_pdf}")
+    return True
+def reporte_precio_producto(dic,cod_pais,cod_ciudad,cod_rest,cod_menu,cod_prod,nombre_pdf,stock=False):
+    pais = dic.get(cod_pais)
+    if not pais:
+        print(f"Código de país '{cod_pais}' no encontrado.")
+        return False
+    ciudad = pais.get('ciudades', {}).get(cod_ciudad)
+    if not ciudad:
+        print(f"Código de ciudad '{cod_ciudad}' no encontrado.")
+        return False
+    rest = ciudad.get('restaurantes', {}).get(cod_rest)
+    if not rest:
+        print(f"Código de restaurante '{cod_rest}' no encontrado.")
+        return False
+    menu = rest.get('menus', {}).get(cod_menu)
+    if not menu:
+        print(f"Código de menú '{cod_menu}' no encontrado.")
+        return False
+    prod = menu.get('productos', {}).get(cod_prod)
+    if not prod:
+        print(f"Código de producto '{cod_prod}' no encontrado.")
+        return False
+
+    nombre_prod = prod.get('nombre', '<sin nombre>')
+    precio_unit = prod.get('precio', 0.0)
+    stock_qty   = prod.get('stock', 0)
+    # Crear el PDF
+    doc    = SimpleDocTemplate(nombre_pdf, pagesize=LETTER)
+    styles = getSampleStyleSheet()
+    cuerpo = []
+    if stock:
+        cuerpo.append(Paragraph(f"Reporte de Stock - {nombre_prod} ({cod_prod})", styles['Title']))
+        cuerpo.append(Spacer(1, 12))
+        cuerpo.append(Paragraph(f"Nombre:        {nombre_prod}", styles['Normal']))
+        cuerpo.append(Paragraph(f"Stock disponible: {stock_qty}", styles['Normal']))
+    else:
+        cuerpo.append(Paragraph(f"Reporte de Producto - {nombre_prod} ({cod_prod})", styles['Title']))
+        cuerpo.append(Spacer(1, 12))
+        cuerpo.append(Paragraph(f"Precio unitario: {precio_unit:.2f}", styles['Normal']))
+        cuerpo.append(Paragraph(f"Stock disponible: {stock_qty}", styles['Normal']))
+
+    doc.build(cuerpo)
+
+    modo = "stock" if stock else "completo"
+    print(f"PDF de reporte ({modo}) generado correctamente en: {nombre_pdf}")
+    return True
+def reporte_descuentos(data_dict, nombre_pdf):
+    documento = SimpleDocTemplate(nombre_pdf, pagesize=LETTER)
+    estilo = getSampleStyleSheet()
+    cuerpo = []
+
+    cuerpo.append(Paragraph("Reporte de Descuentos Aplicados", estilo['Title']))
+    cuerpo.append(Spacer(1, 12))
+
+    for i, (descripcion, descuento) in enumerate(data_dict.items(), start=1):
+        texto = f"{i}. {descripcion}: {descuento * 100:.0f}%"
+        cuerpo.append(Paragraph(texto, estilo['Normal']))
+        cuerpo.append(Spacer(1, 6))
+
+    documento.build(cuerpo)
+
+    mensaje = f"PDF generado correctamente en: {nombre_pdf}"
+    print(mensaje)
+    return mensaje
 #______________________________________________________________________________________________________________________#
 #MENU__________________________________________________________________________________________________________________#
 def mostrar_menu(opciones):
@@ -755,7 +953,7 @@ def MainMenu():
     subopciones=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Regresar al mantenimiento"] #Para poder ingresar a otro ciclo y muestre un segundo menu
     subopciones_insertar=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Registrar compra", "Regresar al mantenimiento"]
     opciones_reportes=["Lista de Países", "Ciudades de un País", "Restaurantes de una Ciudad", "Lista de Clientes", "Reporte de todas las compras", "Compras de un Cliente", "Estadisticas", "Regresar al menú principal"]
-    opciones_rep_estadisticas=["Restaurante mas buscado", "Menu mas buscado", "Producto mas comprado", "Factura de mayor monto", "Factura de menor monto", "Precio de un producto", "Descuento por pagar con tarjeta", "Regresar al menu principal"]
+    opciones_rep_estadisticas=["Restaurante mas buscado", "Menu mas buscado", "Producto mas comprado", "Factura de mayor monto", "Factura de menor monto", "Precio de un producto", "Consultar Descuentos", "Consultar Stock/Cantidad de Producto", "Regresar al menu principal"]
     while True:
         mostrar_menu(opciones_principales)
         print("\n Ingrese que quiere hacer: ")
@@ -926,7 +1124,7 @@ def MainMenu():
                     cod_ciudad=entrada("Ingrese el codigo de la ciudad: ")
                     reporte_restaurantes(dic, cod_pais, cod_ciudad, "reporte_de_rests.pdf")
                 elif y==4:reporte_clientes(cli, "reporte_de_clientes.pdf")
-                elif y==5:pass
+                elif y==5:reporte_todas_compras("Reporte_todas_las_compras.pdf", archivo_facturas="facturas.txt")
                 elif y==6:
                     cedula=entrada("Ingrese la cedula del cliente")
                     reporte_compras_cliente(cedula, "facturas.txt", "reporte_de_compras.pdf")
@@ -937,11 +1135,24 @@ def MainMenu():
                         if x==1:reporte_rest_mas("reporte_restaurante_mas_buscado.pdf")
                         if x==2:reporte_menu_mas("reporte_menu_mas_buscado.pdf")
                         if x==3: reporte_producto_mas("reporte_prod_mas_buscado.pdf")
-                        if x==4: pass #reporte_facturas_extremas(mayor=True)
-                        if x==5: pass # reporte_facturas_extremas(mayor=False)
-                        if x==6: pass #reporte_precio_produ()
-                        if x==7: pass # reporte_descuentos()
-                        if x==8: break
+                        if x==4: reporte_factura_precio_extremo("Reporte_PrecioMayor.pdf", archivo_facturas="facturas.txt", mayor=True)
+                        if x==5: reporte_factura_precio_extremo("Reporte_PrecioMenor.pdf", archivo_facturas="facturas.txt", mayor=False)
+                        if x==6:
+                            cod_pais=entrada("Código del país: ").strip()
+                            cod_ciudad=entrada("Código de la ciudad: ").strip()
+                            cod_rest=entrada("Código del restaurante: ").strip()
+                            cod_menu=entrada("Código del menú: ").strip()
+                            cod_prod=entrada("Código del producto: ").strip()
+                            reporte_precio_producto(dic,cod_pais,cod_ciudad,cod_rest,cod_menu,cod_prod,"Reporte_Consulta_Producto.pdf",stock=False)
+                        if x==7: reporte_descuentos(descuentos, "Reporte_Descuentos.pdf")
+                        if x==8:
+                            cod_pais=entrada("Código del país: ").strip()
+                            cod_ciudad=entrada("Código de la ciudad: ").strip()
+                            cod_rest=entrada("Código del restaurante: ").strip()
+                            cod_menu=entrada("Código del menú: ").strip()
+                            cod_prod=entrada("Código del producto: ").strip()
+                            reporte_precio_producto(dic, cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod,"Reporte_Consulta_Cantidad.pdf", stock=True)
+                        if x==9: break
                 elif y==8:
                     print("Volviendo al menú principal...")
                     break
