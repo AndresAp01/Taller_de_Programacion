@@ -1,5 +1,5 @@
 #Luis Andres Acunna Perez
-
+#auxiliar de factorial
 def factorial_CFA(n):
     if n==0:
         return 1
@@ -12,31 +12,36 @@ def FactorialCFA_aux(n):
     else:
         return n*FactorialCFA_aux(n-1)
 #CON PILA
-def sumatoria_pila(n):
-    if n<0 or type(n)!=int:
-        return "Parámetro incorrecto"
-    return sumatoria_pila_aux(n, 0, n)
+def suma_pila(n):
+    return (suma_pila_aux(n, 0))**3
 
-def sumatoria_pila_aux(i, tope, original):
-    if i>tope:
+def suma_pila_aux(n, i):
+    if i>n:
         return 0
-    f = factorial_CFA(i)
-    termino = (f + original**2 * f) ** 3
-    return termino + sumatoria_pila_aux(i + 1, tope, original)
+    f=factorial_CFA(i)*(1+n**2)
+    return f+suma_pila_aux(n, i+1)
 
 #CON COLA
-def sumatoria_cola(n):
-    if n < 0 or type(n) != int:
-        return "Parámetro incorrecto"
-    return sumatoria_cola_aux(0, n, n, 0)
+def suma_cola(n):
+    return (suma_cola_aux(n, 0, 0))**3
 
-def sumatoria_cola_aux(i, tope, original, acumulador):
-    if i > tope:
-        return acumulador
-    f = factorialCola(i)
-    termino = (f + original**2 * f) ** 3
-    return sumatoria_cola_aux(i + 1, tope, original, acumulador + termino)
+def suma_cola_aux(n, i, acumulado):
+    if i>n:
+        return acumulado
+    f=factorial_CFA(i)*(1+n**2)
+    return suma_cola_aux(n, i+1, acumulado+f)
 
+"""
+Prueba
+n=1
+print("Pila:", suma_pila(n))
+print("Cola:", suma_cola(n))
+Pila: 8000
+Cola: 8000
 
-print(sumatoria_pila(1))
-print(funcion4_Cola(1))
+n=2
+print("Pila:", suma_pila(n))
+print("Cola:", suma_cola(n))
+Pila: 8000
+Cola: 8000
+"""
