@@ -674,7 +674,6 @@ def reporte_clientes(dict, nombre):
     print(mensaje_confirma)
     return mensaje_confirma
 def reporte_compras_cliente(cedula, facturas_r, reporte_ruta):
-    # Leer facturas y filtrar por cédula
     compras=[]
     try:
         with open(facturas_r, 'r', encoding='utf-8') as f:
@@ -683,13 +682,16 @@ def reporte_compras_cliente(cedula, facturas_r, reporte_ruta):
                 if len(campos) >= 8 and campos[0] == cedula:
                     compras.append(campos)
     except FileNotFoundError:
-        print(f"Archivo de facturas no encontrado: {facturas_r}")
+        print(f"Archivo de facturas no encontrado: {facturas_r}. Tal vez no existan facturas aun.")
+        return False
+    if not compras:
+        print(f"No existe la cédula {cedula} en el archivo de facturas.")
         return False
     cuenta = len(compras)
     #generar pdf
-    doc     = SimpleDocTemplate(reporte_ruta, pagesize=LETTER)
-    estilo  = getSampleStyleSheet()
-    cuerpo   = []
+    doc= SimpleDocTemplate(reporte_ruta, pagesize=LETTER)
+    estilo= getSampleStyleSheet()
+    cuerpo= []
     cuerpo.append(Paragraph(f"Reporte de Compras - Cliente {cedula}", estilo['Title']))
     cuerpo.append(Spacer(1, 12))
     cuerpo.append(Paragraph(f"Total de compras realizadas: {cuenta}", estilo['Normal']))
@@ -708,15 +710,14 @@ def reporte_compras_cliente(cedula, facturas_r, reporte_ruta):
             cuerpo.append(Spacer(1, 6))
     else:
         cuerpo.append(Paragraph("<i>No se encontraron compras para este cliente.</i>", estilo['Normal']))
-
     doc.build(cuerpo)
     mensaje = f"PDF de reporte de compras guardado en: {reporte_ruta}"
     print(mensaje)
     return True
 def reporte_todas_compras(ruta_pdf, archivo_facturas="facturas.txt"):
     documento = SimpleDocTemplate(ruta_pdf, pagesize=LETTER)
-    estilo    = getSampleStyleSheet()
-    cuerpo    = []
+    estilo= getSampleStyleSheet()
+    cuerpo= []
     cuerpo.append(Paragraph("Reporte de Todas las Compras", estilo['Title']))
     cuerpo.append(Spacer(1, 12))
 
@@ -802,11 +803,10 @@ def reporte_producto_mas(ruta):
         print("No hay búsquedas de productos registradas.")
         return False
     top_prod = max(total_producto_busquedas, key=total_producto_busquedas.get)
-    count    = total_producto_busquedas[top_prod]
-
-    doc    = SimpleDocTemplate(ruta, pagesize=LETTER)
-    styles = getSampleStyleSheet()
-    cuerpo = []
+    count=total_producto_busquedas[top_prod]
+    doc=SimpleDocTemplate(ruta, pagesize=LETTER)
+    styles=getSampleStyleSheet()
+    cuerpo=[]
     cuerpo.append(Paragraph(f"Producto más buscado: {top_prod}", styles['Title']))
     cuerpo.append(Spacer(1, 12))
     cuerpo.append(Paragraph(f"Veces buscado: {count}", styles['Normal']))
@@ -953,7 +953,7 @@ def MainMenu():
     subopciones=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Regresar al mantenimiento"] #Para poder ingresar a otro ciclo y muestre un segundo menu
     subopciones_insertar=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Registrar compra", "Regresar al mantenimiento"]
     opciones_reportes=["Lista de Países", "Ciudades de un País", "Restaurantes de una Ciudad", "Lista de Clientes", "Reporte de todas las compras", "Compras de un Cliente", "Estadisticas", "Regresar al menú principal"]
-    opciones_rep_estadisticas=["Restaurante mas buscado", "Menu mas buscado", "Producto mas comprado", "Factura de mayor monto", "Factura de menor monto", "Precio de un producto", "Consultar Descuentos", "Consultar Stock/Cantidad de Producto", "Regresar al menu principal"]
+    opciones_rep_estadisticas=["Restaurante mas buscado", "Menu mas buscado", "Producto mas buscado", "Factura de mayor monto", "Factura de menor monto", "Precio de un producto", "Consultar Descuentos", "Consultar Stock/Cantidad de Producto", "Regresar al menu principal"]
     while True:
         mostrar_menu(opciones_principales)
         print("\n Ingrese que quiere hacer: ")
