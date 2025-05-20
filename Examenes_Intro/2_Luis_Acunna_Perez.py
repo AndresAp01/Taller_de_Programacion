@@ -434,7 +434,7 @@ def CUATRO(numero, lista):
 
     return f"lista con duplicados: {lista}"
 
-print(CUATRO(3, [1,3,[2,3,9],[3,[4,2,3,6],[8,3,3],3],3]))
+print(CUATRO(-3, [1,-3,[2,3,9],[-3,[4,2,3,6],[8,-3,3],3],3]))
 #Pruebas:
 """
 primera prueba:

@@ -144,6 +144,7 @@ def UNO(num1, num2):
         print("Parametros incorrectos, deben ser numeros enteros, debe tener una cantidad impar de digitos y ambos del mismo largo. \n Por ejemplo, num1: 123 y num2: 456")
         return 0
 
+print(UNO(33445, 21345))
 #_________________________________________________________________________________________________________________
 #Funcion 2
 ''' 

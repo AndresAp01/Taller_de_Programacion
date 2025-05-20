@@ -260,7 +260,7 @@ def largolista(lista): #cualquier lista: [5,6,7,8,1,0]
             return 0
         else:
             cont=0
-            #cont   lista
+            #contador   lista
             #0      [5,6,7,8,1,0]
             #1      [6,7,8,1,0]
             #2      [7,8,1,0]
@@ -285,7 +285,7 @@ def largoSD(lista):
         else:
             cont=0
             i=0
-            #cont   i   lista
+            #contador   i   lista
             #0      0   [5, 6, 7, 8, 1, 0]
             #1      1   [5, 6, 7, 8, 1, 0]
             #2      1   [5, 6, 7, 8, 1, 0]
@@ -298,7 +298,7 @@ def largoSD(lista):
             while i<len(lista): #0<6si 1<6si 2<6si 3<6si 4<6si 5<6 si 6<6 no
                 i=i+1           #1 2 3 4 5 6
                 cont=cont+1     #1 2 3 4 5 6
-            print(cont, lista)  #6, {En este ejercicio la variable i es para posiciones, la cont es un contador, pero justo sale que van las dos igual
+            print(cont, lista)  #6, {En este ejercicio la variable i es para posiciones, la contador es un contador, pero justo sale que van las dos igual
             #}
     else:
         print("Parametro incorrecto")
@@ -314,7 +314,7 @@ def ContarParesD(lista): #[5,6,7,8,9,1,0]
             return 0
         else:
             cont=0
-            #cont   lista
+            #contador   lista
             #0      [5,6,7,8,9,1,0] P0=5
             #0      [6,7,8,9,1,0]   P0=6
             #1      [7,8,9,1,0]     P0=7
@@ -340,7 +340,7 @@ def ContarParesSD(lista): #[5,6,7,8,9,1,0]
         else:
             cont=0
             i=0
-            #cont   i   lista
+            #contador   i   lista
             #0      0   [5,6,7,8,9,1,0] i=0=>5
             #0      1   [5,6,7,8,9,1,0] i=1=>6 ****
             #1      2   [5,6,7,8,9,1,0] i=2=>7

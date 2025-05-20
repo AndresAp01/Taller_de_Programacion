@@ -57,7 +57,7 @@ def largo(num):#4567890
         return 1
     else:
         cont=0
-        #cont    num
+        #contador    num
         #0       4567890
         #1       456789
         #2       45678

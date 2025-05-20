@@ -36,7 +36,7 @@ def cuentaPares(num):
         while i<=num:
             #Dentro del ciclo while, se verifica que el residuo sea 0 para que sea par y lo cuente
             if i%2==0:
-                #Si i es par, se suma el contador cont en 1.
+                #Si i es par, se suma el contador contador en 1.
                 cont=cont+1
             #Se incrementa en 1 por cada vez que lo pasa
             i=i+1 #lleva: 2, 3, 4, 5, 6, etc...

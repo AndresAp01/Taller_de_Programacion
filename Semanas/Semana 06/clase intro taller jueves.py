@@ -100,7 +100,7 @@ def largo(num):#2345
     if num==0:
         return 1
     else:
-        #cont   num
+        #contador   num
         #0      2345
         #1      234
         #2      23

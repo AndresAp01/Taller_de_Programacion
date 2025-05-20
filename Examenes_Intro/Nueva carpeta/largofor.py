@@ -9,8 +9,8 @@ def largofor(num):#234
                 if num==0:
                    #233x 23x 2x 0si
                    # print(i)
-                    #print("Contador: ",cont)#3
-                    #return cont
+                    #print("Contador: ",contador)#3
+                    #return contador
                     break
                 cont=cont+1#1 2 3
                 num=num//10#23 2 0

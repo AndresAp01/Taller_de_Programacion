@@ -66,7 +66,7 @@ def largo_de_num(num):
         print(1)
     else:
         cont=0
-        #cont   num
+        #contador   num
         #0      4567890
         #1      456789
         #2
@@ -89,7 +89,7 @@ def CuentaPares(num):
         print(1)
     else:
         cont=0
-        #cont   num*
+        #contador   num*
         #0      4567890
         #1      456789
         #1      45678
@@ -116,7 +116,7 @@ def CuentaParesMod(num):
         print(1)
     else:
         cont=0
-        #cont   num*
+        #contador   num*
         #0      4567890
         #1      456789
         #1      45678

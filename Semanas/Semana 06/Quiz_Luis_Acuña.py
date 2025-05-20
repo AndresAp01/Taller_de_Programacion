@@ -73,14 +73,14 @@ def contar_digito(digito, n): #(6, 4567093606)
                 #i      digito
                 #4  =   6 no
                 #5  =   6 no
-                #6  =   6 si cont+1
+                #6  =   6 si contador+1
                 #7  =   6 no
                 #0  =   6 no
                 #9  =   6 no
                 #3  =   6 no
-                #6  =   6 si cont + 1
+                #6  =   6 si contador + 1
                 #0  =   6 no
-                #6  =   6 si cont +1
+                #6  =   6 si contador +1
                 contador+=1
         
         return contador
