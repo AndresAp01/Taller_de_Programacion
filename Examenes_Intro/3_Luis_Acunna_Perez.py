@@ -187,7 +187,6 @@ def DOS(num1, num2, num3):
             return "Los numeros deben ser enteros."
     else:
         return "Los numeros deben ser distintos de cero."
-print(DOS(123.1, 456, 789))
 """
     Pruebas de DOS():
     {1}
