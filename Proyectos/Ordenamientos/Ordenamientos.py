@@ -1,41 +1,4 @@
 #Luis Andres Acunna Perez
-#
-#MENU
-ans=True
-while ans:
-    print ("""
-    1.Ordenamientos
-    2.Busquedas
-    3.Salir
-    """)
-    ans=input("Que le gustaria hacer? ")
-    if ans=="1":
-        print("""
-        Opciones de ordenamiento:
-        1. Burbuja
-        2. Seleccion
-        3. Insercion
-        4. Shell
-        5. Quicksort
-        """)
-        op=input("\n Escoga la opcion:")
-
-        if op=="1":
-          print("""
-            primer ordenamiento
-            """)
-        elif op=="2":
-            print("Segundo ordenamiento")
-
-    elif ans=="2":
-      print("\n Opciones de Busquedas:")
-    elif ans=="3":
-      print("\n Adios!")
-      break
-    elif ans !="":
-      print("\n No es una opcion valida.")
-
-
 #CODIGOS
 #AUXILIARES
 def largo(num):
@@ -50,23 +13,23 @@ def largo(num):
 #BURBUJA
 def ordenamientoBurbuja(lista):
     for i in range(1, len(lista)):
-        for j in range(0, len(lista) - i):
-            if (lista[j] > lista[j + 1]):
-                k = lista[j + 1]
-                lista[j + 1] = lista[j]
-                lista[j] = k
-        print(lista)
+        for j in range(0, len(lista)-i):
+            if (lista[j]>lista[j+1]):
+                k=lista[j+1]
+                lista[j+1]=lista[j]
+                lista[j]=k
+    print(lista)
 #SELECCION
 def selectionsort(lista):
-    for i in range(0, len(lista) - 1):
-        minimo = i
-        for j in range(i + 1, len(lista)):
-            if lista[minimo] > lista[j]:
-                minimo = j
-            aux = lista[minimo]
-        lista[minimo] = lista[i]
-        lista[i] = aux
-        print(lista)
+    for i in range(0, len(lista)-1):
+        minimo=i
+        for j in range(i+1, len(lista)):
+            if lista[minimo]>lista[j]:
+                minimo=j
+            aux=lista[minimo]
+        lista[minimo]=lista[i]
+        lista[i]=aux
+    print(lista)
 
 #INSERCION
 def insercionDirecta(lista):
@@ -78,10 +41,46 @@ def insercionDirecta(lista):
             j=j-1
         lista[j+1]=v
     print(lista)
-"""    todas
-    las
-    pasadas"""
+#MERGE
+def merge_sort(my_list):  # merge sort sacado de data camp
+    if len(my_list) > 1:
+        mid = len(my_list) // 2
+        left_half = my_list[:mid]
+        right_half = my_list[mid:]
 
+        merge_sort(left_half)
+        merge_sort(right_half)
+
+        i = j = k = 0
+
+        while i < len(left_half) and j < len(right_half):
+            if left_half[i] < right_half[j]:
+                my_list[k] = left_half[i]
+                i += 1
+            else:
+                my_list[k] = right_half[j]
+                j += 1
+            k += 1
+
+        while i < len(left_half):
+            my_list[k] = left_half[i]
+            i += 1
+            k += 1
+
+        while j < len(right_half):
+            my_list[k] = right_half[j]
+            j += 1
+            k += 1
+    print(my_list)  # todas las pasadas
+
+#SHAKE
+def shake(lista):
+    for i in range(len(lista)-1):
+        for j in range(i+1, len(lista)):
+            if lista[i]>lista[j]:
+                lista[i],lista[j]=lista[j],lista[i]
+    print(lista)
+print(shake([4,2,1,6,8]))
 #SHELL
 def  ordenShell(lista):
      inc=int(len(lista)/2 )
@@ -116,31 +115,66 @@ def quicksort(lista):
         segunda=quicksort(lista[i+1:])
         primera.append(lista[i])
         print(primera + segunda)
-    return (primera+segunda)  #todas las pasadas
-#RAIDX
+    #Para imprimir todas las pasadas:
+    return (primera+segunda)
+#RADIX
 def Radix(lista):
-    print(lista)
-    max_num=lista[0]
-    for num in lista:
-        if num>max_num:
-            max_num=num
-    largo_mayor=largo(max_num)
-    print(max_num, largo_mayor)
-    for _ in range(largo_mayor):
-        lista_temp=[]
-        for i in range(10):
-            lista_temp=lista_temp+[[]]
+    if not isinstance(lista, list):
+        return "Dato invalido"
+    elif lista==[]:
+        return []
+    else:
         for i in range(len(lista)):
-            digito=(lista[i]//(10**_))%10
-            lista_temp[digito]=lista_temp[digito]+[lista[i]]
-            print(lista_temp)
-        lista_completa=[]
-        for i in range(10):
-            lista_temp_ordenada=insercionDirecta(lista_temp[i])
-            lista_completa=lista_completa+lista_temp_ordenada
-        lista=lista_completa
-    print(lista)
+            if lista[i] < 0:
+                return 'Hay elementos negativos en la lista'
 
+        mayor=0
+        for i in range(len(lista)):
+            if i==0:
+                mayor=lista[i]
+            else:
+                if lista[i] > mayor:
+                    mayor = lista[i]
+
+        cont = 0
+        for i in range(largo(mayor)):
+            l0=[]
+            l1=[]
+            l2=[]
+            l3=[]
+            l4=[]
+            l5=[]
+            l6=[]
+            l7=[]
+            l8=[]
+            l9=[]
+            while lista != []:
+                if (lista[0]//(10**cont))%10==0:
+                    l0+=[lista[0]]
+                elif (lista[0] // (10 ** cont)) % 10 == 1:
+                    l1+=[lista[0]]
+                elif (lista[0] // (10 ** cont)) % 10 == 2:
+                    l2+=[lista[0]]
+                elif (lista[0] // (10 ** cont)) % 10 == 3:
+                    l3+=[lista[0]]
+                elif (lista[0] // (10 ** cont)) % 10 == 4:
+                    l4+=[lista[0]]
+                elif (lista[0] // (10 ** cont)) % 10 == 5:
+                    l5+=[lista[0]]
+                elif (lista[0] // (10 ** cont)) % 10 == 6:
+                    l6+=[lista[0]]
+                elif (lista[0] // (10 ** cont)) % 10 == 7:
+                    l7+=[lista[0]]
+                elif (lista[0] // (10 ** cont)) % 10 == 8:
+                    l8+=[lista[0]]
+                elif (lista[0] // (10 ** cont)) % 10 == 9:
+                    l9+=[lista[0]]
+                lista=lista[1:]
+            print(l0, l1, l2, l3, l4, l5, l6, l7, l8, l9)
+            lista=lista+l0+l1+l2+l3+l4+l5+l6+l7+l8+l9
+            print(lista)
+            cont+=1
+        return lista
 
 #BUSQUEDAS
 #BINARIA
@@ -208,3 +242,115 @@ def cocktailSort(lista):
         # the last stage would have moved the next
         # smallest number to its rightful spot.
         start=start+1
+
+def largo(n):
+    if not isinstance(n, int):
+     return 'Error'
+    elif n==0:
+     return 1
+    cont=0
+    for i in range(n):
+     cont+=1
+     n//=10
+     if n==0:
+         return cont
+
+#MENU_______________________
+def input_lista(mensaje):
+    while True:
+        entrada=input(mensaje).strip()
+        if entrada.startswith('[') and entrada.endswith(']'):
+            entrada=entrada[1:-1].strip()
+        if "," in entrada:
+            elementos=entrada.split(",")
+        else:
+            elementos=entrada.split()
+        try:
+            lista=[]
+            for num_str in elementos:
+                num_str=num_str.strip()
+                if not num_str:
+                    continue
+                if '.' in num_str or not num_str.lstrip('-').isdigit():
+                    raise ValueError
+                lista.append(int(num_str))
+            return lista
+        except ValueError:
+            print("¡Error! Ingresa solo enteros. Ejemplo: [6,1,3] o 6 1 3")
+
+def menu():
+    principal=(
+                "1.Ordenamientos\n"
+                "2.Busquedas\n"
+                "3.Salir\n"
+    )
+    ordenamientos=(
+                    "1.Burbuja\n"
+                    "2.Seleccion\n"
+                    "3.Insercion\n"
+                    "4.Shell\n"
+                    "5.Quicksort\n"
+                    "6.Radix\n"
+                    "7.Merge\n"
+                    "8.Shake\n"
+                    "9. Ingresar nueva lista\n"
+                    "10.Salir\n"
+    )
+    busquedas=(
+                "Ingrese una opcion\n"
+                "1.Secuencial\n"
+                "2.Binaria\n"
+                "3.Salir\n"
+    )
+
+    lista_actual=None
+    while True:
+        print(principal)
+        opcion=input("Ingrese una opcion(1-3): ")
+        if opcion=="1": #Ordenamientos
+            if lista_actual is None:
+                lista_actual=input_lista("Ingrese la lista: ")
+            while True:
+                print(ordenamientos)
+                y=input("Ingrese una opcion(1-9): ")
+                if y=="1": ordenamientoBurbuja(lista_actual.copy())
+                elif y=="2": selectionsort(lista_actual.copy())
+                elif y=="3": insercionDirecta(lista_actual.copy())
+                elif y=="4": ordenShell(lista_actual.copy())
+                elif y=="5": quicksort(lista_actual.copy())
+                elif y=="6": Radix(lista_actual.copy())
+                elif y=="7": pass
+                elif y=="8": pass
+                elif y=="9":
+                    lista_actual=input_lista("Ingrese la nueva lista: ")
+                elif y=="10":
+                    print("Volviendo al menú principal...")
+                    break
+                else:
+                    print("Opcion invalida")
+        elif opcion=="2":
+            if lista_actual is None:
+                lista_actual=input_lista("Ingrese la lista: ")
+            while True:
+                print(busquedas)
+                y=input("Ingrese una opcion(1-4): ")
+                if y=="1":
+                    lista=input_lista("Ingrese la lista: ")
+                    num=int(input("Ingrese el numero a buscar: "))
+                    busquedaSecuencial(lista_actual, num)
+                if y=="2":
+                    lista=input_lista("Ingrese la lista: ")
+                    num=int(input("Ingrese el numero a buscar: "))
+                    busquedaBinaria(lista_actual, num)
+                elif y=="3":
+                    lista_actual=input_lista("Ingrese la nueva lista: ")
+                elif y=="4":
+                    break
+                else:
+                    print("Opcion invalida")
+        elif opcion=="3":
+            print("Hasta luego!")
+            break
+        else:
+            print("Opcion incorrecta")
+menu()
