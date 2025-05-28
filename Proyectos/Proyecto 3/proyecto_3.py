@@ -3,23 +3,21 @@
 ####################################################################################################################
 import tkinter as tk
 from tkinter import *
-
 from tkinter import simpledialog, messagebox, Menu, Label, Frame, font
-
-def normalizar_codigo(codigo):
-    if not isinstance(codigo, (str, int)):
-        print(f"El codigo {codigo} no es alfanumerico")
-    else:
-        return str(codigo).lstrip('-')
-
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import LETTER
+#Para recibir bien datos
+def normalizar_codigo(codigo):
+    if not isinstance(codigo, (str, int)):
+        print(f"El codigo {codigo} no es alfanumerico")
+    else:
+        return str(codigo).lstrip('-')
 #Construccion de diccionarios
-#----------------------------
+#----------------------------------------------------------------------------------------------------------------
 #Funcion para normalizar cada entrada del usuario
 input_orig=input
 def entrada(prompt=""):
@@ -1037,18 +1035,13 @@ def ventana_login():
     Button(frame_cliente, text="Ingresar", command=verificar_cliente).pack(pady=10)
 
     ventana.mainloop()
-
-
 def regresar_login(ventana):
     ventana.destroy()
     ventana_login()
-
 #FUNCIONES GLOBALES
-
 def limpiar_frame():
     for widget in frame_dinamico.winfo_children():
         widget.destroy()
-
 def formulario_insertar_pais():
     limpiar_frame()
     tk.Label(frame_dinamico, text="Insertar País", font=('Arial', 16)).pack(pady=10)
@@ -2285,7 +2278,6 @@ def ventana_principal():
                           command=ventana.destroy)
     btn_salir.pack(side="left", padx=20)
     ventana.mainloop()
-
 def ventana_usuario():
     global frame_dinamico
     ventana = tk.Tk()
