@@ -83,3 +83,63 @@ def cuentranumeros2(cadena): #'3sto 3s un 3j3mplo 123 p4r4 num3r0s 56'
 
 #print(cuentranumeros2("3sto 3s un 3j3mplo 123 p4r4 num3r0s 56"))
 
+def largoSD(num): # 23456
+    if num==0:
+        return 1
+    else:
+        cont=0 #
+        temp=num#Copia
+        while temp!=0:  #23456 2345 234 23 2 0
+            temp=temp//10 #2345  234  23  2 0
+            cont=cont+1  #0 1 2 3 4 5
+         #
+        return cont #5
+
+def PasalistaFor(num): #234  [2,3,4] 0 [0]
+
+    if isinstance (num,int):
+        num=abs(num)#234
+        if num==0:
+            return [0]
+        else:
+            listaNueva=[]#definiendo un lista vacia,almacenar los elementos
+            for i in range(0,num):#234 23 2 0   i=0 1 2 3   233
+                if num==0:
+                    return listaNueva
+                else:
+                    listaNueva= [num%10]+listaNueva
+                                #[4]+[]=[4]
+                                #[3]+[]=[3,4]
+                                #[2]+[3,4]=[2,3,4]
+                    num=num//10#234 23 2 0
+
+    else:
+         print(" No es entero")
+
+#Escribir una funcion que recibe dos numeros enteros positivos del mismo largo, validar, negativo con abs, se inserttan
+#en dos listas
+#Se intercalan las listas, se convierten a str y se imprimen como numero nuevo
+
+def Intercalar(num1, num2):
+    if isinstance(num1, int) and isinstance(num2, int) and largoSD(num1)==largoSD(num2):
+        num1=abs(num1)
+        num2=abs(num2)
+        lista1=PasalistaFor(num1)
+        lista2=PasalistaFor(num2)
+        print(lista1, lista2)
+        lista3=[]
+        #intercalar:
+        i=0
+        while i<len(lista1):
+            lista3=lista3+[lista1[i]]+[lista2[i]]
+            i=i+1
+        print(lista3)
+        for i in range(len(lista3)):
+            lista3[i]=str(lista3[i])
+        print(lista3)
+        cadena=''.join(lista3)
+        print(cadena)
+    else:
+        print("Parametros incorrectos")
+
+print(Intercalar(234, 567))

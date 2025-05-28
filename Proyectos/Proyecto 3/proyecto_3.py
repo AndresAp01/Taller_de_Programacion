@@ -3,7 +3,8 @@
 ####################################################################################################################
 import tkinter as tk
 from tkinter import *
-from tkinter import simpledialog, messagebox, Toplevel
+
+from tkinter import simpledialog, messagebox, Menu, Label, Frame, font
 
 def normalizar_codigo(codigo):
     if not isinstance(codigo, (str, int)):
@@ -487,6 +488,8 @@ def insertar_cliente(cli_dict, cedula, nombre):
 def registrar_compra_menu(dic, cli, entrada, archivo_facturas="facturas.txt"):
     facturas = []
     ced = entrada("Cédula del cliente: ").strip()
+    print(f"Buscando cliente: '{ced}'")
+    print(f"Clientes registrados: {list(cli.keys())}")
     if ced not in cli:
         print("El cliente no está registrado.")
         return False
@@ -971,426 +974,1371 @@ def reporte_descuentos(data_dict, nombre_pdf):
     print(mensaje)
     return mensaje
 #______________________________________________________________________________________________________________________#
-#MENU__________________________________________________________________________________________________________________#
-def mostrar_menu(opciones):
-    print(f"\n=== Bienvenido al menu de Mantenimiento de Bases de Datos ===")
-    for i, opcion in enumerate(opciones, start=1):
-        print(f"{i}. {opcion}")
-def MainMenu():
-    opciones_principales=["Inserción", "Buscar", "Salir"]
-    subopciones=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Regresar al mantenimiento"] #Para poder ingresar a otro ciclo y muestre un segundo menu
-    subopciones_insertar=["Pais", "Ciudad", "Restaurante", "Menu", "Productos", "Clientes", "Registrar compra", "Regresar al mantenimiento"]
-    opciones_reportes=["Lista de Países", "Ciudades de un País", "Restaurantes de una Ciudad", "Lista de Clientes", "Reporte de todas las compras", "Compras de un Cliente", "Estadisticas", "Regresar al menú principal"]
-    opciones_rep_estadisticas=["Restaurante mas buscado", "Menu mas buscado", "Producto mas buscado", "Factura de mayor monto", "Factura de menor monto", "Precio de un producto", "Consultar Descuentos", "Consultar Stock/Cantidad de Producto", "Regresar al menu principal"]
-    while True:
-        mostrar_menu(opciones_principales)
-        print("\n Ingrese que quiere hacer: ")
-        x=int(entrada())
-        if x==1:
-            print("Has seleccionado la opcion Insertar.")
-            while True:
-                mostrar_menu(subopciones_insertar)
-                y=int(entrada("Selecciona una sub-opción (1-8) para insertar: "))
-                if y==1:insertar_pais()
-                elif y==2:insertar_ciudad()
-                elif y==3:insertar_restaurante()
-                elif y==4:insertar_menu()
-                elif y==5:insertar_producto()
-                elif y==6:
-                    cedula=entrada("Ingrese la cedula de la persona: ")
-                    nombre=entrada("Ingrese el nombre de la persona: ")
-                    insertar_cliente(cli, cedula, nombre)
-                elif y==7:
-                    print("Has seleccionado Registrar compra")
-                    if registrar_compra_menu(dic, cli, entrada):
-                        print("Operación exitosa")
-                    else:
-                        print("No se completó la compra")
-                    entrada("Presione Enter para continuar...")
-                elif y==8:
-                    print("Volviendo al menú principal...")
-                    break
-                else:
-                    print("Opción no válida. Por favor, selecciona una sub-opción del 1 al 8.")
-        elif x==2:
-            print("Has seleccionado Buscar.")
-            while True:
-                mostrar_menu(subopciones)
-                y=int(entrada("Selecciona una sub-opción (1-7) para buscar: "))
-                if y==1:
-                    cod_pais=entrada("Ingrese el codigo del pais a buscar: ")
-                    buscar_elemento(dic, cod_pais)
-                elif y==2:
-                    cod_pais=entrada("Ingrese el codigo del pais donde se encuentra la ciudad: ")
-                    cod_ciudad=entrada("Ingrese el codigo de la ciudad a buscar: ")
-                    buscar_elemento(dic, cod_pais, cod_ciudad)
-                    #validar_ciudad_existe(dic, cod_pais, cod_ciudad)
-                elif y==3:
-                    cod_pais=entrada("Ingrese el codigo del pais: ")
-                    cod_ciudad=entrada("Ingrese el codigo de la ciudad: ")
-                    cod_rest=entrada("Ingrese el codigo del restaurante a buscar: ")
-                    buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest)
-                    #validar_restaurante_existe(dic, cod_pais, cod_ciudad, cod_rest)
-                elif y==4:
-                    cod_pais=entrada("Ingrese el codigo del pais: ")
-                    cod_ciudad=entrada("Ingrese el codigo de la ciudad: ")
-                    cod_rest=entrada("Ingrese el codigo del restaurante: ")
-                    cod_menu=entrada("Ingrese el codigo del menu a buscar: ")
-                    buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
-                    #validar_menu_existe(dic, cod_pais, cod_ciudad, cod_rest, cod_menu)
-                elif y==5:
-                    cod_pais=entrada("Ingrese el codigo del pais: ")
-                    cod_ciudad=entrada("Ingrese el codigo de la ciudad: ")
-                    cod_rest=entrada("Ingrese el codigo del restaurante: ")
-                    cod_menu=entrada("Ingrese el codigo del menu: ")
-                    cod_prod=entrada("Ingrese el codigo del producto a buscar: ")
-                    buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod)
-                elif y==6:
-                    ced=entrada("Ingrese la cedula del cliente a buscar")
-                    buscar_cli(cli, ced)
-                elif y==7:
-                    print("Volviendo al menú principal...")
-                    break  # Salir del submenú y volver al menú principal
-                else:
-                    print("Opción no válida. Por favor, selecciona una sub-opción del 1 al 7.")
-        elif x==3:
-            break
-            print("Has seleccionado Modificar.")
-            while True:
-                mostrar_menu(subopciones)
-                y=int(entrada("Selecciona una sub-opción (1-7) para modificar: "))
-                if y==1:
-                    cod_pais=entrada("Ingrese el codigo del pais a modificar: ")
-                    nuevo_nombre=entrada("Ingrese el nuevo nombre del pais: ")
-                    modificar_pais(cod_pais, nuevo_nombre)
-                elif y==2:
-                    cod_pais=entrada("Ingrese el codigo del pais donde se encuentra la ciudad: ")
-                    cod_ciudad=entrada("Ingrese el codigo de la ciudad a modificar: ")
-                    nuevo_nombre=entrada("Ingrese el nuevo nombre de la ciudad: ")
-                    modificar_ciudad(cod_pais, cod_ciudad, nuevo_nombre)
-                elif y==3:
-                    cod_pais = entrada("Ingrese el codigo del pais donde se encuentra la ciudad: ")
-                    cod_ciudad = entrada("Ingrese el codigo de la ciudad del restaurante: ")
-                    cod_rest = entrada("Ingrese el codigo del restaurante a modificar: ")
-                    nuevo_nombre = entrada("Ingrese el nuevo nombre del restaurante: ")
-                    modificar_restaurante(cod_pais, cod_ciudad, cod_rest, nuevo_nombre)
-                elif y==4:
-                    cod_pais = entrada("Ingrese el codigo del pais donde se encuentra la ciudad: ")
-                    cod_ciudad = entrada("Ingrese el codigo de la ciudad del restaurante: ")
-                    cod_rest=entrada("Ingrese el codigo del restaurante donde esta el menu: ")
-                    cod_menu=entrada("Ingrese el codigo del menu a modificar: ")
-                    nuevo_nombre=entrada("Ingrese el nuevo nombre del menu: ")
-
-                    modificar_menu(cod_pais, cod_ciudad, cod_rest, cod_menu, nuevo_nombre)
-                elif y==5:
-                    cod_pais = entrada("Ingrese el codigo del pais: ")
-                    cod_ciudad = entrada("Ingrese el codigo de la ciudad: ")
-                    cod_rest = entrada("Ingrese el codigo del restaurante: ")
-                    cod_menu = entrada("Ingrese el codigo del menu: ")
-                    cod_prod = entrada("Ingrese el codigo del producto a modificar: ")
-                    nuevo_nombre = entrada("Ingrese el nuevo nombre del producto: ")
-                    nuevas_calorias=entrada("Ingrese el nuevo valor de las calorias del producto: ")
-                    nuevo_precio=entrada("Ingrese el nuevo valor del precio del producto: ")
-
-                    modificar_producto(cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod, nuevo_nombre,  nuevas_calorias, nuevo_precio)
-                elif y==6:
-                    cedula_cliente=entrada("Ingrese la cedula del cliente a modificar: ")
-                    nuevo_nombre=entrada("Ingrese el nuevo nombre del cliente: ")
-                    modificar_cliente(cedula_cliente, nuevo_nombre)
-
-                elif y==7:
-                    print("Volviendo al menú principal...")
-                    break
-        elif x==4:
-            break
-            print("Has seleccionado Eliminar.")
-            while True:
-                mostrar_menu(subopciones)
-                y = int(entrada("Selecciona una sub-opción (1-7) para eliminar: "))
-                if y == 1:
-                    cod_pais = entrada("Ingrese el código del país a eliminar: ")
-                    eliminar_pais(cod_pais)
-                elif y == 2:
-                    cod_pais = entrada("Ingrese el código del país: ")
-                    cod_ciudad = entrada("Ingrese el código de la ciudad a eliminar: ")
-                    eliminar_ciudad(cod_pais, cod_ciudad)
-                elif y == 3:
-                    cod_pais = entrada("Ingrese el código del país: ")
-                    cod_ciudad = entrada("Ingrese el código de la ciudad: ")
-                    cod_rest = entrada("Ingrese el código del restaurante a eliminar: ")
-                    eliminar_restaurante(cod_pais, cod_ciudad, cod_rest)
-                elif y == 4:
-                    cod_pais = entrada("Ingrese el código del país: ")
-                    cod_ciudad = entrada("Ingrese el código de la ciudad: ")
-                    cod_rest = entrada("Ingrese el código del restaurante: ")
-                    cod_menu = entrada("Ingrese el código del menú a eliminar: ")
-                    eliminar_menu(cod_pais, cod_ciudad, cod_rest, cod_menu)
-                elif y == 5:
-                    cod_pais = entrada("Ingrese el código del país: ")
-                    cod_ciudad = entrada("Ingrese el código de la ciudad: ")
-                    cod_rest = entrada("Ingrese el código del restaurante: ")
-                    cod_menu = entrada("Ingrese el código del menú: ")
-                    cod_prod = entrada("Ingrese el código del producto a eliminar: ")
-                    eliminar_producto(cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod)
-                elif y == 6:
-                    cedula = entrada("Ingrese la cédula del cliente a eliminar: ")
-                    eliminar_cliente(cedula)
-                elif y == 7:
-                    print("Volviendo al menú principal...")
-                    break
-                else:
-                    print("Opción no válida. Por favor, selecciona una sub-opción del 1 al 7.")
-        elif x==5:
-            break
-            print("Has seleccionado Reportes.")
-            while True:
-                mostrar_menu(opciones_reportes)
-                y=int(entrada("Selecciona un reporte (1-8): "))
-                if y==1:reporte_paises(dic,"reporte_de_paises.pdf")
-                elif y==2:
-                    cod_pais=entrada("Ingrese el codigo del pais: ")
-                    reporte_ciudades(dic, cod_pais, "reporte_de_ciudades.pdf")
-                elif y==3:
-                    cod_pais=entrada("Ingrese el codigo del pais: ")
-                    cod_ciudad=entrada("Ingrese el codigo de la ciudad: ")
-                    reporte_restaurantes(dic, cod_pais, cod_ciudad, "reporte_de_rests.pdf")
-                elif y==4:reporte_clientes(cli, "reporte_de_clientes.pdf")
-                elif y==5:reporte_todas_compras("Reporte_todas_las_compras.pdf", archivo_facturas="facturas.txt")
-                elif y==6:
-                    cedula=entrada("Ingrese la cedula del cliente")
-                    reporte_compras_cliente(cedula, "facturas.txt", "reporte_de_compras.pdf")
-                elif y==7:
-                    while True:
-                        mostrar_menu(opciones_rep_estadisticas)
-                        x=int(entrada("Selecciona una opcion del 1-7: "))
-                        if x==1:reporte_rest_mas("reporte_restaurante_mas_buscado.pdf")
-                        if x==2:reporte_menu_mas("reporte_menu_mas_buscado.pdf")
-                        if x==3: reporte_producto_mas("reporte_prod_mas_buscado.pdf")
-                        if x==4: reporte_factura_precio_extremo("Reporte_PrecioMayor.pdf", archivo_facturas="facturas.txt", mayor=True)
-                        if x==5: reporte_factura_precio_extremo("Reporte_PrecioMenor.pdf", archivo_facturas="facturas.txt", mayor=False)
-                        if x==6:
-                            cod_pais=entrada("Código del país: ").strip()
-                            cod_ciudad=entrada("Código de la ciudad: ").strip()
-                            cod_rest=entrada("Código del restaurante: ").strip()
-                            cod_menu=entrada("Código del menú: ").strip()
-                            cod_prod=entrada("Código del producto: ").strip()
-                            reporte_precio_producto(dic,cod_pais,cod_ciudad,cod_rest,cod_menu,cod_prod,"Reporte_Consulta_Producto.pdf",stock=False)
-                        if x==7: reporte_descuentos(descuentos, "Reporte_Descuentos.pdf")
-                        if x==8:
-                            cod_pais=entrada("Código del país: ").strip()
-                            cod_ciudad=entrada("Código de la ciudad: ").strip()
-                            cod_rest=entrada("Código del restaurante: ").strip()
-                            cod_menu=entrada("Código del menú: ").strip()
-                            cod_prod=entrada("Código del producto: ").strip()
-                            reporte_precio_producto(dic, cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod,"Reporte_Consulta_Cantidad.pdf", stock=True)
-                        if x==9: break
-                elif y==8:
-                    print("Volviendo al menú principal...")
-                    break
-        elif x==6:
-            break
-        else:
-            print("\n\n Atención!! \n Ingresa una opción del 1 al 3.")
-            continue #Para que el usuario no tenga que reiniciar el programa
 # ================== FUNCIONES BASE ==================
-def admin_menu(ventana_padre):
-    def crear_ventana_opciones(titulo, opciones, comandos):
-        ventana = Toplevel(ventana_padre)
-        ventana.title(titulo)
+def ventana_login():
+    ventana = tk.Tk()
+    ventana.geometry('800x600')
+    ventana.title("Sistema de Restaurante")
+    ventana.resizable(True, True)
 
-        for i, (texto, comando) in enumerate(zip(opciones, comandos), 1):
-            btn = tk.Button(ventana,
-                            text=texto,
-                            command=comando,
-                            width=20,
-                            font=("Arial", 10))
-            btn.pack(padx=10, pady=5)
+    # Frame principal
+    frame_principal = Frame(ventana, padx=20, pady=20)
+    frame_principal.pack(expand=True, fill='both')
+    Label(frame_principal, text="Inicio de Sesión", font=('Arial', 18)).pack(pady=20)
 
-        btn_volver = tk.Button(ventana,
-                               text="Volver",
-                               command=ventana.destroy)
-        btn_volver.pack(pady=10)
+    # Frame para administradores
+    frame_admin = Frame(frame_principal, padx=10, pady=10, relief='groove', borderwidth=2)
+    frame_admin.pack(pady=20, fill='x')
 
-    # Función para inserción
-    def mostrar_menu_insercion():
-        opciones = [
-            "País",
-            "Ciudad",
-            "Restaurante",
-            "Menú",
-            "Producto",
-            "Cliente"
-        ]
+    Label(frame_admin, text="Acceso Administrador", font=('Arial', 14)).pack(pady=10)
 
-        comandos = [
-            insertar_pais,
-            insertar_ciudad,
-            insertar_restaurante,
-            insertar_menu,
-            insertar_producto,
-            lambda: insertar_cliente_gui()
-        ]
+    # Entrada para cédula de admin
+    Label(frame_admin, text="Cédula:").pack()
+    entrada_cedula_admin = Entry(frame_admin)
+    entrada_cedula_admin.pack(pady=5)
 
-        crear_ventana_opciones("Insertar elementos", opciones, comandos)
-
-    # Función para búsqueda
-    def mostrar_menu_busqueda():
-        opciones = [
-            "País",
-            "Ciudad",
-            "Restaurante",
-            "Menú",
-            "Producto",
-            "Cliente"
-        ]
-
-        comandos = [
-            lambda: consultar_elemento_gui(nivel=1),
-            lambda: consultar_elemento_gui(nivel=2),
-            lambda: consultar_elemento_gui(nivel=3),
-            lambda: consultar_elemento_gui(nivel=4),
-            lambda: consultar_elemento_gui(nivel=5),
-            buscar_cliente_gui
-        ]
-
-        crear_ventana_opciones("Consultar elementos", opciones, comandos)
-
-    # Ventana principal de admin
-    ventana_admin = Toplevel(ventana_padre)
-    ventana_admin.title("Menú de Administrador")
-    tk.Label(ventana_admin,
-             text="Gestión de Datos",
-             font=("Arial", 14)).pack(pady=5)
-    tk.Button(ventana_admin,
-              text="Mantenimiento",
-              width=25).pack(pady=10)
-    tk.Button(ventana_admin,
-              text="Facturacion",
-              width=25).pack(pady=10)
-    tk.Button(ventana_admin,
-              text="Acerca De",
-              width=25).pack(pady=10)
-    tk.Button(ventana_admin,
-              text="Contacto",
-              width=25).pack(pady=10)
-
-    tk.Button(ventana_admin,
-              text="Insertar Elementos",
-              command=mostrar_menu_insercion,
-              width=25).pack(pady=10)
-
-    tk.Button(ventana_admin,
-              text="Consultar Elementos",
-              command=mostrar_menu_busqueda,
-              width=25).pack(pady=10)
-# ================== FUNCIONES MODIFICADAS PARA GUI ==================
-def entrada_gui(prompt):
-    return simpledialog.askstring("Entrada", prompt)
-
-def insertar_cliente_gui():
-    cedula = entrada_gui("Cedula del cliente:")
-    nombre = entrada_gui("Nombre del cliente:")
-    if cedula and nombre:
-        if insertar_cliente(cli, cedula, nombre):
-            messagebox.showinfo("Exito", "Cliente insertado correctamente")
-    else:
-        messagebox.showerror("Error", "Datos incompletos")
-
-def consultar_elemento_gui(nivel):
-    codigos = []
-    prompts = [
-        "Código de país:",
-        "Código de ciudad:",
-        "Código de restaurante:",
-        "Código de menú:",
-        "Código de producto:"
-    ]
-
-    for i in range(nivel):
-        codigo = entrada_gui(prompts[i])
-        if not codigo:
+    def verificar_admin():
+        cedula = entrada_cedula_admin.get().strip()
+        if not cedula:
+            messagebox.showerror("Error", "Por favor ingrese una cédula")
             return
-        codigos.append(codigo)
+        if cedula in admin:
+            messagebox.showinfo("Éxito", f"Bienvenido administrador {admin[cedula]}")
+            ventana.destroy()
+            ventana_principal()
+        else:
+            messagebox.showerror("Error", "Cédula no registrada como administrador")
 
-    resultado = buscar_elemento(dic, *codigos)
-    if resultado is True:
-        messagebox.showinfo("Éxito", "Elemento encontrado")
+    Button(frame_admin, text="Ingresar", command=verificar_admin).pack(pady=10)
+
+    # Frame para clientes
+    frame_cliente = Frame(frame_principal, padx=10, pady=10, relief='groove', borderwidth=2)
+    frame_cliente.pack(pady=20, fill='x')
+
+    Label(frame_cliente, text="Acceso Cliente", font=('Arial', 14)).pack(pady=10)
+
+    # Entrada para cédula de cliente
+    Label(frame_cliente, text="Cédula:").pack()
+    entrada_cedula_cliente = Entry(frame_cliente)
+    entrada_cedula_cliente.pack(pady=5)
+
+    def verificar_cliente():
+        cedula = entrada_cedula_cliente.get().strip()
+        if not cedula:
+            messagebox.showerror("Error", "Por favor ingrese una cédula")
+            return
+        if cedula in cli:
+            messagebox.showinfo("Éxito", f"Bienvenido {cli[cedula]}")
+            ventana.destroy()
+            ventana_usuario()
+        else:
+            messagebox.showerror("Error", "Cédula no registrada como cliente")
+
+    Button(frame_cliente, text="Ingresar", command=verificar_cliente).pack(pady=10)
+
+    ventana.mainloop()
+
+
+def regresar_login(ventana):
+    ventana.destroy()
+    ventana_login()
+
+#FUNCIONES GLOBALES
+
+def limpiar_frame():
+    for widget in frame_dinamico.winfo_children():
+        widget.destroy()
+
+def formulario_insertar_pais():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Insertar País", font=('Arial', 16)).pack(pady=10)
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_codigo = tk.Entry(frame_dinamico)
+    entry_codigo.pack()
+    tk.Label(frame_dinamico, text="Nombre de País:").pack()
+    entry_nombre = tk.Entry(frame_dinamico)
+    entry_nombre.pack()
+
+    def guardar():
+        codigo = entry_codigo.get().strip()
+        nombre = entry_nombre.get().strip()
+        if codigo and nombre:
+            resultado = insertar_pais_manual(codigo, nombre)  # Nueva función adaptada
+            if resultado:
+                messagebox.showinfo("Éxito", "País insertado correctamente")
+                limpiar_frame()
+        else:
+            messagebox.showerror("Error", "Complete todos los campos.")
+
+    tk.Button(frame_dinamico, text="Guardar", command=guardar).pack(pady=10)
+def insertar_pais_manual(codigo, nombre):
+    return insertar_en_diccionario([codigo, nombre], nivel=1)
+def formulario_insertar_ciudad():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Insertar Ciudad", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_codigo_pais = tk.Entry(frame_dinamico)
+    entry_codigo_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_codigo_ciudad = tk.Entry(frame_dinamico)
+    entry_codigo_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Nombre de Ciudad:").pack()
+    entry_nombre_ciudad = tk.Entry(frame_dinamico)
+    entry_nombre_ciudad.pack()
+
+    def guardar():
+        codigo_pais = entry_codigo_pais.get().strip()
+        codigo_ciudad = entry_codigo_ciudad.get().strip()
+        nombre_ciudad = entry_nombre_ciudad.get().strip()
+        if codigo_pais and codigo_ciudad and nombre_ciudad:
+            resultado = insertar_ciudad_manual(codigo_pais, codigo_ciudad, nombre_ciudad)
+            if resultado:
+                messagebox.showinfo("Éxito", "Ciudad insertada correctamente")
+                limpiar_frame()
+        else:
+            messagebox.showerror("Error", "Complete todos los campos.")
+
+    tk.Button(frame_dinamico, text="Guardar", command=guardar).pack(pady=10)
+
+    def insertar_ciudad_manual(codigo_pais, codigo_ciudad, nombre_ciudad):
+        return insertar_en_diccionario([codigo_pais, codigo_ciudad, nombre_ciudad], nivel=2)
+def formulario_insertar_restaurante():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Insertar Restaurante", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_codigo_pais = tk.Entry(frame_dinamico)
+    entry_codigo_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_codigo_ciudad = tk.Entry(frame_dinamico)
+    entry_codigo_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_codigo_rest = tk.Entry(frame_dinamico)
+    entry_codigo_rest.pack()
+
+    tk.Label(frame_dinamico, text="Nombre de Restaurante:").pack()
+    entry_nombre_rest = tk.Entry(frame_dinamico)
+    entry_nombre_rest.pack()
+
+    def guardar():
+        cod_pais = entry_codigo_pais.get().strip()
+        cod_ciudad = entry_codigo_ciudad.get().strip()
+        cod_rest = entry_codigo_rest.get().strip()
+        nombre_rest = entry_nombre_rest.get().strip()
+
+        if cod_pais and cod_ciudad and cod_rest and nombre_rest:
+            resultado = insertar_restaurante_manual(cod_pais, cod_ciudad, cod_rest, nombre_rest)
+            if resultado:
+                messagebox.showinfo("Éxito", "Restaurante insertado correctamente")
+                limpiar_frame()
+        else:
+            messagebox.showerror("Error", "Complete todos los campos.")
+
+    tk.Button(frame_dinamico, text="Guardar", command=guardar).pack(pady=10)
+def insertar_restaurante_manual(cod_pais, cod_ciudad, cod_rest, nombre_rest):
+    return insertar_en_diccionario([cod_pais, cod_ciudad, cod_rest, nombre_rest], nivel=3)
+def formulario_insertar_menu():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Insertar Menú", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_codigo_pais = tk.Entry(frame_dinamico)
+    entry_codigo_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_codigo_ciudad = tk.Entry(frame_dinamico)
+    entry_codigo_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_codigo_rest = tk.Entry(frame_dinamico)
+    entry_codigo_rest.pack()
+
+    tk.Label(frame_dinamico, text="Código de Menú:").pack()
+    entry_codigo_menu = tk.Entry(frame_dinamico)
+    entry_codigo_menu.pack()
+
+    tk.Label(frame_dinamico, text="Nombre de Menú:").pack()
+    entry_nombre_menu = tk.Entry(frame_dinamico)
+    entry_nombre_menu.pack()
+
+    def guardar():
+        cod_pais = entry_codigo_pais.get().strip()
+        cod_ciudad = entry_codigo_ciudad.get().strip()
+        cod_rest = entry_codigo_rest.get().strip()
+        cod_menu = entry_codigo_menu.get().strip()
+        nombre_menu = entry_nombre_menu.get().strip()
+
+        if cod_pais and cod_ciudad and cod_rest and cod_menu and nombre_menu:
+            resultado = insertar_menu_manual(cod_pais, cod_ciudad, cod_rest, cod_menu, nombre_menu)
+            if resultado:
+                messagebox.showinfo("Éxito", "Menú insertado correctamente")
+                limpiar_frame()
+        else:
+            messagebox.showerror("Error", "Complete todos los campos.")
+
+    tk.Button(frame_dinamico, text="Guardar", command=guardar).pack(pady=10)
+def insertar_menu_manual(cod_pais, cod_ciudad, cod_rest, cod_menu, nombre_menu):
+    return insertar_en_diccionario([cod_pais, cod_ciudad, cod_rest, cod_menu, nombre_menu], nivel=4)
+def formulario_insertar_producto():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Insertar Producto", font=('Arial', 16)).pack(pady=10)
+
+    # Entradas necesarias
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_codigo_pais = tk.Entry(frame_dinamico)
+    entry_codigo_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_codigo_ciudad = tk.Entry(frame_dinamico)
+    entry_codigo_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_codigo_rest = tk.Entry(frame_dinamico)
+    entry_codigo_rest.pack()
+
+    tk.Label(frame_dinamico, text="Código de Menú:").pack()
+    entry_codigo_menu = tk.Entry(frame_dinamico)
+    entry_codigo_menu.pack()
+
+    tk.Label(frame_dinamico, text="Código de Producto:").pack()
+    entry_codigo_prod = tk.Entry(frame_dinamico)
+    entry_codigo_prod.pack()
+
+    tk.Label(frame_dinamico, text="Nombre de Producto:").pack()
+    entry_nombre_prod = tk.Entry(frame_dinamico)
+    entry_nombre_prod.pack()
+
+    tk.Label(frame_dinamico, text="Calorías:").pack()
+    entry_calorias = tk.Entry(frame_dinamico)
+    entry_calorias.pack()
+
+    tk.Label(frame_dinamico, text="Precio:").pack()
+    entry_precio = tk.Entry(frame_dinamico)
+    entry_precio.pack()
+
+    tk.Label(frame_dinamico, text="Stock:").pack()
+    entry_stock = tk.Entry(frame_dinamico)
+    entry_stock.pack()
+
+    def guardar():
+        cod_pais = entry_codigo_pais.get().strip()
+        cod_ciudad = entry_codigo_ciudad.get().strip()
+        cod_rest = entry_codigo_rest.get().strip()
+        cod_menu = entry_codigo_menu.get().strip()
+        cod_prod = entry_codigo_prod.get().strip()
+        nombre_prod = entry_nombre_prod.get().strip()
+        calorias = entry_calorias.get().strip()
+        precio = entry_precio.get().strip()
+        stock = entry_stock.get().strip()
+
+        if all([cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod, nombre_prod, calorias, precio, stock]):
+            resultado = insertar_producto_manual(cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod, nombre_prod,
+                                                 calorias, precio, stock)
+            if resultado:
+                messagebox.showinfo("Éxito", "Producto insertado correctamente")
+                limpiar_frame()
+        else:
+            messagebox.showerror("Error", "Complete todos los campos.")
+
+    tk.Button(frame_dinamico, text="Guardar", command=guardar).pack(pady=10)
+def insertar_producto_manual(cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod, nombre_prod, calorias, precio,
+                             stock):
+    return insertar_en_diccionario(
+        [cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod, nombre_prod, calorias, precio, stock], nivel=5)
+def formulario_insertar_cliente():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Insertar Cliente", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Cédula del Cliente:").pack()
+    entry_cedula = tk.Entry(frame_dinamico)
+    entry_cedula.pack()
+
+    tk.Label(frame_dinamico, text="Nombre del Cliente:").pack()
+    entry_nombre = tk.Entry(frame_dinamico)
+    entry_nombre.pack()
+
+    def guardar():
+        cedula = entry_cedula.get().strip()
+        nombre = entry_nombre.get().strip()
+
+        if cedula and nombre:
+            resultado = insertar_cliente_manual(cedula, nombre)
+            if resultado:
+                messagebox.showinfo("Éxito", "Cliente insertado correctamente")
+                limpiar_frame()
+            else:
+                messagebox.showerror("Error", "No se pudo insertar el cliente (ya existe o error).")
+        else:
+            messagebox.showerror("Error", "Complete todos los campos.")
+
+    tk.Button(frame_dinamico, text="Guardar", command=guardar).pack(pady=10)
+def insertar_cliente_manual(cedula, nombre):
+    return insertar_cliente(cli, cedula, nombre)
+def formulario_insertar_administrador():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Insertar Administrador", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Cédula del Administrador:").pack()
+    entry_cedula = tk.Entry(frame_dinamico)
+    entry_cedula.pack()
+
+    tk.Label(frame_dinamico, text="Nombre del Administrador:").pack()
+    entry_nombre = tk.Entry(frame_dinamico)
+    entry_nombre.pack()
+
+    def guardar():
+        cedula = entry_cedula.get().strip()
+        nombre = entry_nombre.get().strip()
+
+        if cedula and nombre:
+            resultado = insertar_administrador_manual(cedula, nombre)
+            if resultado:
+                messagebox.showinfo("Éxito", "Administrador insertado correctamente")
+                limpiar_frame()
+            else:
+                messagebox.showerror("Error", "El administrador ya existe.")
+        else:
+            messagebox.showerror("Error", "Complete todos los campos.")
+
+    tk.Button(frame_dinamico, text="Guardar", command=guardar).pack(pady=10)
+def insertar_administrador_manual(cedula, nombre):
+    if cedula in admin:
+        return False
+    admin[cedula] = nombre
+    return True
+#FUNCIONES DE BUSQUEDA
+def buscar(cod_pais, cod_ciudad=None, cod_rest=None, cod_menu=None, cod_prod=None):
+    return buscar_elemento(dic, cod_pais, cod_ciudad, cod_rest, cod_menu, cod_prod)
+def formulario_consultar_pais():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Consultar País", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_codigo_pais = tk.Entry(frame_dinamico)
+    entry_codigo_pais.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def buscar_pais():
+        cod_pais = entry_codigo_pais.get().strip()
+        if not cod_pais:
+            messagebox.showerror("Error", "Ingrese el código del país.")
+            return
+
+        if buscar(cod_pais):
+            nombre_pais = dic[cod_pais]['nombre']
+            resultado_label.config(text=f"País encontrado: {cod_pais} → {nombre_pais}", fg="green")
+        else:
+            resultado_label.config(text=f"El país {cod_pais} no existe.", fg="red")
+
+    tk.Button(frame_dinamico, text="Buscar", command=buscar_pais).pack(pady=10)
+def formulario_consultar_ciudad():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Consultar Ciudad", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_codigo_pais = tk.Entry(frame_dinamico)
+    entry_codigo_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_codigo_ciudad = tk.Entry(frame_dinamico)
+    entry_codigo_ciudad.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def buscar_ciudad():
+        cod_pais = entry_codigo_pais.get().strip()
+        cod_ciudad = entry_codigo_ciudad.get().strip()
+        if not cod_pais or not cod_ciudad:
+            messagebox.showerror("Error", "Ingrese ambos códigos: País y Ciudad.")
+            return
+
+        if buscar(cod_pais, cod_ciudad):
+            nombre_ciudad = dic[cod_pais]['ciudades'][cod_ciudad]['nombre']
+            resultado_label.config(text=f"Ciudad encontrada: {cod_ciudad} → {nombre_ciudad}", fg="green")
+        else:
+            resultado_label.config(text=f"La ciudad {cod_ciudad} no existe en el país {cod_pais}.", fg="red")
+
+    tk.Button(frame_dinamico, text="Buscar", command=buscar_ciudad).pack(pady=10)
+def formulario_consultar_restaurante():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Consultar Restaurante", font=('Arial', 16)).pack(pady=10)
+
+    # Entradas
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_pais = tk.Entry(frame_dinamico)
+    entry_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_ciudad = tk.Entry(frame_dinamico)
+    entry_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_rest = tk.Entry(frame_dinamico)
+    entry_rest.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def buscar_rest():
+        cp = entry_pais.get().strip()
+        cc = entry_ciudad.get().strip()
+        cr = entry_rest.get().strip()
+        if not cp or not cc or not cr:
+            messagebox.showerror("Error", "Ingrese País, Ciudad y Restaurante.")
+            return
+
+        if buscar(cp, cc, cr):
+            nombre = dic[cp]['ciudades'][cc]['restaurantes'][cr]['nombre']
+            resultado_label.config(text=f"Restaurante encontrado: {cr} → {nombre}", fg="green")
+        else:
+            resultado_label.config(text=f"Restaurante {cr} no encontrado.", fg="red")
+
+    tk.Button(frame_dinamico, text="Buscar", command=buscar_rest).pack(pady=10)
+def formulario_consultar_menu():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Consultar Menú", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_pais = tk.Entry(frame_dinamico)
+    entry_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_ciudad = tk.Entry(frame_dinamico)
+    entry_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_rest = tk.Entry(frame_dinamico)
+    entry_rest.pack()
+
+    tk.Label(frame_dinamico, text="Código de Menú:").pack()
+    entry_menu = tk.Entry(frame_dinamico)
+    entry_menu.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def buscar_menu_():
+        cp = entry_pais.get().strip()
+        cc = entry_ciudad.get().strip()
+        cr = entry_rest.get().strip()
+        cm = entry_menu.get().strip()
+        if not cp or not cc or not cr or not cm:
+            messagebox.showerror("Error", "Ingrese País, Ciudad, Restaurante y Menú.")
+            return
+
+        if buscar(cp, cc, cr, cm):
+            nombre = dic[cp]['ciudades'][cc]['restaurantes'][cr]['menus'][cm]['nombre']
+            resultado_label.config(text=f"Menú encontrado: {cm} → {nombre}", fg="green")
+        else:
+            resultado_label.config(text=f"Menú {cm} no encontrado.", fg="red")
+
+    tk.Button(frame_dinamico, text="Buscar", command=buscar_menu_).pack(pady=10)
+def formulario_consultar_producto():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Consultar Producto", font=('Arial', 16)).pack(pady=10)
+
+    # Entradas
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_pais = tk.Entry(frame_dinamico)
+    entry_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_ciudad = tk.Entry(frame_dinamico)
+    entry_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_rest = tk.Entry(frame_dinamico)
+    entry_rest.pack()
+
+    tk.Label(frame_dinamico, text="Código de Menú:").pack()
+    entry_menu = tk.Entry(frame_dinamico)
+    entry_menu.pack()
+
+    tk.Label(frame_dinamico, text="Código de Producto:").pack()
+    entry_prod = tk.Entry(frame_dinamico)
+    entry_prod.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def buscar_prod():
+        cp = entry_pais.get().strip()
+        cc = entry_ciudad.get().strip()
+        cr = entry_rest.get().strip()
+        cm = entry_menu.get().strip()
+        cprod = entry_prod.get().strip()
+
+        if not all([cp, cc, cr, cm, cprod]):
+            messagebox.showerror("Error", "Ingrese País, Ciudad, Restaurante, Menú y Producto.")
+            return
+
+        if buscar(cp, cc, cr, cm, cprod):
+            nombre = dic[cp]['ciudades'][cc]['restaurantes'][cr]['menus'][cm]['productos'][cprod]['nombre']
+            resultado_label.config(text=f"Producto encontrado: {cprod} → {nombre}", fg="green")
+        else:
+            resultado_label.config(text=f"Producto {cprod} no encontrado.", fg="red")
+
+    tk.Button(frame_dinamico, text="Buscar", command=buscar_prod).pack(pady=10)
+def formulario_consultar_cliente():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Consultar Cliente", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Cédula del Cliente:").pack()
+    entry_cedula = tk.Entry(frame_dinamico)
+    entry_cedula.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def buscar_cli_():
+        cedula = entry_cedula.get().strip()
+        if not cedula:
+            messagebox.showerror("Error", "Ingrese la cédula del cliente.")
+            return
+
+        if cedula in cli:
+            nombre = cli[cedula]
+            resultado_label.config(text=f"Cliente encontrado: {cedula} → {nombre}", fg="green")
+        else:
+            resultado_label.config(text=f"Cliente {cedula} no encontrado.", fg="red")
+
+    tk.Button(frame_dinamico, text="Buscar", command=buscar_cli_).pack(pady=10)
+def formulario_consultar_administrador():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Consultar Administrador", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Cédula del Administrador:").pack()
+    entry_cedula = tk.Entry(frame_dinamico)
+    entry_cedula.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def buscar_admin_():
+        cedula = entry_cedula.get().strip()
+        if not cedula:
+            messagebox.showerror("Error", "Ingrese la cédula del administrador.")
+            return
+
+        if cedula in admin:
+            nombre = admin[cedula]
+            resultado_label.config(text=f"Administrador encontrado: {cedula} → {nombre}", fg="green")
+        else:
+            resultado_label.config(text=f"Administrador {cedula} no encontrado.", fg="red")
+
+    tk.Button(frame_dinamico, text="Buscar", command=buscar_admin_).pack(pady=10)
+#FUNCIONES DE MODIFICAR
+def formulario_modificar_pais():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Modificar País", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_codigo_pais = tk.Entry(frame_dinamico)
+    entry_codigo_pais.pack()
+
+    tk.Label(frame_dinamico, text="Nuevo Nombre de País:").pack()
+    entry_nuevo_nombre = tk.Entry(frame_dinamico)
+    entry_nuevo_nombre.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def modificar():
+        cod_pais = entry_codigo_pais.get().strip()
+        nuevo_nombre = entry_nuevo_nombre.get().strip()
+        if not cod_pais or not nuevo_nombre:
+            messagebox.showerror("Error", "Ingrese el código y el nuevo nombre del país.")
+            return
+
+        resultado = modificar_pais(cod_pais, nuevo_nombre)
+        resultado_label.config(text=resultado, fg="green" if "modificado" in resultado else "red")
+
+    tk.Button(frame_dinamico, text="Modificar", command=modificar).pack(pady=10)
+def formulario_modificar_ciudad():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Modificar Ciudad", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_codigo_pais = tk.Entry(frame_dinamico)
+    entry_codigo_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_codigo_ciudad = tk.Entry(frame_dinamico)
+    entry_codigo_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Nuevo Nombre de Ciudad:").pack()
+    entry_nuevo_nombre = tk.Entry(frame_dinamico)
+    entry_nuevo_nombre.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def modificar():
+        cod_pais = entry_codigo_pais.get().strip()
+        cod_ciudad = entry_codigo_ciudad.get().strip()
+        nuevo_nombre = entry_nuevo_nombre.get().strip()
+        if not cod_pais or not cod_ciudad or not nuevo_nombre:
+            messagebox.showerror("Error", "Ingrese todos los campos: País, Ciudad y Nuevo Nombre.")
+            return
+
+        resultado = modificar_ciudad(cod_pais, cod_ciudad, nuevo_nombre)
+        resultado_label.config(text=resultado, fg="green" if "modificada" in resultado else "red")
+
+    tk.Button(frame_dinamico, text="Modificar", command=modificar).pack(pady=10)
+def formulario_modificar_restaurante():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Modificar Restaurante", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_codigo_pais = tk.Entry(frame_dinamico)
+    entry_codigo_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_codigo_ciudad = tk.Entry(frame_dinamico)
+    entry_codigo_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_codigo_rest = tk.Entry(frame_dinamico)
+    entry_codigo_rest.pack()
+
+    tk.Label(frame_dinamico, text="Nuevo Nombre de Restaurante:").pack()
+    entry_nuevo_nombre = tk.Entry(frame_dinamico)
+    entry_nuevo_nombre.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def modificar():
+        cod_pais = entry_codigo_pais.get().strip()
+        cod_ciudad = entry_codigo_ciudad.get().strip()
+        cod_rest = entry_codigo_rest.get().strip()
+        nuevo_nombre = entry_nuevo_nombre.get().strip()
+        if not all([cod_pais, cod_ciudad, cod_rest, nuevo_nombre]):
+            messagebox.showerror("Error", "Ingrese todos los campos: País, Ciudad, Restaurante y Nuevo Nombre.")
+            return
+
+        resultado = modificar_restaurante(cod_pais, cod_ciudad, cod_rest, nuevo_nombre)
+        resultado_label.config(text=resultado, fg="green" if "modificado" in resultado else "red")
+
+    tk.Button(frame_dinamico, text="Modificar", command=modificar).pack(pady=10)
+def formulario_modificar_menu():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Modificar Menú", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_codigo_pais = tk.Entry(frame_dinamico)
+    entry_codigo_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_codigo_ciudad = tk.Entry(frame_dinamico)
+    entry_codigo_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_codigo_rest = tk.Entry(frame_dinamico)
+    entry_codigo_rest.pack()
+
+    tk.Label(frame_dinamico, text="Código de Menú:").pack()
+    entry_codigo_menu = tk.Entry(frame_dinamico)
+    entry_codigo_menu.pack()
+
+    tk.Label(frame_dinamico, text="Nuevo Nombre de Menú:").pack()
+    entry_nuevo_nombre = tk.Entry(frame_dinamico)
+    entry_nuevo_nombre.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def modificar():
+        cod_pais = entry_codigo_pais.get().strip()
+        cod_ciudad = entry_codigo_ciudad.get().strip()
+        cod_rest = entry_codigo_rest.get().strip()
+        cod_menu = entry_codigo_menu.get().strip()
+        nuevo_nombre = entry_nuevo_nombre.get().strip()
+        if not all([cod_pais, cod_ciudad, cod_rest, cod_menu, nuevo_nombre]):
+            messagebox.showerror("Error", "Ingrese País, Ciudad, Restaurante, Menú y Nuevo Nombre.")
+            return
+
+        resultado = modificar_menu(cod_pais, cod_ciudad, cod_rest, cod_menu, nuevo_nombre)
+        resultado_label.config(text=resultado, fg="green" if "modificado" in resultado else "red")
+
+    tk.Button(frame_dinamico, text="Modificar", command=modificar).pack(pady=10)
+def formulario_modificar_producto():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Modificar Producto", font=('Arial', 16)).pack(pady=10)
+
+    # Entradas necesarias
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_pais = tk.Entry(frame_dinamico)
+    entry_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_ciudad = tk.Entry(frame_dinamico)
+    entry_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_rest = tk.Entry(frame_dinamico)
+    entry_rest.pack()
+
+    tk.Label(frame_dinamico, text="Código de Menú:").pack()
+    entry_menu = tk.Entry(frame_dinamico)
+    entry_menu.pack()
+
+    tk.Label(frame_dinamico, text="Código de Producto:").pack()
+    entry_prod = tk.Entry(frame_dinamico)
+    entry_prod.pack()
+
+    tk.Label(frame_dinamico, text="Nuevo Nombre (opcional):").pack()
+    entry_nombre = tk.Entry(frame_dinamico)
+    entry_nombre.pack()
+
+    tk.Label(frame_dinamico, text="Nuevas Calorías (opcional):").pack()
+    entry_calorias = tk.Entry(frame_dinamico)
+    entry_calorias.pack()
+
+    tk.Label(frame_dinamico, text="Nuevo Precio (opcional):").pack()
+    entry_precio = tk.Entry(frame_dinamico)
+    entry_precio.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def modificar():
+        cp = entry_pais.get().strip()
+        cc = entry_ciudad.get().strip()
+        cr = entry_rest.get().strip()
+        cm = entry_menu.get().strip()
+        cprod = entry_prod.get().strip()
+        nombre = entry_nombre.get().strip() or None
+        calorias = entry_calorias.get().strip()
+        precio = entry_precio.get().strip()
+
+        calorias = int(calorias) if calorias else None
+        precio = float(precio) if precio else None
+
+        if not all([cp, cc, cr, cm, cprod]):
+            messagebox.showerror("Error", "Complete todos los códigos.")
+            return
+
+        resultado = modificar_producto(cp, cc, cr, cm, cprod, nombre, calorias, precio)
+        resultado_label.config(text=resultado, fg="green" if "modificado" in resultado else "red")
+
+    tk.Button(frame_dinamico, text="Modificar", command=modificar).pack(pady=10)
+def formulario_modificar_cliente():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Modificar Cliente", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Cédula del Cliente:").pack()
+    entry_cedula = tk.Entry(frame_dinamico)
+    entry_cedula.pack()
+
+    tk.Label(frame_dinamico, text="Nuevo Nombre:").pack()
+    entry_nombre = tk.Entry(frame_dinamico)
+    entry_nombre.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def modificar():
+        cedula = entry_cedula.get().strip()
+        nombre = entry_nombre.get().strip()
+        if not cedula or not nombre:
+            messagebox.showerror("Error", "Complete ambos campos.")
+            return
+
+        resultado = modificar_cliente(cedula, nombre)
+        resultado_label.config(text=resultado, fg="green" if "modificado" in resultado else "red")
+
+    tk.Button(frame_dinamico, text="Modificar", command=modificar).pack(pady=10)
+def formulario_modificar_administrador():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Modificar Administrador", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Cédula del Administrador:").pack()
+    entry_cedula = tk.Entry(frame_dinamico)
+    entry_cedula.pack()
+
+    tk.Label(frame_dinamico, text="Nuevo Nombre:").pack()
+    entry_nombre = tk.Entry(frame_dinamico)
+    entry_nombre.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def modificar():
+        cedula = entry_cedula.get().strip()
+        nombre = entry_nombre.get().strip()
+        if not cedula or not nombre:
+            messagebox.showerror("Error", "Complete ambos campos.")
+            return
+
+        if cedula in admin:
+            admin[cedula] = nombre
+            resultado_label.config(text=f"Administrador {cedula} modificado correctamente.", fg="green")
+        else:
+            resultado_label.config(text=f"Administrador {cedula} no encontrado.", fg="red")
+
+    tk.Button(frame_dinamico, text="Modificar", command=modificar).pack(pady=10)
+#FUNCIOONES DE ELIMINAR
+def eliminar(tipo, *args):
+    if tipo == "pais":
+        return eliminar_pais(*args)
+    elif tipo == "ciudad":
+        return eliminar_ciudad(*args)
+    elif tipo == "restaurante":
+        return eliminar_restaurante(*args)
+    elif tipo == "menu":
+        return eliminar_menu(*args)
+    elif tipo == "producto":
+        return eliminar_producto(*args)
+    elif tipo == "cliente":
+        return eliminar_cliente(*args)
+    elif tipo == "admin":
+        cedula = args[0]
+        if cedula in admin:
+            del admin[cedula]
+            return True
+        else:
+            return False
     else:
-        messagebox.showerror("Error", resultado)
+        return False
+def formulario_eliminar_pais():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Eliminar País", font=('Arial', 16)).pack(pady=10)
 
-root = tk.Tk()
-# ================== CONFIGURACIÓN DE BOTONES ==================
-def cliente_click():
-    cedula = simpledialog.askstring("Cédula", "Ingrese su cédula:")
-    if not cedula:
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_pais = tk.Entry(frame_dinamico)
+    entry_pais.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def eliminar_p():
+        cod_pais = entry_pais.get().strip()
+        if not cod_pais:
+            messagebox.showerror("Error", "Ingrese el código del país.")
+            return
+
+        if eliminar("pais", cod_pais):
+            resultado_label.config(text=f"País {cod_pais} eliminado correctamente.", fg="green")
+        else:
+            resultado_label.config(text=f"País {cod_pais} no encontrado.", fg="red")
+
+    tk.Button(frame_dinamico, text="Eliminar", command=eliminar_p).pack(pady=10)
+def formulario_eliminar_ciudad():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Eliminar Ciudad", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_pais = tk.Entry(frame_dinamico)
+    entry_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_ciudad = tk.Entry(frame_dinamico)
+    entry_ciudad.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def eliminar_c():
+        cp = entry_pais.get().strip()
+        cc = entry_ciudad.get().strip()
+        if not cp or not cc:
+            messagebox.showerror("Error", "Ingrese el código de país y ciudad.")
+            return
+
+        if eliminar("ciudad", cp, cc):
+            resultado_label.config(text=f"Ciudad {cc} eliminada correctamente.", fg="green")
+        else:
+            resultado_label.config(text=f"Ciudad {cc} no encontrada.", fg="red")
+
+    tk.Button(frame_dinamico, text="Eliminar", command=eliminar_c).pack(pady=10)
+def formulario_eliminar_restaurante():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Eliminar Restaurante", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_pais = tk.Entry(frame_dinamico)
+    entry_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_ciudad = tk.Entry(frame_dinamico)
+    entry_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_rest = tk.Entry(frame_dinamico)
+    entry_rest.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def eliminar_r():
+        cp = entry_pais.get().strip()
+        cc = entry_ciudad.get().strip()
+        cr = entry_rest.get().strip()
+        if not all([cp, cc, cr]):
+            messagebox.showerror("Error", "Ingrese País, Ciudad y Restaurante.")
+            return
+
+        if eliminar("restaurante", cp, cc, cr):
+            resultado_label.config(text=f"Restaurante {cr} eliminado correctamente.", fg="green")
+        else:
+            resultado_label.config(text=f"Restaurante {cr} no encontrado.", fg="red")
+
+    tk.Button(frame_dinamico, text="Eliminar", command=eliminar_r).pack(pady=10)
+def formulario_eliminar_menu():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Eliminar Menú", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_pais = tk.Entry(frame_dinamico)
+    entry_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_ciudad = tk.Entry(frame_dinamico)
+    entry_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_rest = tk.Entry(frame_dinamico)
+    entry_rest.pack()
+
+    tk.Label(frame_dinamico, text="Código de Menú:").pack()
+    entry_menu = tk.Entry(frame_dinamico)
+    entry_menu.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def eliminar_m():
+        cp = entry_pais.get().strip()
+        cc = entry_ciudad.get().strip()
+        cr = entry_rest.get().strip()
+        cm = entry_menu.get().strip()
+        if not all([cp, cc, cr, cm]):
+            messagebox.showerror("Error", "Ingrese País, Ciudad, Restaurante y Menú.")
+            return
+
+        if eliminar("menu", cp, cc, cr, cm):
+            resultado_label.config(text=f"Menú {cm} eliminado correctamente.", fg="green")
+        else:
+            resultado_label.config(text=f"Menú {cm} no encontrado.", fg="red")
+
+    tk.Button(frame_dinamico, text="Eliminar", command=eliminar_m).pack(pady=10)
+def formulario_eliminar_producto():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Eliminar Producto", font=('Arial', 16)).pack(pady=10)
+
+    # Entradas necesarias
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_pais = tk.Entry(frame_dinamico)
+    entry_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_ciudad = tk.Entry(frame_dinamico)
+    entry_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_rest = tk.Entry(frame_dinamico)
+    entry_rest.pack()
+
+    tk.Label(frame_dinamico, text="Código de Menú:").pack()
+    entry_menu = tk.Entry(frame_dinamico)
+    entry_menu.pack()
+
+    tk.Label(frame_dinamico, text="Código de Producto:").pack()
+    entry_prod = tk.Entry(frame_dinamico)
+    entry_prod.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def eliminar_p():
+        cp = entry_pais.get().strip()
+        cc = entry_ciudad.get().strip()
+        cr = entry_rest.get().strip()
+        cm = entry_menu.get().strip()
+        cprod = entry_prod.get().strip()
+        if not all([cp, cc, cr, cm, cprod]):
+            messagebox.showerror("Error", "Ingrese todos los códigos: País, Ciudad, Restaurante, Menú y Producto.")
+            return
+
+        if eliminar("producto", cp, cc, cr, cm, cprod):
+            resultado_label.config(text=f"Producto {cprod} eliminado correctamente.", fg="green")
+        else:
+            resultado_label.config(text=f"Producto {cprod} no encontrado.", fg="red")
+
+    tk.Button(frame_dinamico, text="Eliminar", command=eliminar_p).pack(pady=10)
+def formulario_eliminar_cliente():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Eliminar Cliente", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Cédula del Cliente:").pack()
+    entry_cedula = tk.Entry(frame_dinamico)
+    entry_cedula.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def eliminar_c():
+        cedula = entry_cedula.get().strip()
+        if not cedula:
+            messagebox.showerror("Error", "Ingrese la cédula del cliente.")
+            return
+
+        if eliminar("cliente", cedula):
+            resultado_label.config(text=f"Cliente {cedula} eliminado correctamente.", fg="green")
+        else:
+            resultado_label.config(text=f"Cliente {cedula} no encontrado.", fg="red")
+
+    tk.Button(frame_dinamico, text="Eliminar", command=eliminar_c).pack(pady=10)
+def formulario_eliminar_administrador():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Eliminar Administrador", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Cédula del Administrador:").pack()
+    entry_cedula = tk.Entry(frame_dinamico)
+    entry_cedula.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def eliminar_a():
+        cedula = entry_cedula.get().strip()
+        if not cedula:
+            messagebox.showerror("Error", "Ingrese la cédula del administrador.")
+            return
+
+        if eliminar("admin", cedula):
+            resultado_label.config(text=f"Administrador {cedula} eliminado correctamente.", fg="green")
+        else:
+            resultado_label.config(text=f"Administrador {cedula} no encontrado.", fg="red")
+
+    tk.Button(frame_dinamico, text="Eliminar", command=eliminar_a).pack(pady=10)
+#FUNCION REGISTRO COMPRA
+def formulario_registrar_compra():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Registrar Compra", font=('Arial', 16)).pack(pady=10)
+    # Entradas necesarias
+    tk.Label(frame_dinamico, text="Cédula del Cliente:").pack()
+    entry_cedula = tk.Entry(frame_dinamico)
+    entry_cedula.pack()
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_pais = tk.Entry(frame_dinamico)
+    entry_pais.pack()
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_ciudad = tk.Entry(frame_dinamico)
+    entry_ciudad.pack()
+
+    tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
+    entry_rest = tk.Entry(frame_dinamico)
+    entry_rest.pack()
+
+    tk.Label(frame_dinamico, text="Código de Menú:").pack()
+    entry_menu = tk.Entry(frame_dinamico)
+    entry_menu.pack()
+
+    tk.Label(frame_dinamico, text="Código de Producto:").pack()
+    entry_prod = tk.Entry(frame_dinamico)
+    entry_prod.pack()
+
+    tk.Label(frame_dinamico, text="Cantidad:").pack()
+    entry_cantidad = tk.Entry(frame_dinamico)
+    entry_cantidad.pack()
+
+    tk.Label(frame_dinamico, text="¿Para llevar? (s/n):").pack()
+    entry_condicion = tk.Entry(frame_dinamico)
+    entry_condicion.pack()
+
+    tk.Label(frame_dinamico, text="Método de Pago (1=Efectivo, 2=Tarjeta):").pack()
+    entry_pago = tk.Entry(frame_dinamico)
+    entry_pago.pack()
+    resultado_label = tk.Label(frame_dinamico, text="", fg="blue", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+    def procesar_compra():
+        ced = entry_cedula.get().strip()
+        cp = entry_pais.get().strip()
+        cc = entry_ciudad.get().strip()
+        cr = entry_rest.get().strip()
+        cm = entry_menu.get().strip()
+        cprod = entry_prod.get().strip()
+        cant = entry_cantidad.get().strip()
+        cond = entry_condicion.get().strip().lower()
+        pago = entry_pago.get().strip()
+        if not all([ced, cp, cc, cr, cm, cprod, cant, cond, pago]):
+            messagebox.showerror("Error", "Complete todos los campos.")
+            return
+        try:
+            cant = int(cant)
+            if pago not in ("1", "2"):
+                messagebox.showerror("Error", "El método de pago debe ser 1 o 2.")
+                return
+        except ValueError:
+            messagebox.showerror("Error", "Cantidad debe ser un número.")
+            return
+        # Definir entrada() "dummy" para registrar_compra_menu
+        def entrada(prompt=""):
+            if "Cédula del cliente" in prompt:
+                return entry_cedula.get().strip()
+            elif "Es para llevar" in prompt:
+                return entry_condicion.get().strip().lower()
+            elif "Método de pago" in prompt:
+                return entry_pago.get().strip()
+            elif "Código del país" in prompt:
+                return entry_pais.get().strip()
+            elif "Código de la ciudad" in prompt:
+                return entry_ciudad.get().strip()
+            elif "Código del restaurante" in prompt:
+                return entry_rest.get().strip()
+            elif "Código del menú" in prompt:
+                return entry_menu.get().strip()
+            elif "Código del producto" in prompt:
+                return entry_prod.get().strip()
+            elif "Cantidad a comprar" in prompt:
+                return entry_cantidad.get().strip()
+            elif "Desea agregar otro producto" in prompt:
+                return "n"  # Por ahora, solo una compra
+            else:
+                return ""
+
+        exito = registrar_compra_menu(dic, cli, entrada)
+        if exito:
+            resultado_label.config(text="Compra registrada correctamente.", fg="green")
+        else:
+            resultado_label.config(text="Error al registrar compra.", fg="red")
+
+    tk.Button(frame_dinamico, text="Registrar Compra", command=procesar_compra).pack(pady=10)
+#FILA
+def formulario_ver_fila_compra():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Fila de Compra (últimas compras registradas)", font=('Arial', 16)).pack(pady=10)
+    try:
+        with open("facturas.txt", "r", encoding="utf-8") as f:
+            lineas = [linea.strip() for linea in f if linea.strip()]
+    except FileNotFoundError:
+        tk.Label(frame_dinamico, text="No hay facturas registradas.", fg="red").pack(pady=10)
         return
-    cedula = normalizar_codigo(cedula)
-    if cedula not in cli:
-        messagebox.showerror("Error", "Cliente no registrado.")
+
+    if not lineas:
+        tk.Label(frame_dinamico, text="No hay compras registradas.", fg="red").pack(pady=10)
         return
-    # Registrar compra
-    if registrar_compra_menu(dic, cli, entrada):
-        messagebox.showinfo("Éxito", "Compra registrada correctamente.")
-    else:
-        messagebox.showwarning("Error", "No se pudo completar la compra.")
 
-def admin_click():
-    cedula = simpledialog.askstring("Autenticación", "Cédula de administrador:")
-    if cedula and cedula in admin:
-        admin_menu(root)  # Abre el menú de administrador
-    else:
-        messagebox.showerror("Error", "Credenciales inválidas")
+    for i, linea in enumerate(lineas, start=1):
+        campos = linea.split(";")
+        texto = f"{i}. Cédula: {campos[0]}, País: {campos[1]}, Ciudad: {campos[2]}, Restaurante: {campos[3]}, Menú: {campos[4]}, Producto: {campos[5]}, Cantidad: {campos[6]}, Precio: {campos[7]}, Pago: {campos[8]}, Servicio: {campos[9]}"
+        tk.Label(frame_dinamico, text=texto, wraplength=800, justify="left").pack(anchor="w")
+def formulario_vaciar_fila_compra():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Vaciar Fila de Compra", font=('Arial', 16)).pack(pady=10)
 
-boton_admin = tk.Button(
-    root,
-    text="Administrador",
-    command=admin_click,
-    activebackground="blue",
-    activeforeground="white",
-    anchor="center",
-    bd=3,
-    bg="lightgray",
-    cursor="hand2",
-    disabledforeground="gray",
-    fg="black",
-    font=("Arial", 12),
-    height=2,
-    highlightbackground="black",
-    highlightcolor="green",
-    highlightthickness=2,
-    justify="center",
-    overrelief="raised",
-    padx=10,
-    pady=5,
-    width=15,
-    wraplength=100
-)
-boton_admin.pack(padx=10, pady=10)
+    def vaciar():
+        try:
+            with open("facturas.txt", "w") as f:
+                f.write("")
+            tk.Label(frame_dinamico, text="Fila de compra vaciada correctamente.", fg="green").pack(pady=10)
+        except Exception as e:
+            tk.Label(frame_dinamico, text=f"Error al vaciar: {e}", fg="red").pack(pady=10)
 
-cliente = tk.Button(
-    root,
-    text="Cliente",
-    command=cliente_click,
-    activebackground="green",
-    activeforeground="white",
-    anchor="center",
-    bd=3,
-    bg="lightgray",
-    cursor="hand2",
-    disabledforeground="gray",
-    fg="black",
-    font=("Arial", 12),
-    height=2,
-    highlightbackground="black",
-    highlightcolor="green",
-    highlightthickness=2,
-    justify="center",
-    overrelief="raised",
-    padx=10,
-    pady=5,
-    width=15,
-    wraplength=100
-)
-cliente.pack(padx=40, pady=40)
+    tk.Button(frame_dinamico, text="Vaciar Fila de Compra", command=vaciar).pack(pady=10)
+def mostrar_mensaje(seccion):
+    limpiar_frame()
+    tk.Label(frame_dinamico, text=f"Seleccionaste: {seccion}", font=("Arial", 18)).pack(pady=50)
+#___________VENTANA PRINCIPAL_________________
+def ventana_principal():
+    global frame_dinamico
+    ventana = tk.Tk()
+    ventana.geometry('1280x900')
+    ventana.title("Sistema de Restaurante")
+    ventana.config(bg="#e6f0fa")
 
-root.mainloop()
+    frame_iconos = tk.Frame(ventana,bg="#ebe8e3", bd=2, relief="groove", padx=15, pady=10)
+    frame_iconos.pack(side="top", pady=10)
+
+    frame_dinamico = tk.Frame(ventana, bg="#f0f0f0", padx=10, pady=10)
+    frame_dinamico.pack(fill='both', expand=True)
+
+    #UBICACIONES
+    icono_ubi = tk.PhotoImage(file="iconos/ubi.png")
+    icono_rest = tk.PhotoImage(file="iconos/rest.png")
+    icono_usuar = tk.PhotoImage(file="iconos/usuar.png")
+    icono_salir = tk.PhotoImage(file="iconos/salir.png")
+    ventana.iconos=[icono_ubi, icono_rest, icono_usuar, icono_salir]
+    #BOTONES
+    """btn_ubi=tk.Button(frame_iconos, image=icono_ubi, command=lambda: mostrar_mensaje("Ubicaciones"))
+    btn_ubi.pack(side="left", padx=20)
+
+    btn_rest=tk.Button(frame_iconos, image=icono_rest, command=lambda: mostrar_mensaje("Restaurantes"))
+    btn_rest.pack(side="left", padx=20)
+
+    btn_usuar=tk.Button(frame_iconos, image=icono_usuar, command=lambda: mostrar_mensaje("Usuarios"))
+    btn_usuar.pack(side="left", padx=20)
+
+    btn_salir = tk.Button(frame_iconos, image=icono_salir, command=ventana.destroy)
+    btn_salir.pack(side="left", padx=20)"""
+
+    barra_menu = tk.Menu(ventana)
+    ventana.config(menu=barra_menu)
+
+    # ======= Menú de Ubicaciones =======
+    menu_ubicaciones=tk.Menu(barra_menu, tearoff=0)
+    submenu_paises=tk.Menu(menu_ubicaciones, tearoff=0)
+    submenu_paises.add_command(label="Insertar País",command=formulario_insertar_pais)
+    submenu_paises.add_command(label="Consultar País", command=formulario_consultar_pais)
+    submenu_paises.add_command(label="Modificar País", command=formulario_modificar_pais)
+    submenu_paises.add_command(label="Eliminar País", command=formulario_eliminar_pais)
+    submenu_ciudades = tk.Menu(menu_ubicaciones, tearoff=0)
+    submenu_ciudades.add_command(label="Insertar Ciudad", command=formulario_insertar_ciudad)
+    submenu_ciudades.add_command(label="Consultar Ciudad", command=formulario_consultar_ciudad)
+    submenu_ciudades.add_command(label="Modificar Ciudad", command=formulario_modificar_ciudad)
+    submenu_ciudades.add_command(label="Eliminar Ciudad",command=formulario_eliminar_ciudad)
+
+    menu_ubicaciones.add_cascade(label="Países", menu=submenu_paises)
+    menu_ubicaciones.add_cascade(label="Ciudades", menu=submenu_ciudades)
+    barra_menu.add_cascade(label="Ubicaciones", menu=menu_ubicaciones)
+
+    # ======= Menú de Restaurantes =======
+    menu_restaurantes = tk.Menu(barra_menu, tearoff=0)
+
+    submenu_restaurantes = tk.Menu(menu_restaurantes, tearoff=0)
+    submenu_restaurantes.add_command(label="Insertar Restaurante", command=formulario_insertar_restaurante)
+    submenu_restaurantes.add_command(label="Consultar Restaurante", command=formulario_consultar_restaurante)
+    submenu_restaurantes.add_command(label="Modificar Restaurante", command=formulario_modificar_restaurante)
+    submenu_restaurantes.add_command(label="Eliminar Restaurante",command=formulario_eliminar_restaurante)
+
+    submenu_menus = tk.Menu(menu_restaurantes, tearoff=0)
+    submenu_menus.add_command(label="Insertar Menú", command=formulario_insertar_menu)
+    submenu_menus.add_command(label="Consultar Menú", command=formulario_consultar_menu)
+    submenu_menus.add_command(label="Modificar Menú", command=formulario_modificar_menu)
+    submenu_menus.add_command(label="Eliminar Menú", command=formulario_eliminar_menu)
+
+    submenu_productos = tk.Menu(menu_restaurantes, tearoff=0)
+    submenu_productos.add_command(label="Insertar Producto", command=formulario_insertar_producto)
+    submenu_productos.add_command(label="Consultar Producto", command=formulario_consultar_producto)
+    submenu_productos.add_command(label="Modificar Producto", command=formulario_modificar_producto)
+    submenu_productos.add_command(label="Eliminar Producto", command=formulario_eliminar_producto)
+
+    menu_restaurantes.add_cascade(label="Restaurantes", menu=submenu_restaurantes)
+    menu_restaurantes.add_cascade(label="Menús", menu=submenu_menus)
+    menu_restaurantes.add_cascade(label="Productos", menu=submenu_productos)
+    barra_menu.add_cascade(label="Restaurantes", menu=menu_restaurantes)
+
+    # ======= Menú de Usuarios =======
+    menu_usuarios = tk.Menu(barra_menu, tearoff=0)
+
+    submenu_clientes = tk.Menu(menu_usuarios, tearoff=0)
+    submenu_clientes.add_command(label="Insertar Cliente", command=formulario_insertar_cliente)
+    submenu_clientes.add_command(label="Consultar Cliente", command=formulario_consultar_cliente)
+    submenu_clientes.add_command(label="Modificar Cliente", command=formulario_modificar_cliente)
+    submenu_clientes.add_command(label="Eliminar Cliente", command=formulario_eliminar_cliente)
+
+    submenu_admins = tk.Menu(menu_usuarios, tearoff=0)
+    submenu_admins.add_command(label="Insertar Administrador", command=formulario_insertar_administrador)
+    submenu_admins.add_command(label="Consultar Administrador", command=formulario_consultar_administrador)
+    submenu_admins.add_command(label="Modificar Administrador", command=formulario_modificar_administrador)
+    submenu_admins.add_command(label="Eliminar Administrador", command=formulario_eliminar_administrador)
+
+    submenu_fila = tk.Menu(menu_usuarios, tearoff=0)
+    submenu_fila.add_command(label="Ver Fila de Compra", command=formulario_ver_fila_compra)
+    submenu_fila.add_command(label="Vaciar Fila de Compra", command=formulario_vaciar_fila_compra)
+
+    submenu_registrar = tk.Menu(menu_usuarios, tearoff=0)
+    submenu_registrar.add_command(label="Registrar Compra", command=formulario_registrar_compra)
+
+    menu_usuarios.add_cascade(label="Clientes", menu=submenu_clientes)
+    menu_usuarios.add_cascade(label="Administradores", menu=submenu_admins)
+    menu_usuarios.add_cascade(label="Fila de Compra", menu=submenu_fila)
+    menu_usuarios.add_cascade(label="Registrar Compra", menu=submenu_registrar)
+    barra_menu.add_cascade(label="Usuarios", menu=menu_usuarios)
+
+    # ======= Cerrar Ventana =======
+    barra_menu.add_command(label="Cerrar Ventana", command=lambda:regresar_login(ventana))
+
+    def mostrar_popup(menu, event):
+        try:
+            menu.tk_popup(event.x_root, event.y_root)
+        finally:
+            menu.grab_release()
+    # Botones de iconos (sin bordes ni efectos)
+    btn_ubi = tk.Button(frame_iconos, image=icono_ubi, bd=0, relief='flat', bg="#f0f0f0",
+                        command=lambda: None)
+    btn_ubi.pack(side="left", padx=20)
+    btn_ubi.bind("<Button-1>", lambda e: mostrar_popup(menu_ubicaciones, e))
+
+    btn_rest = tk.Button(frame_iconos, image=icono_rest, bd=0, relief='flat', bg="#f0f0f0",
+                         command=lambda: None)
+    btn_rest.pack(side="left", padx=20)
+    btn_rest.bind("<Button-1>", lambda e: mostrar_popup(menu_restaurantes, e))
+
+    btn_usuar = tk.Button(frame_iconos, image=icono_usuar, bd=0, relief='flat', bg="#f0f0f0",
+                          command=lambda: None)
+    btn_usuar.pack(side="left", padx=20)
+    btn_usuar.bind("<Button-1>", lambda e: mostrar_popup(menu_usuarios, e))
+
+    btn_salir = tk.Button(frame_iconos, image=icono_salir, bd=0, relief='flat', bg="#f0f0f0",
+                          command=ventana.destroy)
+    btn_salir.pack(side="left", padx=20)
+    ventana.mainloop()
+
+def ventana_usuario():
+    global frame_dinamico
+    ventana = tk.Tk()
+    ventana.geometry('1280x900')
+    ventana.title("Sistema de Restaurante - Usuario")
+    ventana.config(bg="#e6f0fa")
+    frame_iconos = tk.Frame(ventana, bg="#cce0f5", bd=2, relief="groove", padx=15, pady=10)
+    frame_iconos.pack(side="top", pady=10)
+    frame_dinamico = tk.Frame(ventana, bg="#f0f0f0", padx=10, pady=10)
+    frame_dinamico.pack(fill='both', expand=True)
+
+    # Cargar iconos
+    icono_ubi = tk.PhotoImage(file="iconos/ubi.png")
+    icono_rest = tk.PhotoImage(file="iconos/rest.png")
+    icono_salir = tk.PhotoImage(file="iconos/salir.png")
+    ventana.iconos = [icono_ubi, icono_rest, icono_salir]
+
+    # Menús solo de consulta
+    menu_ubicaciones = tk.Menu(ventana, tearoff=0)
+    menu_ubicaciones.add_command(label="Consultar País", command=formulario_consultar_pais)
+    menu_ubicaciones.add_command(label="Consultar Ciudad", command=formulario_consultar_ciudad)
+
+    menu_restaurantes = tk.Menu(ventana, tearoff=0)
+    menu_restaurantes.add_command(label="Consultar Restaurante", command=formulario_consultar_restaurante)
+    menu_restaurantes.add_command(label="Consultar Menú", command=formulario_consultar_menu)
+    menu_restaurantes.add_command(label="Consultar Producto", command=formulario_consultar_producto)
+
+    # Mostrar menú al hacer clic en íconos
+    def mostrar_popup(menu, event):
+        try:
+            menu.tk_popup(event.x_root, event.y_root)
+        finally:
+            menu.grab_release()
+
+    estilo_btn = {"bd": 0, "relief": "flat", "bg": "#cce0f5", "activebackground": "#b3d1f0"}
+
+    # Íconos con leyenda
+    def crear_icono(frame_padre, icono, texto, comando):
+        frame = tk.Frame(frame_padre, bg="#cce0f5")
+        frame.pack(side="left", padx=15)
+
+        btn = tk.Button(frame, image=icono, **estilo_btn)
+        btn.pack()
+        btn.bind("<Button-1>", comando)
+
+        tk.Label(frame, text=texto, bg="#cce0f5", font=("Arial", 10)).pack()
+
+    crear_icono(frame_iconos, icono_ubi, "Ubicaciones", lambda e: mostrar_popup(menu_ubicaciones, e))
+    crear_icono(frame_iconos, icono_rest, "Restaurantes", lambda e: mostrar_popup(menu_restaurantes, e))
+    crear_icono(frame_iconos, icono_salir, "Salir", lambda e: ventana.destroy())
+
+    ventana.mainloop()
+
+ventana_login()
+
+
