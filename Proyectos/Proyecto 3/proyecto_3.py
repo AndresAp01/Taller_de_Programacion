@@ -4,9 +4,7 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import simpledialog, messagebox, Menu, Label, Frame, font
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-from reportlab.platypus.doctemplate import SimpleDocTemplate
+1
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import LETTER
@@ -147,6 +145,13 @@ descuentos = {
     "Comer en restaurante - efectivo": 0.01,
     "Comer en restaurante - tarjeta":  0.05,
 }
+paises_eliminados={}
+ciudades_eliminadas={}
+restaurantes_eliminados={}
+menus_eliminados={}
+productos_eliminados={}
+
+
 #Funcion para buscar general
 def buscar_elemento(diccionario, cod_pais, cod_ciudad=None, cod_rest=None, cod_menu=None, cod_prod=None):
     # Se usa .get
@@ -296,6 +301,8 @@ def modificar_cliente(cedula_cliente, nuevo_nombre):
 #ELIMINACIONES_________________________________________________________________________________________________________#
 def eliminar_pais(codigo_pais):
     if codigo_pais in dic:
+        nombre=dic[codigo_pais]["nombre"]
+        paises_eliminados[codigo_pais]=nombre  # ← Guarda copia antes de eliminar
         del dic[codigo_pais]
         print(f"País {codigo_pais} y toda su información asociada fue eliminada.")
         return True
@@ -304,6 +311,8 @@ def eliminar_pais(codigo_pais):
         return False
 def eliminar_ciudad(codigo_pais, codigo_ciudad):
     if codigo_pais in dic and codigo_ciudad in dic[codigo_pais]["ciudades"]:
+        nombre = dic[codigo_pais]["ciudades"][codigo_ciudad]["nombre"]
+        ciudades_eliminadas[(codigo_pais, codigo_ciudad)] = nombre  # ← guardar ciudad eliminada
         del dic[codigo_pais]["ciudades"][codigo_ciudad]
         print(f"Ciudad {codigo_ciudad} y toda su información fue eliminada.")
         return True
@@ -311,10 +320,12 @@ def eliminar_ciudad(codigo_pais, codigo_ciudad):
         print(f"La ciudad {codigo_ciudad} no existe en el país {codigo_pais}.")
         return False
 def eliminar_restaurante(codigo_pais, codigo_ciudad, codigo_restaurante):
-    if (codigo_pais in dic and 
-        codigo_ciudad in dic[codigo_pais]["ciudades"] and 
+    if (codigo_pais in dic and
+        codigo_ciudad in dic[codigo_pais]["ciudades"] and
         codigo_restaurante in dic[codigo_pais]["ciudades"][codigo_ciudad]["restaurantes"]):
-        
+
+        nombre = dic[codigo_pais]["ciudades"][codigo_ciudad]["restaurantes"][codigo_restaurante]["nombre"]
+        restaurantes_eliminados[(codigo_pais, codigo_ciudad, codigo_restaurante)] = nombre
         del dic[codigo_pais]["ciudades"][codigo_ciudad]["restaurantes"][codigo_restaurante]
         print(f"Restaurante {codigo_restaurante} eliminado.")
         return True
@@ -323,6 +334,8 @@ def eliminar_restaurante(codigo_pais, codigo_ciudad, codigo_restaurante):
         return False
 def eliminar_menu(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu):
     try:
+        nombre = dic[codigo_pais]["ciudades"][codigo_ciudad]["restaurantes"][codigo_restaurante]["menus"][codigo_menu]["nombre"]
+        menus_eliminados[(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu)] = nombre
         del dic[codigo_pais]["ciudades"][codigo_ciudad]["restaurantes"][codigo_restaurante]["menus"][codigo_menu]
         print(f"Menú {codigo_menu} eliminado.")
         return True
@@ -331,12 +344,15 @@ def eliminar_menu(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu):
         return False
 def eliminar_producto(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu, codigo_producto):
     try:
+        nombre = dic[codigo_pais]["ciudades"][codigo_ciudad]["restaurantes"][codigo_restaurante]["menus"][codigo_menu]["productos"][codigo_producto]["nombre"]
+        productos_eliminados[(codigo_pais, codigo_ciudad, codigo_restaurante, codigo_menu, codigo_producto)] = nombre
         del dic[codigo_pais]["ciudades"][codigo_ciudad]["restaurantes"][codigo_restaurante]["menus"][codigo_menu]["productos"][codigo_producto]
         print(f"Producto {codigo_producto} eliminado.")
         return True
     except KeyError:
         print(f"No se encontró el producto {codigo_producto} para eliminar.")
         return False
+
 def eliminar_cliente(cedula):
     if cedula in cli:
         del cli[cedula]
@@ -971,6 +987,99 @@ def reporte_descuentos(data_dict, nombre_pdf):
     mensaje = f"PDF generado correctamente en: {nombre_pdf}"
     print(mensaje)
     return mensaje
+
+#Eliminados
+def reporte_paises_eliminados(nombre_pdf):
+    doc = SimpleDocTemplate(nombre_pdf, pagesize=LETTER)
+    estilo = getSampleStyleSheet()
+    cuerpo = []
+    cuerpo.append(Paragraph("Reporte de Países Eliminados", estilo["Title"]))
+    cuerpo.append(Spacer(1, 12))
+    if not paises_eliminados:
+        cuerpo.append(Paragraph("<i>No hay países eliminados registrados.</i>", estilo["Normal"]))
+    else:
+        for i, (codigo, nombre) in enumerate(paises_eliminados.items(), start=1):
+            texto = f"{i}. Código: {codigo}   Nombre: {nombre}"
+            cuerpo.append(Paragraph(texto, estilo["Normal"]))
+            cuerpo.append(Spacer(1, 6))
+    doc.build(cuerpo)
+    print(f"PDF generado: {nombre_pdf}")
+    return True
+def reporte_ciudades_eliminadas(nombre_pdf):
+    doc = SimpleDocTemplate(nombre_pdf, pagesize=LETTER)
+    estilo = getSampleStyleSheet()
+    cuerpo = []
+    cuerpo.append(Paragraph("Reporte de Ciudades Eliminadas", estilo["Title"]))
+    cuerpo.append(Spacer(1, 12))
+    if not ciudades_eliminadas:
+        cuerpo.append(Paragraph("<i>No hay ciudades eliminadas registradas.</i>", estilo["Normal"]))
+    else:
+        for i, ((cod_pais, cod_ciudad), nombre) in enumerate(ciudades_eliminadas.items(), start=1):
+            texto = f"{i}. País: {cod_pais} | Ciudad: {cod_ciudad} → {nombre}"
+            cuerpo.append(Paragraph(texto, estilo["Normal"]))
+            cuerpo.append(Spacer(1, 6))
+
+    doc.build(cuerpo)
+    print(f"PDF generado: {nombre_pdf}")
+    return True
+def reporte_restaurantes_eliminados(nombre_pdf):
+    doc = SimpleDocTemplate(nombre_pdf, pagesize=LETTER)
+    estilo = getSampleStyleSheet()
+    cuerpo = []
+
+    cuerpo.append(Paragraph("Reporte de Restaurantes Eliminados", estilo["Title"]))
+    cuerpo.append(Spacer(1, 12))
+
+    if not restaurantes_eliminados:
+        cuerpo.append(Paragraph("<i>No hay restaurantes eliminados registrados.</i>", estilo["Normal"]))
+    else:
+        for i, ((cod_pais, cod_ciudad, cod_rest), nombre) in enumerate(restaurantes_eliminados.items(), start=1):
+            texto = f"{i}. País: {cod_pais} | Ciudad: {cod_ciudad} | Restaurante: {cod_rest} → {nombre}"
+            cuerpo.append(Paragraph(texto, estilo["Normal"]))
+            cuerpo.append(Spacer(1, 6))
+
+    doc.build(cuerpo)
+    print(f"PDF generado: {nombre_pdf}")
+    return True
+def reporte_menus_eliminados(nombre_pdf):
+    doc = SimpleDocTemplate(nombre_pdf, pagesize=LETTER)
+    estilo = getSampleStyleSheet()
+    cuerpo = []
+
+    cuerpo.append(Paragraph("Reporte de Menús Eliminados", estilo["Title"]))
+    cuerpo.append(Spacer(1, 12))
+
+    if not menus_eliminados:
+        cuerpo.append(Paragraph("<i>No hay menús eliminados registrados.</i>", estilo["Normal"]))
+    else:
+        for i, ((cp, cc, cr, cm), nombre) in enumerate(menus_eliminados.items(), start=1):
+            texto = f"{i}. País: {cp} | Ciudad: {cc} | Restaurante: {cr} | Menú: {cm} → {nombre}"
+            cuerpo.append(Paragraph(texto, estilo["Normal"]))
+            cuerpo.append(Spacer(1, 6))
+
+    doc.build(cuerpo)
+    print(f"PDF generado: {nombre_pdf}")
+    return True
+def reporte_productos_eliminados(nombre_pdf):
+    doc = SimpleDocTemplate(nombre_pdf, pagesize=LETTER)
+    estilo = getSampleStyleSheet()
+    cuerpo = []
+
+    cuerpo.append(Paragraph("Reporte de Productos Eliminados", estilo["Title"]))
+    cuerpo.append(Spacer(1, 12))
+
+    if not productos_eliminados:
+        cuerpo.append(Paragraph("<i>No hay productos eliminados registrados.</i>", estilo["Normal"]))
+    else:
+        for i, ((cp, cc, cr, cm, cprod), nombre) in enumerate(productos_eliminados.items(), start=1):
+            texto = f"{i}. País: {cp} | Ciudad: {cc} | Restaurante: {cr} | Menú: {cm} | Producto: {cprod} → {nombre}"
+            cuerpo.append(Paragraph(texto, estilo["Normal"]))
+            cuerpo.append(Spacer(1, 6))
+
+    doc.build(cuerpo)
+    print(f"PDF generado: {nombre_pdf}")
+    return True
+
 #______________________________________________________________________________________________________________________#
 # ================== FUNCIONES BASE ==================
 def ventana_login():
@@ -1666,36 +1775,28 @@ def formulario_modificar_menu():
 def formulario_modificar_producto():
     limpiar_frame()
     tk.Label(frame_dinamico, text="Modificar Producto", font=('Arial', 16)).pack(pady=10)
-
     # Entradas necesarias
     tk.Label(frame_dinamico, text="Código de País:").pack()
     entry_pais = tk.Entry(frame_dinamico)
     entry_pais.pack()
-
     tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
     entry_ciudad = tk.Entry(frame_dinamico)
     entry_ciudad.pack()
-
     tk.Label(frame_dinamico, text="Código de Restaurante:").pack()
     entry_rest = tk.Entry(frame_dinamico)
     entry_rest.pack()
-
     tk.Label(frame_dinamico, text="Código de Menú:").pack()
     entry_menu = tk.Entry(frame_dinamico)
     entry_menu.pack()
-
     tk.Label(frame_dinamico, text="Código de Producto:").pack()
     entry_prod = tk.Entry(frame_dinamico)
     entry_prod.pack()
-
     tk.Label(frame_dinamico, text="Nuevo Nombre (opcional):").pack()
     entry_nombre = tk.Entry(frame_dinamico)
     entry_nombre.pack()
-
     tk.Label(frame_dinamico, text="Nuevas Calorías (opcional):").pack()
     entry_calorias = tk.Entry(frame_dinamico)
     entry_calorias.pack()
-
     tk.Label(frame_dinamico, text="Nuevo Precio (opcional):").pack()
     entry_precio = tk.Entry(frame_dinamico)
     entry_precio.pack()
@@ -2143,6 +2244,371 @@ def formulario_vaciar_fila_compra():
 def mostrar_mensaje(seccion):
     limpiar_frame()
     tk.Label(frame_dinamico, text=f"Seleccionaste: {seccion}", font=("Arial", 18)).pack(pady=50)
+
+#FUNCIONES DE REPORTES
+def formulario_reporte_paises():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Países", font=('Arial', 16)).pack(pady=10)
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+    def generar():
+        nombre_pdf="Reporte_paises.pdf"
+        try:
+            mensaje=reporte_paises(dic, nombre_pdf)
+            resultado_label.config(text=mensaje, fg="green")
+        except Exception as e:
+            resultado_label.config(text=f"Error al generar el reporte: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_ciudades():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Ciudades", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_pais = tk.Entry(frame_dinamico)
+    entry_pais.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        cod_pais = entry_pais.get().strip()
+        if not cod_pais:
+            messagebox.showerror("Error", "Debe ingresar el código del país.")
+            return
+        nombre_pdf = f"Reporte_ciudades_{cod_pais}.pdf"
+        try:
+            mensaje = reporte_ciudades(dic, cod_pais, nombre_pdf)
+            resultado_label.config(text=mensaje, fg="green")
+        except Exception as e:
+            resultado_label.config(text=f"Error al generar el reporte: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_restaurantes():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Restaurantes", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Código de País:").pack()
+    entry_pais = tk.Entry(frame_dinamico)
+    entry_pais.pack()
+
+    tk.Label(frame_dinamico, text="Código de Ciudad:").pack()
+    entry_ciudad = tk.Entry(frame_dinamico)
+    entry_ciudad.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        cod_pais = entry_pais.get().strip()
+        cod_ciudad = entry_ciudad.get().strip()
+
+        if not cod_pais or not cod_ciudad:
+            messagebox.showerror("Error", "Debe ingresar el código del país y de la ciudad.")
+            return
+
+        nombre_pdf = f"Reporte_restaurantes_{cod_pais}_{cod_ciudad}.pdf"
+        try:
+            mensaje = reporte_restaurantes(dic, cod_pais, cod_ciudad, nombre_pdf)
+            resultado_label.config(text=mensaje, fg="green")
+        except Exception as e:
+            resultado_label.config(text=f"Error al generar el reporte: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_clientes():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Clientes", font=('Arial', 16)).pack(pady=10)
+
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        nombre_pdf = "Reporte_clientes.pdf"
+        try:
+            mensaje = reporte_clientes(cli, nombre_pdf)
+            resultado_label.config(text=mensaje, fg="green")
+        except Exception as e:
+            resultado_label.config(text=f"Error al generar el reporte: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_compras_cliente():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Compras por Cliente", font=('Arial', 16)).pack(pady=10)
+
+    tk.Label(frame_dinamico, text="Cédula del Cliente:").pack()
+    entry_cedula = tk.Entry(frame_dinamico)
+    entry_cedula.pack()
+
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        cedula = entry_cedula.get().strip()
+        if not cedula:
+            messagebox.showerror("Error", "Debe ingresar la cédula del cliente.")
+            return
+
+        nombre_pdf = f"Reporte_compras_{cedula}.pdf"
+        try:
+            exito = reporte_compras_cliente(cedula, "facturas.txt", nombre_pdf)
+            if exito:
+                resultado_label.config(text=f"Reporte generado: {nombre_pdf}", fg="green")
+            else:
+                resultado_label.config(text="No se encontraron compras para esta cédula.", fg="red")
+        except Exception as e:
+            resultado_label.config(text=f"Error: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_todas_compras():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Todas las Compras", font=('Arial', 16)).pack(pady=10)
+
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        nombre_pdf = "Reporte_todas_compras.pdf"
+        try:
+            mensaje = reporte_todas_compras(nombre_pdf)
+            resultado_label.config(text=mensaje, fg="green")
+        except Exception as e:
+            resultado_label.config(text=f"Error al generar el reporte: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_rest_mas():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte del Restaurante Más Buscado", font=('Arial', 16)).pack(pady=10)
+
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        nombre_pdf = "Reporte_restaurante_mas_buscado.pdf"
+        try:
+            exito = reporte_rest_mas(nombre_pdf)
+            if exito:
+                resultado_label.config(text=f"Reporte generado: {nombre_pdf}", fg="green")
+            else:
+                resultado_label.config(text="No hay búsquedas registradas de restaurantes.", fg="red")
+        except Exception as e:
+            resultado_label.config(text=f"Error: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_menu_mas():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte del Menú Más Buscado", font=('Arial', 16)).pack(pady=10)
+
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        nombre_pdf = "Reporte_menu_mas_buscado.pdf"
+        try:
+            exito = reporte_menu_mas(nombre_pdf)
+            if exito:
+                resultado_label.config(text=f"Reporte generado: {nombre_pdf}", fg="green")
+            else:
+                resultado_label.config(text="No hay búsquedas registradas de menús.", fg="red")
+        except Exception as e:
+            resultado_label.config(text=f"Error: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_producto_mas():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte del Producto Más Buscado", font=('Arial', 16)).pack(pady=10)
+
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        nombre_pdf = "Reporte_producto_mas_buscado.pdf"
+        try:
+            exito = reporte_producto_mas(nombre_pdf)
+            if exito:
+                resultado_label.config(text=f"Reporte generado: {nombre_pdf}", fg="green")
+            else:
+                resultado_label.config(text="No hay búsquedas registradas de productos.", fg="red")
+        except Exception as e:
+            resultado_label.config(text=f"Error: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_factura_extremo():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Factura con Precio Extremo", font=('Arial', 16)).pack(pady=10)
+    tk.Label(frame_dinamico, text="Seleccione tipo de factura:").pack()
+    opcion_var = tk.StringVar(value="mayor")
+    opciones = [("Mayor precio", "mayor"), ("Menor precio", "menor")]
+    for texto, valor in opciones:
+        tk.Radiobutton(frame_dinamico, text=texto, variable=opcion_var, value=valor).pack(anchor="w")
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        opcion = opcion_var.get()
+        es_mayor = opcion == "mayor"
+        nombre_pdf = f"Factura_{'mayor' if es_mayor else 'menor'}_precio.pdf"
+        try:
+            exito = reporte_factura_precio_extremo(nombre_pdf, "facturas.txt", mayor=es_mayor)
+            if exito:
+                resultado_label.config(text=f"Reporte generado: {nombre_pdf}", fg="green")
+            else:
+                resultado_label.config(text="No se encontró ninguna factura válida.", fg="red")
+        except Exception as e:
+            resultado_label.config(text=f"Error: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_precio_producto():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Producto (Precio y Stock)", font=('Arial', 16)).pack(pady=10)
+    # Entradas
+    campos = [
+        ("Código de País:", "pais"),
+        ("Código de Ciudad:", "ciudad"),
+        ("Código de Restaurante:", "rest"),
+        ("Código de Menú:", "menu"),
+        ("Código de Producto:", "producto")
+    ]
+    entradas = {}
+    for etiqueta, clave in campos:
+        tk.Label(frame_dinamico, text=etiqueta).pack()
+        entradas[clave] = tk.Entry(frame_dinamico)
+        entradas[clave].pack()
+    stock_var = tk.BooleanVar()
+    tk.Checkbutton(frame_dinamico, text="Solo mostrar Stock", variable=stock_var).pack()
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        cp = entradas["pais"].get().strip()
+        cc = entradas["ciudad"].get().strip()
+        cr = entradas["rest"].get().strip()
+        cm = entradas["menu"].get().strip()
+        cprod = entradas["producto"].get().strip()
+
+        if not all([cp, cc, cr, cm, cprod]):
+            messagebox.showerror("Error", "Complete todos los campos.")
+            return
+
+        nombre_pdf = f"Reporte_producto_{cprod}.pdf"
+        try:
+            exito = reporte_precio_producto(dic, cp, cc, cr, cm, cprod, nombre_pdf, stock=stock_var.get())
+            if exito:
+                resultado_label.config(text=f"Reporte generado: {nombre_pdf}", fg="green")
+            else:
+                resultado_label.config(text="No se encontró el producto solicitado.", fg="red")
+        except Exception as e:
+            resultado_label.config(text=f"Error: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_descuentos():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Descuentos Aplicados", font=('Arial', 16)).pack(pady=10)
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+    def generar():
+        nombre_pdf = "Reporte_descuentos.pdf"
+        try:
+            mensaje = reporte_descuentos(descuentos, nombre_pdf)
+            resultado_label.config(text=mensaje, fg="green")
+        except Exception as e:
+            resultado_label.config(text=f"Error al generar el reporte: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+
+#Eliminaciones
+def formulario_reporte_paises_eliminados():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Países Eliminados", font=('Arial', 16)).pack(pady=10)
+
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        nombre_pdf = "Reporte_paises_eliminados.pdf"
+        try:
+            exito = reporte_paises_eliminados(nombre_pdf)
+            if exito:
+                resultado_label.config(text=f"Reporte generado: {nombre_pdf}", fg="green")
+            else:
+                resultado_label.config(text="No hay países eliminados para reportar.", fg="red")
+        except Exception as e:
+            resultado_label.config(text=f"Error: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_ciudades_eliminadas():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Ciudades Eliminadas", font=('Arial', 16)).pack(pady=10)
+
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        nombre_pdf = "Reporte_ciudades_eliminadas.pdf"
+        try:
+            exito = reporte_ciudades_eliminadas(nombre_pdf)
+            if exito:
+                resultado_label.config(text=f"Reporte generado: {nombre_pdf}", fg="green")
+            else:
+                resultado_label.config(text="No hay ciudades eliminadas para reportar.", fg="red")
+        except Exception as e:
+            resultado_label.config(text=f"Error: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_restaurantes_eliminados():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Restaurantes Eliminados", font=('Arial', 16)).pack(pady=10)
+
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        nombre_pdf = "Reporte_restaurantes_eliminados.pdf"
+        try:
+            exito = reporte_restaurantes_eliminados(nombre_pdf)
+            if exito:
+                resultado_label.config(text=f"Reporte generado: {nombre_pdf}", fg="green")
+            else:
+                resultado_label.config(text="No hay restaurantes eliminados para reportar.", fg="red")
+        except Exception as e:
+            resultado_label.config(text=f"Error: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_menus_eliminados():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Menús Eliminados", font=('Arial', 16)).pack(pady=10)
+
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+
+    def generar():
+        nombre_pdf = "Reporte_menus_eliminados.pdf"
+        try:
+            exito = reporte_menus_eliminados(nombre_pdf)
+            if exito:
+                resultado_label.config(text=f"Reporte generado: {nombre_pdf}", fg="green")
+            else:
+                resultado_label.config(text="No hay menús eliminados para reportar.", fg="red")
+        except Exception as e:
+            resultado_label.config(text=f"Error: {e}", fg="red")
+
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+def formulario_reporte_productos_eliminados():
+    limpiar_frame()
+    tk.Label(frame_dinamico, text="Reporte de Productos Eliminados", font=('Arial', 16)).pack(pady=10)
+    resultado_label = tk.Label(frame_dinamico, text="", font=("Arial", 12))
+    resultado_label.pack(pady=10)
+    def generar():
+        nombre_pdf = "Reporte_productos_eliminados.pdf"
+        try:
+            exito = reporte_productos_eliminados(nombre_pdf)
+            if exito:
+                resultado_label.config(text=f"Reporte generado: {nombre_pdf}", fg="green")
+            else:
+                resultado_label.config(text="No hay productos eliminados para reportar.", fg="red")
+        except Exception as e:
+            resultado_label.config(text=f"Error: {e}", fg="red")
+    tk.Button(frame_dinamico, text="Generar Reporte", command=generar).pack(pady=10)
+
 #___________VENTANA PRINCIPAL_________________
 def ventana_principal():
     global frame_dinamico
@@ -2150,33 +2616,20 @@ def ventana_principal():
     ventana.geometry('1280x900')
     ventana.title("Sistema de Restaurante")
     ventana.config(bg="#e6f0fa")
-
-    frame_iconos = tk.Frame(ventana,bg="#ebe8e3", bd=2, relief="groove", padx=15, pady=10)
+    frame_iconos=tk.Frame(ventana,bg="#ebe8e3", bd=2, relief="groove", padx=15, pady=10)
     frame_iconos.pack(side="top", pady=10)
-
-    frame_dinamico = tk.Frame(ventana, bg="#f0f0f0", padx=10, pady=10)
+    frame_dinamico=tk.Frame(ventana, bg="#f0f0f0", padx=10, pady=10)
     frame_dinamico.pack(fill='both', expand=True)
 
     #UBICACIONES
-    icono_ubi = tk.PhotoImage(file="iconos/ubi.png")
-    icono_rest = tk.PhotoImage(file="iconos/rest.png")
-    icono_usuar = tk.PhotoImage(file="iconos/usuar.png")
-    icono_salir = tk.PhotoImage(file="iconos/salir.png")
-    ventana.iconos=[icono_ubi, icono_rest, icono_usuar, icono_salir]
-    #BOTONES
-    """btn_ubi=tk.Button(frame_iconos, image=icono_ubi, command=lambda: mostrar_mensaje("Ubicaciones"))
-    btn_ubi.pack(side="left", padx=20)
+    icono_ubi=tk.PhotoImage(file="iconos/ubi.png")
+    icono_rest=tk.PhotoImage(file="iconos/rest.png")
+    icono_usuar=tk.PhotoImage(file="iconos/usuar.png")
+    icono_reportes=tk.PhotoImage(file="iconos/reporte.png")
+    icono_salir=tk.PhotoImage(file="iconos/salir.png")
+    ventana.iconos=[icono_ubi, icono_rest, icono_usuar, icono_reportes, icono_salir]
 
-    btn_rest=tk.Button(frame_iconos, image=icono_rest, command=lambda: mostrar_mensaje("Restaurantes"))
-    btn_rest.pack(side="left", padx=20)
-
-    btn_usuar=tk.Button(frame_iconos, image=icono_usuar, command=lambda: mostrar_mensaje("Usuarios"))
-    btn_usuar.pack(side="left", padx=20)
-
-    btn_salir = tk.Button(frame_iconos, image=icono_salir, command=ventana.destroy)
-    btn_salir.pack(side="left", padx=20)"""
-
-    barra_menu = tk.Menu(ventana)
+    barra_menu=tk.Menu(ventana)
     ventana.config(menu=barra_menu)
 
     # ======= Menú de Ubicaciones =======
@@ -2186,32 +2639,35 @@ def ventana_principal():
     submenu_paises.add_command(label="Consultar País", command=formulario_consultar_pais)
     submenu_paises.add_command(label="Modificar País", command=formulario_modificar_pais)
     submenu_paises.add_command(label="Eliminar País", command=formulario_eliminar_pais)
-    submenu_ciudades = tk.Menu(menu_ubicaciones, tearoff=0)
+    submenu_paises.add_command(label="Reporte de Paises", command=formulario_reporte_paises)
+    submenu_ciudades=tk.Menu(menu_ubicaciones, tearoff=0)
     submenu_ciudades.add_command(label="Insertar Ciudad", command=formulario_insertar_ciudad)
     submenu_ciudades.add_command(label="Consultar Ciudad", command=formulario_consultar_ciudad)
     submenu_ciudades.add_command(label="Modificar Ciudad", command=formulario_modificar_ciudad)
     submenu_ciudades.add_command(label="Eliminar Ciudad",command=formulario_eliminar_ciudad)
+    submenu_ciudades.add_command(label="Reporte de Ciudades", command=formulario_reporte_ciudades)
 
     menu_ubicaciones.add_cascade(label="Países", menu=submenu_paises)
     menu_ubicaciones.add_cascade(label="Ciudades", menu=submenu_ciudades)
     barra_menu.add_cascade(label="Ubicaciones", menu=menu_ubicaciones)
 
     # ======= Menú de Restaurantes =======
-    menu_restaurantes = tk.Menu(barra_menu, tearoff=0)
+    menu_restaurantes=tk.Menu(barra_menu, tearoff=0)
 
     submenu_restaurantes = tk.Menu(menu_restaurantes, tearoff=0)
     submenu_restaurantes.add_command(label="Insertar Restaurante", command=formulario_insertar_restaurante)
     submenu_restaurantes.add_command(label="Consultar Restaurante", command=formulario_consultar_restaurante)
     submenu_restaurantes.add_command(label="Modificar Restaurante", command=formulario_modificar_restaurante)
     submenu_restaurantes.add_command(label="Eliminar Restaurante",command=formulario_eliminar_restaurante)
+    submenu_restaurantes.add_command(label="Reporte de Restaurantes", command=formulario_reporte_restaurantes)
 
-    submenu_menus = tk.Menu(menu_restaurantes, tearoff=0)
+    submenu_menus=tk.Menu(menu_restaurantes, tearoff=0)
     submenu_menus.add_command(label="Insertar Menú", command=formulario_insertar_menu)
     submenu_menus.add_command(label="Consultar Menú", command=formulario_consultar_menu)
     submenu_menus.add_command(label="Modificar Menú", command=formulario_modificar_menu)
     submenu_menus.add_command(label="Eliminar Menú", command=formulario_eliminar_menu)
 
-    submenu_productos = tk.Menu(menu_restaurantes, tearoff=0)
+    submenu_productos=tk.Menu(menu_restaurantes, tearoff=0)
     submenu_productos.add_command(label="Insertar Producto", command=formulario_insertar_producto)
     submenu_productos.add_command(label="Consultar Producto", command=formulario_consultar_producto)
     submenu_productos.add_command(label="Modificar Producto", command=formulario_modificar_producto)
@@ -2223,25 +2679,26 @@ def ventana_principal():
     barra_menu.add_cascade(label="Restaurantes", menu=menu_restaurantes)
 
     # ======= Menú de Usuarios =======
-    menu_usuarios = tk.Menu(barra_menu, tearoff=0)
+    menu_usuarios=tk.Menu(barra_menu, tearoff=0)
 
-    submenu_clientes = tk.Menu(menu_usuarios, tearoff=0)
+    submenu_clientes=tk.Menu(menu_usuarios, tearoff=0)
     submenu_clientes.add_command(label="Insertar Cliente", command=formulario_insertar_cliente)
     submenu_clientes.add_command(label="Consultar Cliente", command=formulario_consultar_cliente)
     submenu_clientes.add_command(label="Modificar Cliente", command=formulario_modificar_cliente)
     submenu_clientes.add_command(label="Eliminar Cliente", command=formulario_eliminar_cliente)
+    submenu_clientes.add_command(label="Reporte de Clientes", command=formulario_reporte_clientes)
 
-    submenu_admins = tk.Menu(menu_usuarios, tearoff=0)
+    submenu_admins=tk.Menu(menu_usuarios, tearoff=0)
     submenu_admins.add_command(label="Insertar Administrador", command=formulario_insertar_administrador)
     submenu_admins.add_command(label="Consultar Administrador", command=formulario_consultar_administrador)
     submenu_admins.add_command(label="Modificar Administrador", command=formulario_modificar_administrador)
     submenu_admins.add_command(label="Eliminar Administrador", command=formulario_eliminar_administrador)
 
-    submenu_fila = tk.Menu(menu_usuarios, tearoff=0)
+    submenu_fila=tk.Menu(menu_usuarios, tearoff=0)
     submenu_fila.add_command(label="Ver Fila de Compra", command=formulario_ver_fila_compra)
     submenu_fila.add_command(label="Vaciar Fila de Compra", command=formulario_vaciar_fila_compra)
 
-    submenu_registrar = tk.Menu(menu_usuarios, tearoff=0)
+    submenu_registrar=tk.Menu(menu_usuarios, tearoff=0)
     submenu_registrar.add_command(label="Registrar Compra", command=formulario_registrar_compra)
 
     menu_usuarios.add_cascade(label="Clientes", menu=submenu_clientes)
@@ -2249,7 +2706,30 @@ def ventana_principal():
     menu_usuarios.add_cascade(label="Fila de Compra", menu=submenu_fila)
     menu_usuarios.add_cascade(label="Registrar Compra", menu=submenu_registrar)
     barra_menu.add_cascade(label="Usuarios", menu=menu_usuarios)
+    # ======= Reportes =============
+    # ======= Menú de Reportes =======
+    menu_reportes = tk.Menu(barra_menu, tearoff=0)
+    menu_reportes.add_command(label="Reporte de Países", command=formulario_reporte_paises)
+    menu_reportes.add_command(label="Reporte de Ciudades", command=formulario_reporte_ciudades)
+    menu_reportes.add_command(label="Reporte de Restaurantes", command=formulario_reporte_restaurantes)
+    menu_reportes.add_command(label="Reporte de Clientes", command=formulario_reporte_clientes)
+    menu_reportes.add_command(label="Reporte de Compras por Cliente", command=formulario_reporte_compras_cliente)
+    menu_reportes.add_command(label="Reporte de Todas las Compras", command=formulario_reporte_todas_compras)
+    menu_reportes.add_command(label="Restaurante Más Buscado", command=formulario_reporte_rest_mas)
+    menu_reportes.add_command(label="Menú Más Buscado", command=formulario_reporte_menu_mas)
+    menu_reportes.add_command(label="Producto Más Buscado", command=formulario_reporte_producto_mas)
+    menu_reportes.add_command(label="Factura de Mayor/Menor Precio", command=formulario_reporte_factura_extremo)
+    menu_reportes.add_command(label="Reporte de Producto (Precio/Stock)", command=formulario_reporte_precio_producto)
+    menu_reportes.add_command(label="Reporte de Descuentos", command=formulario_reporte_descuentos)
 
+    submenu_eliminados = tk.Menu(menu_reportes, tearoff=0)
+    submenu_eliminados.add_command(label="Países Eliminados", command=formulario_reporte_paises_eliminados)
+    submenu_eliminados.add_command(label="Ciudades Eliminadas", command=formulario_reporte_ciudades_eliminadas)
+    submenu_eliminados.add_command(label="Restaurantes Eliminados", command=formulario_reporte_restaurantes_eliminados)
+    submenu_eliminados.add_command(label="Menús Eliminados", command=formulario_reporte_menus_eliminados)
+    submenu_eliminados.add_command(label="Productos Eliminados", command=formulario_reporte_productos_eliminados)
+    menu_reportes.add_cascade(label="Eliminados", menu=submenu_eliminados)
+    barra_menu.add_cascade(label="Reportes", menu=menu_reportes)
     # ======= Cerrar Ventana =======
     barra_menu.add_command(label="Cerrar Ventana", command=lambda:regresar_login(ventana))
 
@@ -2258,22 +2738,23 @@ def ventana_principal():
             menu.tk_popup(event.x_root, event.y_root)
         finally:
             menu.grab_release()
-    # Botones de iconos (sin bordes ni efectos)
+    # Botones de iconos
     btn_ubi = tk.Button(frame_iconos, image=icono_ubi, bd=0, relief='flat', bg="#f0f0f0",
                         command=lambda: None)
     btn_ubi.pack(side="left", padx=20)
     btn_ubi.bind("<Button-1>", lambda e: mostrar_popup(menu_ubicaciones, e))
-
     btn_rest = tk.Button(frame_iconos, image=icono_rest, bd=0, relief='flat', bg="#f0f0f0",
                          command=lambda: None)
     btn_rest.pack(side="left", padx=20)
     btn_rest.bind("<Button-1>", lambda e: mostrar_popup(menu_restaurantes, e))
-
     btn_usuar = tk.Button(frame_iconos, image=icono_usuar, bd=0, relief='flat', bg="#f0f0f0",
                           command=lambda: None)
     btn_usuar.pack(side="left", padx=20)
     btn_usuar.bind("<Button-1>", lambda e: mostrar_popup(menu_usuarios, e))
-
+    btn_reportes = tk.Button(frame_iconos, image=icono_reportes, bd=0, relief='flat', bg="#f0f0f0",
+                             command=lambda: None)
+    btn_reportes.pack(side="left", padx=20)
+    btn_reportes.bind("<Button-1>", lambda e: mostrar_popup(menu_reportes, e))
     btn_salir = tk.Button(frame_iconos, image=icono_salir, bd=0, relief='flat', bg="#f0f0f0",
                           command=ventana.destroy)
     btn_salir.pack(side="left", padx=20)

@@ -1,6 +1,6 @@
 #Luis Andres Acunna Perez
 
-cadena="pepe"
+"""cadena="pepe"
 print(cadena.capitalize())
 print(cadena)
 cadena=cadena.capitalize()
@@ -16,18 +16,18 @@ print(cadena)
 
 cadena='esto es una prueba y es solo eso'
 print(len(cadena))
-"""Cadena tiene posibilidad de usar len y tambien es indexada
+Cadena tiene posibilidad de usar len y tambien es indexada
 pos=0
 mayuscula y minuscula son diferentes
-Buscar un caracter es -1, no esta"""
+Buscar un caracter es -1, no esta
 
-"""find sintaxis ("cadena", <opcional inicio>, <opcional fin>)
-en que posicion esta dentro de cadena"""
+find sintaxis ("cadena", <opcional inicio>, <opcional fin>)
+en que posicion esta dentro de cadena
 pos=cadena.find("es", 15)
 print(pos)
 
 cadena=cadena.replace("es", "ES", 2)
-print(cadena)
+print(cadena)"""
 
 #Escribir una funcion que recibe una cadena de numeros. Analiza cada digito, y si es par, lo cambia por 1.
 def cambiar_par(cadena): #"345678" visualmente los str numericos se ven 345678
@@ -142,4 +142,84 @@ def Intercalar(num1, num2):
     else:
         print("Parametros incorrectos")
 
-print(Intercalar(234, 567))
+#print(Intercalar(234, 567))
+
+#Clase jueves
+#Escribir una funcion que recibe un numero entero positivo
+#pasa a lista y los elementos pares se cambian por un 1
+#regresa un numero
+
+def CambiaPares(num): #234567
+    if type(num)==int:
+        num=abs(num)
+        lista=PasalistaFor(num) #[2,3,4,5,6,7]
+        print( lista)
+        for i in range(len(lista)):
+            if lista[i]%2==0:
+                lista[i]=1
+        print(lista)
+        for i in range(len(lista)):
+            lista[i]=str(lista[i])
+        print(lista)
+        cadena=''.join(lista)
+        print(cadena)
+    else:
+        print("Parametro incorrecto")
+
+print(CambiaPares(234567))
+
+#Escribir una funcion que recibe un string(cadena de caracteres)
+#contar la cantidad de vocales que existen
+#Se reemplaza por vocales mayusculas
+
+def vocales(cadena): #'Ana va para la EscuelA ana va FelIz'
+    if type(cadena)==str:
+        cadena=cadena.lower()
+        print(cadena)
+        cont=0
+        for i in range(len(cadena)):
+            if cadena[i]=="a" or cadena[i]=="e" or cadena[i]=="i" or cadena[i]=="o" or cadena[i]=="u":
+                cont=cont+1
+        for i in range(len(cadena)):
+            if cadena[i] == "a" or cadena[i] == "e" or cadena[i] == "i" or cadena[i] == "o" or cadena[i] == "u":
+                c=''.join(cadena[i])
+                c=c.upper()
+                print(c)
+                cadena=cadena.replace(cadena[i], c)
+        print(cadena, "cantidad de vocales: ", cont)
+    else:
+        print("Parametro incorrecto")
+
+print(vocales("Ana va para la EscuelA ana va FelIz"))
+
+#escribir una funcion que recbe una cadena (validar), buscar una palabra
+#se reemplaza por otra palabra una cantidad de veces
+
+def ReemplazarPalabra(cadena, buscar, reemplazar, cantidad):
+    if type(cadena)==str and type(buscar)==str and type(reemplazar)==str and type(cantidad)==int:
+        cadena=cadena.lower()
+        cont=0
+        for i in range(len(cadena)):
+            if cadena[i].find(buscar) and cont<cantidad:
+                cadena=cadena.replace(buscar, reemplazar, cantidad)
+                cont=cont+cantidad
+        print(cadena)
+    else:
+        print("Parametros incorrectos")
+
+print(ReemplazarPalabra("Ana va para la Escuela ana va muy Feliz ana ama la EscuEla y la playa bien por ana", "ana", "palangana", 2))
+
+def cuentaletra():
+    cantidad=int(input("Cuantos nombres quiere ingresar? : "))
+    lista=[]
+    for i in range(cantidad):
+        nombre=input("Ingrese nombre: ")
+        lista=lista+nombre
+    print(lista)
+    letrainicial=input('Digite la letra inicial a buscar: ')
+    cont=0
+    for i in lista:
+        if i[0]==letrainicial.lower() or i[0]==letrainicial.upper():
+            cont=cont+1
+    print(cont)
+    print("Cantidad de nombres que empiezan por la letra ", letrainicial, "es: ", cont)

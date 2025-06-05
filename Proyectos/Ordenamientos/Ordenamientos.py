@@ -1,4 +1,5 @@
 #Luis Andres Acunna Perez
+#Trabajo de Ordenamientos
 #CODIGOS
 #AUXILIARES
 def largo(num):
@@ -10,6 +11,7 @@ def largo(num):
             num=num//10
             cont=cont+1
         return cont
+
 #BURBUJA
 def ordenamientoBurbuja(lista):
     for i in range(1, len(lista)):
@@ -18,6 +20,7 @@ def ordenamientoBurbuja(lista):
                 k=lista[j+1]
                 lista[j+1]=lista[j]
                 lista[j]=k
+        print(f"Pasada{i}: {lista}")
     print(lista)
 #SELECCION
 def selectionsort(lista):
@@ -29,8 +32,8 @@ def selectionsort(lista):
             aux=lista[minimo]
         lista[minimo]=lista[i]
         lista[i]=aux
+        print(f"Pasada{i+1}: {lista}")
     print(lista)
-
 #INSERCION
 def insercionDirecta(lista):
     for i in range(1, len(lista)):
@@ -40,64 +43,59 @@ def insercionDirecta(lista):
             lista[j+1]=lista[j]
             j=j-1
         lista[j+1]=v
+        print(f"Pasada {i}: {lista}")
     print(lista)
 #MERGE
-def merge_sort(my_list):  # merge sort sacado de data camp
-    if len(my_list) > 1:
-        mid = len(my_list) // 2
-        left_half = my_list[:mid]
-        right_half = my_list[mid:]
-
-        merge_sort(left_half)
-        merge_sort(right_half)
-
-        i = j = k = 0
-
-        while i < len(left_half) and j < len(right_half):
-            if left_half[i] < right_half[j]:
-                my_list[k] = left_half[i]
-                i += 1
+def merge_sort(lista):
+    if len(lista)>1:
+        mitad=len(lista)//2
+        izquierda=lista[:mitad]
+        derecha=lista[mitad:]
+        merge_sort(izquierda)
+        merge_sort(derecha)
+        i=j=k=0
+        while i<len(izquierda) and j<len(derecha):
+            if izquierda[i]<derecha[j]:
+                lista[k]=izquierda[i]
+                i+=1
             else:
-                my_list[k] = right_half[j]
-                j += 1
-            k += 1
-
-        while i < len(left_half):
-            my_list[k] = left_half[i]
-            i += 1
-            k += 1
-
-        while j < len(right_half):
-            my_list[k] = right_half[j]
-            j += 1
-            k += 1
-    print(my_list)  # todas las pasadas
-
+                lista[k]=derecha[j]
+                j+=1
+            k+=1
+        while i<len(izquierda):
+            lista[k]=izquierda[i]
+            i+=1
+            k+=1
+        while j<len(derecha):
+            lista[k]=derecha[j]
+            j+=1
+            k+=1
+    print(f"Pasada: {lista}")  # Muestra todas las pasadas
 #SHAKE
 def shake(lista):
     for i in range(len(lista)-1):
         for j in range(i+1, len(lista)):
             if lista[i]>lista[j]:
                 lista[i],lista[j]=lista[j],lista[i]
+        print(f"Pasada {i+1}: {lista}")
     print(lista)
-print(shake([4,2,1,6,8]))
 #SHELL
-def  ordenShell(lista):
-     inc=int(len(lista)/2 )
-     while  inc>0:
-          for  i in range(inc,len(lista)):
-               j=i
-               temp=lista[i]
-               while j>=inc and lista[j-inc]>temp:
-                    lista[j]=lista[j-inc]
-                    j=j-inc
-               lista[j]=temp
-          if (inc==2) :
-               inc=1
-          else :
-               inc=int(inc/2.5)
-     print(lista) #todas las pasadas
-
+def ordenShell(lista):
+    inc=int(len(lista)/2 )
+    while  inc>0:
+        for  i in range(inc,len(lista)):
+            j=i
+            temp=lista[i]
+            while j>=inc and lista[j-inc]>temp:
+                lista[j]=lista[j-inc]
+                j=j-inc
+            lista[j]=temp
+            print(f"Pasada (incremento={inc}): {lista}")
+        if (inc==2) :
+            inc=1
+        else :
+            inc=int(inc/2.5)
+            #print(lista) #todas las pasadas
 #QUICKSORT
 def quicksort(lista):
     if len(lista)==1 or len(lista)==0:
@@ -175,15 +173,74 @@ def Radix(lista):
             print(lista)
             cont+=1
         return lista
+#SHAKE COCKTAIL
+def cocktailSort(lista):
+    n=len(lista)
+    intercambiado=True
+    inicio=0
+    final=n-1
+    pasada=1
+    while intercambiado:
+        intercambiado=False
+        for i in range(inicio, final):
+            if (lista[i]>lista[i + 1]):
+                lista[i], lista[i+1]=lista[i+1], lista[i]
+                intercambiado = True
+        print(f"Pasada {pasada} (ida): {lista}")
+        pasada=pasada+1
+        if not intercambiado:
+            break
+        final=final-1
+        for i in range(final-1, inicio-1, -1):
+            if (lista[i]>lista[i+1]):
+                lista[i], lista[i+1]=lista[i+1], lista[i]
+                intercambiado=True
+        print(f"Pasada {pasada} (vuelta): {lista}")
+        pasada+=1
+        inicio=inicio+1
+#MERGE
+def merge(lista):
+    if len(lista)>1:
+        mitad=len(lista)//2
+        izquierda=lista[:mitad]
+        derecha=lista[mitad:]
 
+        merge(izquierda)
+        merge(derecha)
+
+        i=j=k=0
+
+        while i<len(izquierda) and j<len(derecha):
+            if izquierda[i]<derecha[j]:
+                lista[k]=izquierda[i]
+                i+=1
+            else:
+                lista[k]=derecha[j]
+                j+=1
+            k+=1
+
+        while i<len(izquierda):
+            lista[k]=izquierda[i]
+            i+=1
+            k+=1
+
+        while j<len(derecha):
+            lista[k]=derecha[j]
+            j+=1
+            k+=1
+
+    print(f"Pasada: {lista}")
+#_____________________________________________
 #BUSQUEDAS
 #BINARIA
-def busquedaBinaria(lista,item):
+def busquedaBinaria(lista, item):
     primero=0
     ultimo=len(lista)-1
     encontrado=False
+    pasada=1
     while primero <=ultimo and not encontrado:
         puntoMedio=(primero+ultimo)//2
+        print(f"Pasada {pasada}: primero={primero}, ultimo={ultimo}, puntoMedio={puntoMedio}, valor={lista[puntoMedio]}")
         if lista[puntoMedio]==item:
             encontrado=True
         else:
@@ -191,69 +248,21 @@ def busquedaBinaria(lista,item):
                 ultimo=puntoMedio-1
             else:
                 primero=puntoMedio+1
-    print (encontrado) #todas las pasadas
-
+        pasada+=1
+    print(f"Resultado: {'Encontrado' if encontrado else 'No encontrado'}")
 #SECUENCIAL
-def busquedaSecuencial(lista,nume):
+def busquedaSecuencial(lista, nume):
     posicion=0
     encontrado=False
+    pasada=1
     while posicion < len(lista) and not encontrado:
-        if lista[posicion]== nume:
-            encontrado = True
+        print(f"Pasada {pasada}: posicion={posicion}, valor={lista[posicion]}")
+        if lista[posicion]==nume:
+            encontrado=True
         else:
-            posicion = posicion+1
-    print (encontrado) #todas las pasadas
-
-#SHAKE COCKTAIL
-def cocktailSort(lista):
-    n=len(lista)
-    intercambiado=True
-    inicio=0
-    final=n-1
-    while intercambiado:
-        # reset the swapped flag on entering the loop,
-        # because it might be true from a previous
-        # iteration.
-        intercambiado=False
-
-        # loop from left to right same as the bubble
-        # sort
-        for i in range(inicio, final):
-            if (lista[i]>lista[i + 1]):
-                lista[i], lista[i+1]=lista[i+1], lista[i]
-                intercambiado = True
-
-        # if nothing moved, then array is sorted.
-        if not intercambiado:
-            break
-        # otherwise, reset the swapped flag so that it
-        # can be used in the next stage
-        intercambiado=False
-        # move the end point back by one, because
-        # item at the end is in its rightful spot
-        final=final-1
-        # from right to left, doing the same
-        # comparison as in the previous stage
-        for i in range(final-1, inicio-1, -1):
-            if (lista[i]>lista[i+1]):
-                lista[i], lista[i+1]=lista[i+1], lista[i]
-                swapped=True
-        # increase the starting point, because
-        # the last stage would have moved the next
-        # smallest number to its rightful spot.
-        start=start+1
-
-def largo(n):
-    if not isinstance(n, int):
-     return 'Error'
-    elif n==0:
-     return 1
-    cont=0
-    for i in range(n):
-     cont+=1
-     n//=10
-     if n==0:
-         return cont
+            posicion=posicion+1
+        pasada+=1
+    print(f"Resultado: {'Encontrado' if encontrado else 'No encontrado'}")
 
 #MENU_______________________
 def input_lista(mensaje):
@@ -280,77 +289,79 @@ def input_lista(mensaje):
 
 def menu():
     principal=(
-                "1.Ordenamientos\n"
-                "2.Busquedas\n"
-                "3.Salir\n"
+        "1. Ordenamientos\n"
+        "2. Búsquedas\n"
+        "3. Salir\n"
     )
     ordenamientos=(
-                    "1.Burbuja\n"
-                    "2.Seleccion\n"
-                    "3.Insercion\n"
-                    "4.Shell\n"
-                    "5.Quicksort\n"
-                    "6.Radix\n"
-                    "7.Merge\n"
-                    "8.Shake\n"
-                    "9. Ingresar nueva lista\n"
-                    "10.Salir\n"
+        "1. Burbuja\n"
+        "2. Selección\n"
+        "3. Inserción\n"
+        "4. Shell\n"
+        "5. Quicksort\n"
+        "6. Radix\n"
+        "7. Merge\n"
+        "8. Shake\n"
+        "9. Ingresar nueva lista\n"
+        "10. Salir\n"
     )
     busquedas=(
-                "Ingrese una opcion\n"
-                "1.Secuencial\n"
-                "2.Binaria\n"
-                "3.Salir\n"
+        "1. Secuencial\n"
+        "2. Binaria\n"
+        "3. Ingresar nueva lista\n"
+        "4. Salir\n"
     )
 
     lista_actual=None
     while True:
         print(principal)
-        opcion=input("Ingrese una opcion(1-3): ")
-        if opcion=="1": #Ordenamientos
+        opcion=input("Ingrese una opción (1-3): ")
+        if opcion=="1":  # Ordenamientos
             if lista_actual is None:
                 lista_actual=input_lista("Ingrese la lista: ")
             while True:
                 print(ordenamientos)
-                y=input("Ingrese una opcion(1-9): ")
+                y=input("Ingrese una opción (1-10): ")
                 if y=="1": ordenamientoBurbuja(lista_actual.copy())
                 elif y=="2": selectionsort(lista_actual.copy())
                 elif y=="3": insercionDirecta(lista_actual.copy())
                 elif y=="4": ordenShell(lista_actual.copy())
                 elif y=="5": quicksort(lista_actual.copy())
                 elif y=="6": Radix(lista_actual.copy())
-                elif y=="7": pass
-                elif y=="8": pass
+                elif y=="7": merge(lista_actual.copy())
+                elif y=="8": cocktailSort(lista_actual.copy())
                 elif y=="9":
                     lista_actual=input_lista("Ingrese la nueva lista: ")
                 elif y=="10":
                     print("Volviendo al menú principal...")
                     break
                 else:
-                    print("Opcion invalida")
-        elif opcion=="2":
+                    print("Opción inválida")
+
+        elif opcion=="2":  # Búsquedas
             if lista_actual is None:
                 lista_actual=input_lista("Ingrese la lista: ")
             while True:
                 print(busquedas)
-                y=input("Ingrese una opcion(1-4): ")
+                y=input("Ingrese una opción (1-4): ")
                 if y=="1":
-                    lista=input_lista("Ingrese la lista: ")
-                    num=int(input("Ingrese el numero a buscar: "))
+                    num=int(input("Ingrese el número a buscar: "))
                     busquedaSecuencial(lista_actual, num)
-                if y=="2":
-                    lista=input_lista("Ingrese la lista: ")
-                    num=int(input("Ingrese el numero a buscar: "))
+                elif y=="2":
+                    num=int(input("Ingrese el número a buscar: "))
                     busquedaBinaria(lista_actual, num)
                 elif y=="3":
                     lista_actual=input_lista("Ingrese la nueva lista: ")
                 elif y=="4":
+                    print("Volviendo al menú principal...")
                     break
                 else:
-                    print("Opcion invalida")
+                    print("Opción inválida")
+
         elif opcion=="3":
             print("Hasta luego!")
             break
         else:
-            print("Opcion incorrecta")
+            print("Opción inválida")
+
 menu()
