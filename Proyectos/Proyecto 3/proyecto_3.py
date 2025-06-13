@@ -4,10 +4,16 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import simpledialog, messagebox, Menu, Label, Frame, font
-1
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import LETTER
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+width, height = A4
+from reportlab.lib import colors
+from reportlab.lib.units import cm
+from datetime import datetime
+
 #Para recibir bien datos
 def normalizar_codigo(codigo):
     if not isinstance(codigo, (str, int)):
@@ -499,6 +505,79 @@ def insertar_cliente(cli_dict, cedula, nombre):
 #______________________________________________________________________________________________________________________#
 #REGISTRO
 #Funcion para leer el ultimo codigo de factura
+def generar_factura_visual(cedula, productos, datos_pago, ruta_pdf):
+    c = canvas.Canvas(ruta_pdf, pagesize=A4)
+    width, height = A4
+
+    # === Encabezado visual ===
+    c.setFont("Helvetica-Bold", 20)
+    c.drawString(3 * cm, height - 2 * cm, "FACTURA CLIENTE")
+
+    # Logo empresa (debes insertar la imagen luego)
+    c.drawImage("iconos/icono.png", x=width - 50, y=height - 50, width=40, height=40)
+
+    c.setFont("Helvetica", 10)
+    c.drawString(3 * cm, height - 2.8 * cm, f"N°FACTURA: {datos_pago['factura_id']}")
+    c.drawString(3 * cm, height - 3.4 * cm, f"FECHA: {datos_pago['fecha']}")
+
+    # === Datos del Cliente ===
+    y = height - 4.5 * cm
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(3 * cm, y, "Datos del cliente:")
+    c.setFont("Helvetica", 10)
+    c.drawString(3 * cm, y - 0.5 * cm, f"Cédula: {cedula}")
+    c.drawString(3 * cm, y - 1.0 * cm, f"Nombre: {datos_pago['cliente_nombre']}")
+    c.drawString(3 * cm, y - 1.5 * cm, f"País: {datos_pago['pais']} | Ciudad: {datos_pago['ciudad']}")
+    c.drawString(3 * cm, y - 2.0 * cm, f"Restaurante: {datos_pago['restaurante']}")
+
+    # === Tabla de productos ===
+    y_inicio = y - 3.5 * cm
+    columnas = ["#", "Menú", "Producto", "Cant.", "P.Unit", "Total"]
+    col_x = [2.2, 3.0, 6.5, 11, 13, 15]  # en cm
+
+    c.setFont("Helvetica-Bold", 10)
+    for i, col in enumerate(columnas):
+        c.drawString(col_x[i] * cm, y_inicio, col)
+
+    c.setFont("Helvetica", 10)
+    y_linea = y_inicio - 0.7 * cm
+    for idx, item in enumerate(productos, start=1):
+        c.drawString(col_x[0] * cm, y_linea, str(idx))
+        c.drawString(col_x[1] * cm, y_linea, item['menu'])
+        c.drawString(col_x[2] * cm, y_linea, item['nombre'])
+        c.drawRightString(col_x[3] * cm + 1*cm, y_linea, str(item['cantidad']))
+        c.drawRightString(col_x[4] * cm + 1*cm, y_linea, f"{item['precio']:.2f}")
+        c.drawRightString(col_x[5] * cm + 1*cm, y_linea, f"{item['precio'] * item['cantidad']:.2f}")
+        y_linea -= 0.5 * cm
+
+    # === Totales ===
+    y_total = y_linea - 1 * cm
+    c.setFont("Helvetica-Bold", 10)
+    c.drawRightString(15 * cm, y_total, f"Subtotal: {datos_pago['subtotal']:.2f}")
+    c.drawRightString(15 * cm, y_total - 0.5 * cm, f"Descuento: {datos_pago['descuento_aplicado']*100:.0f}%")
+    c.drawRightString(15 * cm, y_total - 1.0 * cm, f"Total: {datos_pago['total']:.2f}")
+
+    # === Información de pago ===
+    y_pago = y_total - 2.5 * cm
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(3 * cm, y_pago, "Detalles de Pago:")
+    c.setFont("Helvetica", 10)
+    c.drawString(3 * cm, y_pago - 0.5 * cm, f"Método: {'Tarjeta' if datos_pago['pago'] == '2' else 'Efectivo'}")
+    c.drawString(3 * cm, y_pago - 1.0 * cm, f"Modalidad: {'Para llevar' if datos_pago['llevar'] else 'En restaurante'}")
+
+    # Pie o gráficos decorativos
+
+    img_width = 150  # ancho en puntos (≈5.3 cm)
+    img_height = 100  # alto en puntos (≈3.5 cm)
+
+    x = width - img_width - 40  # 40 pts de margen derecho
+    y = (height - img_height) / 2  # centrado vertical
+
+    c.drawImage("iconos/elemento1.png", x, y, img_width, img_height, mask='auto')
+
+    c.save()
+    print(f"✔ Factura PDF guardada como {ruta_pdf}")
+
 def registrar_compra_menu(dic, cli, entrada, archivo_facturas="facturas.txt"):
     facturas = []
     ced = entrada("Cédula del cliente: ").strip()
@@ -623,7 +702,36 @@ def registrar_compra_menu(dic, cli, entrada, archivo_facturas="facturas.txt"):
     #.2f para ver los dos decimales
     print(f"Descuento aplicado: ({descuento*100:.0f}%): {monto_descontado:.2f}")
     print(f"Total a pagar: {monto_final:.2f}")
+
+    # -----------------------------------
+    # GENERAR FACTURA VISUAL PDF
+    # -----------------------------------
+    datos_factura = {
+        "factura_id": f"{len(productos_seleccionados)}{ced}",  # puedes mejorar el formato si deseas
+        "fecha": datetime.now().strftime("%d/%m/%Y"),
+        "cliente_nombre": cli[ced],
+        "pais": cod_pais,
+        "ciudad": cod_ciudad,
+        "restaurante": cod_rest,
+        "pago": pago,
+        "llevar": condicion,
+        "subtotal": total,
+        "descuento_aplicado": descuento,
+        "total": monto_final
+    }
+
+    # Añadir nombre del menú a cada producto (requiere acceder a diccionario)
+    for item in productos_seleccionados:
+        item["menu"] = \
+        dic[item["pais"]]["ciudades"][item["ciudad"]]["restaurantes"][item["restaurante"]]["menus"][item["menu"]][
+            "nombre"]
+
+    # Generar PDF con nombre único
+    nombre_pdf = f"Factura_{ced}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    generar_factura_visual(ced, productos_seleccionados, datos_factura, nombre_pdf)
+
     return True
+
 #______________________________________________________________________________________________________________________#
 #REPORTES
 def reporte_paises(data_dict, nombre):

@@ -206,7 +206,7 @@ def largoCSD(lista):
         if lista == []:
             return 0
         else:
-            return largoCSD_aux(lsita, 0)
+            return largoCSD_aux(lista, 0)
         
     else:
         print("Par incorre")
@@ -217,7 +217,7 @@ def largoCSD_aux(lista, resultado):
     else:
         return largoCSD_aux(lista, resultado+1)    
     
-return=largoCSD([1,4,5,6,7])
+#return=largoCSD([1,4,5,6,7])
 print(resultado)
 
 

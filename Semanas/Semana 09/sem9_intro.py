@@ -67,7 +67,7 @@ def CuentaParesPD_aux(lista):
         return CuentaParesPD_aux(lista[1:])
 
 def CuentaParesPSD_aux(lista,i):
-    if i==len(lsita):
+    if i==len(lista):
         return 0
     elif lista[i]%2==0:
         return 1+CuentaParesPD_aux(lista,i+1)
@@ -151,7 +151,7 @@ def WhileSD(lista):
         i+=1
     return nueva_lista
 print(WhileSD([6,1,2,3,5,7,8]))
-    
+
 '''
         if lista==[]:
             return 0

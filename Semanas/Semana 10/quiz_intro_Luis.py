@@ -39,7 +39,6 @@ def aparicionesRC_aux(num, dig, resultado):
             #return aparicionesRC_aux(234//10, 3, 2)
             # return aparicionesRC_aux(2//10, 3, 3)
 
-
 #2
 def aparicionesRP(num, dig):
     if isinstance(num, int) and (dig, int):

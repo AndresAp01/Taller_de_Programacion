@@ -108,4 +108,4 @@ def invertir_aux(num):
     if largoRC(num)==1:
         return (num%10)*(10**(largoRC(num)-1))
     else:
-        return ((num%10)*(10**(largoRC(num)-1)))+invertir_aux(num//10)9vb  
+        return ((num%10)*(10**(largoRC(num)-1)))+invertir_aux(num//10)

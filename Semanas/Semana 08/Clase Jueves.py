@@ -50,24 +50,14 @@ def conjuntoNO(lista):#[3,2,1,8]
 def conjuntoSI(lista):#[3,2,1,8]
     largo=0 #0
     pos=0 #0
-
     #largo      pos       lista
     #0          0         [3,2,1,8]
-
-
     while largo<len(lista):# Afuera o Externo mas lento
         #largo<len(lista)
-
-
         while pos<len(lista):#Adentro o Interno, corre mas rapido
-
-
             if largo!=pos:#
-
                 if lista[pos]==lista[largo]:#
                     return(False)
-
-
                 else:
                     pos=pos+1#
             else:
